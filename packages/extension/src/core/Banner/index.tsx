@@ -31,7 +31,7 @@ const Banner = () => {
     <div>
       {
         leftViewItemList.map((viewItem) => {
-          return viewRender(viewItem.view, viewItem.id)
+          return viewRender(viewItem.view, { key: viewItem.id })
         })
       }
     </div>
@@ -39,7 +39,7 @@ const Banner = () => {
     <div className={styles.center}>
       {
         centerViewItemList.map((viewItem) => {
-          return viewRender(viewItem.view, viewItem.id)
+          return viewRender(viewItem.view, { key: viewItem.id })
         })
       }
     </div>
@@ -47,7 +47,7 @@ const Banner = () => {
     <div>
       {
         rightViewItemList.map((viewItem) => {
-          return viewRender(viewItem.view, viewItem.id)
+          return viewRender(viewItem.view, { key: viewItem.id })
         })
       }
     </div>

@@ -55,11 +55,9 @@ export const isBaseType = (value: any) => {
 
 
 export const viewRender = (view: ViewElement, props?: any) => {
-  if (typeof view === 'string') {
-    return React.createElement(React.Fragment, props || {}, view)
-  } else if (typeof view === 'function') {
+  if (typeof view === 'function') {
     return React.createElement(view, props || {})
   } else {
-    return view
+    return React.createElement(React.Fragment, props || {}, view)
   }
 }

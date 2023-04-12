@@ -7,7 +7,7 @@ const ViewsContainer: React.FC<{ context: ViewContainerItem }> = ({ context }) =
   const childrenView = viewList.filter(item => item.parent === context.id)
 
   return <>{
-    childrenView.map(item => viewRender(item.view, item.id))
+    childrenView.map(item => viewRender(item.view, { key: item.id }))
   }</>
 }
 
