@@ -27,7 +27,7 @@ const Banner = () => {
     }
   })
 
-  return <div className={styles.container} style={{ lineHeight: getContext().groot.layout.bannerHeight }}>
+  return <div className={styles.container} style={{ lineHeight: getContext().layout.bannerHeight }}>
     <div>
       {
         leftViewItemList.map((viewItem) => {

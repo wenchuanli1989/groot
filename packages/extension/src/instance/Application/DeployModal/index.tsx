@@ -16,7 +16,7 @@ const DeployModal: React.FC = () => {
 
   const onOk = async () => {
     const formData = await form.validateFields();
-    applicationModel.assetDeploy(formData);
+    applicationModel.createDeploy(formData);
   }
 
   return <Modal open={applicationModel.assetDeployModalStatus !== ModalStatus.None} title="部署"

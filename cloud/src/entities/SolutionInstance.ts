@@ -25,4 +25,7 @@ export class SolutionInstance extends BaseEntity {
 
   @Property({ persist: false })
   extensionInstanceList: ExtensionInstance[]
+
+  @Property({ persist: false })
+  solutionVersionId: number
 }

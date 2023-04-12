@@ -64,7 +64,7 @@ export const PropSetter = () => {
         const width = originData - x;
         let sideWidth = width <= 350 ? 350 : width;
 
-        const layout = getContext().groot.layout
+        const layout = getContext().layout
         layout.secondarySidebarWidth = `${sideWidth}px`
         console.log(`layout width ${layout.secondarySidebarWidth}`)
         layout.refresh(true);

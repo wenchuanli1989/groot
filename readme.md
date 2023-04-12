@@ -13,7 +13,7 @@
 - 本地开发应用启动列表，深度定制化
   - `cloud` 服务器：groot-local.com:10000
   - `examples/webpack-demo` demo项目：groot-local.com:11000
-  - `packages/pangu` 微模块系统基座项目：groot-local.com:15000
+  - `pangu` 微模块系统基座项目：groot-local.com:15000
   - `packages/studio` 微模块系统主项目：groot-local.com:13000
   - `packages/extension` 微模块系统子项目：groot-local.com:12000
   - `examples/groot-studio-demo` 工作台宿主项目：groot-local.com:14000

@@ -13,7 +13,7 @@ export default class SolutionModel extends BaseModel {
     this.componentAddModalStatus = ModalStatus.Submit;
     getContext().request(APIPath.component_add, {
       ...rawComponent,
-      solutionId: getContext().groot.params.solution.id,
+      solutionId: getContext().params.solution.id,
     }).then(({ data }) => {
       this.componentAddModalStatus = ModalStatus.None;
       this.componentList.push(data)

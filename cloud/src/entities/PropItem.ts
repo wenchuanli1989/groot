@@ -17,7 +17,7 @@ export class PropItem extends BaseEntity {
   struct: PropItemStruct = PropItemStruct.Normal;
 
   @Property({ length: 50 })
-  viewType: string;
+  viewType = 'text';
 
   // @ManyToOne({ serializer: value => value?.id, serializedName: 'groupId' })
   // group: PropGroup;

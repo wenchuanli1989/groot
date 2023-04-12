@@ -6,7 +6,7 @@ export const monacoLoader = (path?: string) => {
 
   let vsPath = path;
   if (!vsPath) {
-    const assetUrl = getContext().extension.assetUrl
+    const assetUrl = getContext().extension.extensionVersion.assetUrl
     const url = new URL(assetUrl)
     vsPath = `${assetUrl.replace(url.pathname, '')}/monaco-editor/vs`
   }

@@ -16,6 +16,7 @@ import { ExtensionInstance } from '../../entities/ExtensionInstance';
 import { ExtensionRelationType } from '@grootio/common';
 import { ExtensionVersion } from '../../entities/ExtensionVersion';
 import { SolutionVersion } from '../../entities/SolutionVersion';
+import { LargeText } from '../../entities/LargeText';
 
 export class DatabaseSeeder extends Seeder {
 
@@ -33,14 +34,26 @@ export class DatabaseSeeder extends Seeder {
     });
     await em.persistAndFlush(extension);
 
+    const code = em.create(LargeText, {
+      text: defaultPropItemPipeline
+    })
+
+    const codeRaw = em.create(LargeText, {
+      text: defaultPropItemPipeline
+    })
+
+    await em.persistAndFlush(code);
+    await em.persistAndFlush(codeRaw);
+
     // 创建插件版本
     const extensionVersion = em.create(ExtensionVersion, {
       name: '0.0.1',
       packageName: '_groot_core_extension',
       moduleName: 'Main',
       assetUrl: 'http://groot-local.com:12000/groot-core-extension/index.js',
-      propItemPipeline: defaultPropItemPipeline,
-      propItemPipelineRaw: defaultPropItemPipeline
+      propItemPipeline: code,
+      propItemPipelineRaw: codeRaw,
+      extension
     })
     await em.persistAndFlush(extension);
 

@@ -159,7 +159,7 @@ const fetchRootInstance = (rootInstanceId: number) => {
     const list = [root, ...children]
 
     const solutionPromiseList = solutionInstanceList.map(solutionInstance => {
-      return loadExtension(solutionInstance.extensionInstanceList as ExtensionRuntime[], ExtensionLevel.Solution, solutionInstance.solutionVersion.id)
+      return loadExtension(solutionInstance.extensionInstanceList as ExtensionRuntime[], ExtensionLevel.Solution, solutionInstance.solutionVersionId)
     })
 
     const entryPromise = loadExtension(entryExtensionInstanceList as ExtensionRuntime[], ExtensionLevel.Entry)

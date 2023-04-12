@@ -14,7 +14,7 @@ export default class WorkAreaModel extends BaseModel {
   private viewData: Metadata | Metadata[]
 
   public initIframe(iframe: HTMLIFrameElement) {
-    const { mode } = getContext().groot.params
+    const { mode } = getContext().params
 
     this.iframeEle = iframe;
     this.iframeEle.contentWindow.name = `${iframeNamePrefix}${mode}`;

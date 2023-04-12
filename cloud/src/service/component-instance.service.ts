@@ -178,7 +178,7 @@ export class ComponentInstanceService {
 
     const solutionInstanceList = await em.find(SolutionInstance, {
       entry: rootInstance
-    }, { orderBy: { primary: true } })
+    })
 
     for (const solutionInstance of solutionInstanceList) {
       solutionInstance.extensionInstanceList = await em.find(ExtensionInstance, {

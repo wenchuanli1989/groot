@@ -10,9 +10,8 @@ export class ExtensionVersion extends BaseEntity {
   @Property({ length: 30 })
   name: string;
 
-  // @todo 考虑去json，改为结构化
-  @Property({ length: 1000 })
-  defaultConfig: string;
+  @Property()
+  defaultConfig?: LargeText;
 
   @Property({ length: 30, comment: 'webpack模块联邦包名' })
   packageName: string;
