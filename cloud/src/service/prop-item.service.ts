@@ -51,7 +51,7 @@ export class PropItemService {
     const newItem = em.create(PropItem, {
       ...pick(rawItem, ['label', 'propKey', 'rootPropKey', 'struct', 'viewType', 'span', 'valueOptions', 'versionTraceId']),
       block,
-      // group: block.group,
+      group: block.group,
       component: block.component,
       componentVersion: block.componentVersion,
       order: firstItem ? firstItem.order + 1000 : 1000,

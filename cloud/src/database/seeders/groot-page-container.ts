@@ -63,7 +63,7 @@ export const create = async (em: EntityManager, solution: Solution) => {
     viewType: PropItemViewType.Text,
     defaultValue: '"空白页"',
     block: pageBlock,
-    // group: pageGroup,
+    group: pageGroup,
     componentVersion: pageComponentVersion,
     order: 1000,
     component: pageComponent
@@ -75,7 +75,7 @@ export const create = async (em: EntityManager, solution: Solution) => {
     propKey: 'content',
     struct: PropItemStruct.Component,
     block: pageBlock,
-    // group: pageGroup,
+    group: pageGroup,
     componentVersion: pageComponentVersion,
     order: 2000,
     component: pageComponent

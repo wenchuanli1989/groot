@@ -99,7 +99,7 @@ export class ComponentVersionService {
           ),
           componentVersion,
           block: tempIdData.blockId,
-          // group: tempIdData.groupId,
+          group: tempIdData.groupId,
         });
         itemMap.set(originItem.id, item);
       }
@@ -137,7 +137,7 @@ export class ComponentVersionService {
         const originItem = originItemList[itemIndex];
         const item = itemMap.get(originItem.id);
         item.block = blockMap.get(originItem.block.id);
-        // item.group = groupMap.get(originItem.group.id);
+        item.group = groupMap.get(originItem.group.id);
         if (originItem.childGroup) {
           item.childGroup = groupMap.get(originItem.childGroup.id);;
         }

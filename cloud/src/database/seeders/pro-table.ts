@@ -71,7 +71,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     label: '子项模版配置',
     struct: PropItemStruct.Hierarchy,
     block: columnBlock,
-    // group: commonGroup,
+    group: commonGroup,
     componentVersion: tableComponentVersion,
     component: tableComponent,
     order: 1000
@@ -107,7 +107,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     propKey: 'dataIndex',
     viewType: PropItemViewType.Text,
     block: columnInnerBlock,
-    // group: columnInnerGroup,
+    group: columnInnerGroup,
     componentVersion: tableComponentVersion,
     component: tableComponent,
     order: 1000
@@ -119,7 +119,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     propKey: 'title',
     viewType: PropItemViewType.Text,
     block: columnInnerBlock,
-    // group: columnInnerGroup,
+    group: columnInnerGroup,
     componentVersion: tableComponentVersion,
     component: tableComponent,
     order: 2000
@@ -132,7 +132,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     viewType: PropItemViewType.Select,
     valueOptions: '[{"label": "文本","value": "text"},{"label": "日期","value": "date"},{"label": "下拉框","value": "select"}]',
     block: columnInnerBlock,
-    // group: columnInnerGroup,
+    group: columnInnerGroup,
     componentVersion: tableComponentVersion,
     component: tableComponent,
     order: 2000
@@ -164,7 +164,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     propKey: 'rowKey',
     viewType: PropItemViewType.Text,
     block: requestBlock,
-    // group: commonGroup,
+    group: commonGroup,
     componentVersion: tableComponentVersion,
     component: tableComponent,
     defaultValue: '"id"',
@@ -177,7 +177,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     propKey: 'request',
     viewType: PropItemViewType.Function,
     block: requestBlock,
-    // group: commonGroup,
+    group: commonGroup,
     componentVersion: tableComponentVersion,
     component: tableComponent,
     order: 2000,

@@ -63,7 +63,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     viewType: PropItemViewType.Text,
     defaultValue: '"https://joeschmoe.io/api/v1/random"',
     block: avatarBlock,
-    // group: avatarGroup,
+    group: avatarGroup,
     componentVersion: avatarComponentVersion,
     order: 1000,
     component: avatarComponent
@@ -76,7 +76,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     defaultValue: '"circle"',
     valueOptions: '[{"label": "圆形","value": "circle"},{"label": "方形","value": "square"}]',
     block: avatarBlock,
-    // group: avatarGroup,
+    group: avatarGroup,
     componentVersion: avatarComponentVersion,
     order: 2000,
     component: avatarComponent
@@ -158,7 +158,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     viewType: PropItemViewType.Text,
     defaultValue: '"张三"',
     block: profileBlock,
-    // group: profileGroup,
+    group: profileGroup,
     componentVersion: profileComponentVersion,
     order: 1000,
     component: profileComponent
@@ -170,7 +170,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     viewType: PropItemViewType.Text,
     defaultValue: '"上海"',
     block: profileBlock,
-    // group: profileGroup,
+    group: profileGroup,
     componentVersion: profileComponentVersion,
     order: 2000,
     component: profileComponent
@@ -182,7 +182,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     viewType: PropItemViewType.Text,
     defaultValue: '"zhangsan@email.com"',
     block: profileBlock,
-    // group: profileGroup,
+    group: profileGroup,
     componentVersion: profileComponentVersion,
     order: 3000,
     component: profileComponent
@@ -193,7 +193,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     propKey: 'avatar',
     struct: PropItemStruct.Component,
     block: profileBlock,
-    // group: profileGroup,
+    group: profileGroup,
     componentVersion: profileComponentVersion,
     order: 4000,
     component: profileComponent

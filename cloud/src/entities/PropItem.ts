@@ -19,8 +19,8 @@ export class PropItem extends BaseEntity {
   @Property({ length: 50 })
   viewType = 'text';
 
-  // @ManyToOne({ serializer: value => value?.id, serializedName: 'groupId' })
-  // group: PropGroup;
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'groupId' })
+  group: PropGroup;
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'blockId' })
   block: PropBlock;

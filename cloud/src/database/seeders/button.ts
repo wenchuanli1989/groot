@@ -61,7 +61,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     viewType: PropItemViewType.Text,
     defaultValue: '"hello"',
     block: btnBlock,
-    // group: btnGroup,
+    group: btnGroup,
     componentVersion: btnComponentVersion,
     order: 1000,
     component: btnComponent
@@ -74,7 +74,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     defaultValue: '"primary"',
     valueOptions: '[{"label": "主要","value": "primary"},{"label": "默认","value": "default"},{"label": "幽灵","value": "dashed"},{"label": "链接","value": "link"}]',
     block: btnBlock,
-    // group: btnGroup,
+    group: btnGroup,
     componentVersion: btnComponentVersion,
     order: 2000,
     component: btnComponent
@@ -86,7 +86,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     viewType: PropItemViewType.Function,
     defaultValue: '_exportFn = () => alert(_props.children)',
     block: btnBlock,
-    // group: btnGroup,
+    group: btnGroup,
     componentVersion: btnComponentVersion,
     order: 3000,
     component: btnComponent
