@@ -104,24 +104,7 @@ export class ComponentService {
     return newComponent;
   }
 
-  async list(solutionId: number, all = false) {
-    const em = RequestContext.getEntityManager();
 
-    const query: any = {
-      solution: solutionId,
-    }
-
-    if (!all) {
-      query.recentVersion = { publish: true }
-    }
-
-    const list = await em.find(Component, query);
-    for (const component of list) {
-      component.versionList = await em.find(ComponentVersion, { component });
-    }
-
-    return list;
-  }
 }
 
 

@@ -22,7 +22,7 @@ export default class SolutionModel extends BaseModel {
   }
 
   public loadList() {
-    getContext().request(APIPath.solution_componentList_SolutionId, { solutionId: 1, all: '1' }).then(({ data }) => {
+    getContext().request(APIPath.solution_componentList_solutionVersionId, { solutionVersionId: 1, all: true }).then(({ data }) => {
       this.componentList = data;
     })
   }

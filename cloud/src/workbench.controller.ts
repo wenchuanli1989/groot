@@ -247,9 +247,9 @@ export class WorkbenchController {
   }
 
   // todo 添加解决方案实现
-  @Get('/solution/component-list/:solutionId')
-  async solutionCompoentList(@Param('solutionId') solutionId: number, @Query('all') all: string) {
-    return await this.componentService.list(solutionId, all === '1');
+  @Get('/solution/component-list/:solutionVersionId')
+  async solutionCompoentList(@Param('solutionVersionId') solutionVersionId: number, @Query('all') all: string) {
+    return await this.solutionService.componentListByVersionId(solutionVersionId, all === 'true');
   }
 
 

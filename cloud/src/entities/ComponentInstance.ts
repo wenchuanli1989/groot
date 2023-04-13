@@ -46,7 +46,7 @@ export class ComponentInstance extends BaseEntity {
   @Property({ comment: '是否是页面级组件根实例' })
   entry: boolean = false;
 
-  @ManyToOne({ serializer: value => value?.id, serializedName: 'solutionInstanceId' })
+  @ManyToOne({ serializer: value => value?.solutionVersion?.id, serializedName: 'solutionVersionId' })
   solutionInstance?: SolutionInstance;
   //************************已下是接口入参或者查询返回需要定义的属性************************
 
@@ -84,5 +84,5 @@ export class ComponentInstance extends BaseEntity {
   stateList?: State[];
 
   @Property({ persist: false })
-  solutionInstanceId?: number;
+  solutionVersionId?: number;
 }

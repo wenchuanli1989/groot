@@ -84,7 +84,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     label: '点击事件',
     propKey: 'onClick',
     viewType: PropItemViewType.Function,
-    defaultValue: '_exportFn = () => alert(_props.children)',
+    defaultValue: `"_exportFn = () => alert(_props.children)"`,
     block: btnBlock,
     group: btnGroup,
     componentVersion: btnComponentVersion,

@@ -9,7 +9,7 @@ export const Material = () => {
   const [componentList, setComponentList] = useState<Component[]>([]);
 
   useEffect(() => {
-    getContext().request(APIPath.solution_componentList_SolutionId, { solutionId: 1, all: '0' }).then(({ data }) => {
+    getContext().request(APIPath.solution_componentList_solutionVersionId, { solutionVersionId: 1, all: false }).then(({ data }) => {
       setComponentList(data);
     })
   }, []);

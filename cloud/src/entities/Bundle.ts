@@ -22,8 +22,8 @@ export class Bundle extends BaseEntity {
   oldAssetList = new Collection<BundleAsset>(this);
 
   @Property({ length: 100 })
-  remark: string;
+  remark = '';
 
   @OneToOne({ serializer: value => value.text })
-  manifest: LargeText
+  manifest?: LargeText
 }

@@ -82,7 +82,7 @@ function onMessage(event: any) {
   }
 }
 
-function loadApplication(success = () => { }, fail = () => { }) {
+function loadApplication(success = () => { }, fail = (e) => { throw e }) {
   if (globalConfig.beforeLoadApplication instanceof Promise) {
     instance.status = ApplicationStatus.BeforeLoading;
     globalConfig.beforeLoadApplication.then(() => {

@@ -37,7 +37,7 @@ export class AssetService {
 
     LogicException.assertNotFound(asset, 'InstanceAsset', assetId);
 
-    return asset.content;
+    return asset.content.text;
   }
 
   async appReleaseDetail(appKey: string, appEnv: EnvTypeStr) {
@@ -58,7 +58,7 @@ export class AssetService {
 
     LogicException.assertNotFound(manifest, 'DeployManifest', `releaseId: ${release.id}`);
 
-    return manifest.content;
+    return manifest.content.text;
   }
 
   async build(releaseId: number) {
@@ -80,7 +80,7 @@ export class AssetService {
     this.installPropItemPipelineModule(releaseExtensionInstanceList, ExtensionLevel.Application, extHandler)
     const releaseExtScriptModuleList = [...extHandler.application.values()].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
 
-    const rootInstanceList = await em.find(ComponentInstance, { release, root: null }, { populate: ['solutionInstance'] });
+    const rootInstanceList = await em.find(ComponentInstance, { release, root: null }, { populate: ['solutionInstance', 'component'] });
     const instanceMetadataMap = new Map<ComponentInstance, Metadata[]>();
     // 生成metadata
     for (let rootInstance of rootInstanceList) {
@@ -88,7 +88,7 @@ export class AssetService {
 
       const solutionInstanceList = await em.find(SolutionInstance, {
         entry: rootInstance
-      }, { orderBy: { primary: true } })
+      })
 
       for (const solutionInstance of solutionInstanceList) {
         const solutionExtensionInstanceList = await em.find(ExtensionInstance, {
@@ -161,6 +161,8 @@ export class AssetService {
           bundle,
           manifestKey: instance.key
         });
+
+        await em.flush()
 
         manifest.push({
           key: asset.manifestKey,
@@ -259,12 +261,12 @@ export class AssetService {
     const appData: ApplicationData = {
       name: deploy.application.name,
       key: deploy.application.key,
-      views: '$manifest$' as any,
+      views: '#manifest#' as any,
       envData: {}
     }
 
     const content = em.create(LargeText, {
-      text: JSON.stringify(appData).replace(/"$manifest$"/, deploy.bundle.manifest.text)
+      text: JSON.stringify(appData).replace(/"#manifest#"/, deploy.bundle.manifest.text)
     })
 
     const manifest = em.create(DeployManifest, {

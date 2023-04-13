@@ -150,7 +150,7 @@ function buildPropObjectForLeafItem(propItem: PropItem, ctx: Object, propKeyChai
     propValue = propItem.valueList.find((value) => value.abstractValueIdChain === abstractValueIdChain);
   }
 
-  const value = propValue.value || propItem.defaultValue
+  const value = propValue?.value || propItem.defaultValue
 
   const defaultFn = () => {
     if (typeof value === 'string' && value.length) {
