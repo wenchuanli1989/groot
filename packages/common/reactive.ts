@@ -1,4 +1,4 @@
-import { isBaseType } from './util';
+import { isBaseType, isNativeType } from './util';
 
 
 const ArrayPatchMethods = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse', 'fill'];
@@ -8,6 +8,9 @@ const ArrayPatchMethods = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 
  * 检测对象属性变化
  */
 export function wrapperState(target: any, listener: Function) {
+  if (isNativeType(target)) {
+    throw new Error('不能使用原生引用类型')
+  }
   let terminate = false;
 
   const cancel = () => {

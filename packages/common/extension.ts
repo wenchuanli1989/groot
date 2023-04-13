@@ -142,7 +142,6 @@ export type GrootCommandDict = {
 }
 
 export type GrootStateDict = {
-  'gs.extensionHandle': [ExtensionHandler, false],
   'gs.ui.views': [ViewItem, true],
   'gs.ui.viewsContainers': [ViewContainerItem, true],
 

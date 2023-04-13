@@ -13,7 +13,7 @@ const PropItemSetting: React.FC = () => {
 
   const [form] = Form.useForm<PropItem>();
   const [propTypeOptions] = useState(() => {
-    return [...propHandleModel.propItemViewTypeMap].map(([label, value]) => ({ label, value }))
+    return [...Object.keys(propHandleModel.propItemViewTypeObj)].map(([label]) => ({ label, value: propHandleModel.propItemViewTypeObj[label] }))
   })
 
   const handleOk = async () => {

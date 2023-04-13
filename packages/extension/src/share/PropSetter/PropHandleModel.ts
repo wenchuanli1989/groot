@@ -27,8 +27,8 @@ export default class PropHandleModel extends BaseModel {
   private propTreeCancel: Function;
   public propPathChainEle: HTMLElement;
 
-  public propItemViewTypeMap = new Map<string, string>();
-  public propFormItemMap = new Map<string, ViewElement>();
+  public propItemViewTypeObj = {} as Record<string, string>;
+  public propFormItemObj = {} as Record<string, ViewElement>;
 
 
   public inject(propPersist: PropPersistModel) {
@@ -281,11 +281,11 @@ export default class PropHandleModel extends BaseModel {
 
     const formItemRenderList = grootManager.state.getState('gs.propItem.formRenderList')
     formItemRenderList.forEach((item) => {
-      this.propFormItemMap.set(item.viewType, item.render)
+      this.propFormItemObj[item.viewType] = item.render
     })
 
     grootManager.state.getState('gs.propItem.viewTypeList').forEach(item => {
-      this.propItemViewTypeMap.set(item.label, item.value)
+      this.propItemViewTypeObj[item.label] = item.value
     })
 
     commandBridge.pushPropItemToStack = this.pushPropItemToStack.bind(this)
@@ -397,11 +397,11 @@ export default class PropHandleModel extends BaseModel {
   }
 
   public renderFormItem(propItem: PropItem, formItemProps: any, simplify: boolean) {
-    if (this.propFormItemMap.has(propItem.viewType)) {
-      const view = this.propFormItemMap.get(propItem.viewType)
+    if (this.propFormItemObj[propItem.viewType]) {
+      const view = this.propFormItemObj[propItem.viewType]
       return viewRender(view, { propItem, simplify, formItemProps })
-    } else if (this.propFormItemMap.has('*')) {
-      const view = this.propFormItemMap.get('*')
+    } else if (this.propFormItemObj['*']) {
+      const view = this.propFormItemObj['*']
       return viewRender(view, { propItem, simplify, formItemProps })
     } else {
       return React.createElement(React.Fragment, null, '未识别的类型')

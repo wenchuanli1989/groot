@@ -53,6 +53,9 @@ export const isBaseType = (value: any) => {
   return typeList.includes(typeStr) || value === null || value === undefined
 }
 
+export const isNativeType = (value: any) => {
+  return ['[object Map]', '[object Set]', '[object Date]'].includes(Object.prototype.toString.call(value))
+}
 
 export const viewRender = (view: ViewElement, props?: any) => {
   if (typeof view === 'function') {
