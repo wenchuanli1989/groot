@@ -15,7 +15,7 @@ export type GrootContext = {
   stateManager: StateManager,
   hookManager: HookManager,
   extHandler: ExtensionHandler,
-  loadExtension: (remoteExtensionList: ExtensionRuntime[], extLevel: ExtensionLevel, solutionVersionId?: number) => void,
+  loadExtension: (remoteExtensionList: ExtensionRuntime[], extLevel: ExtensionLevel, solutionInstanceId?: number) => void,
   launchExtension: (remoteExtensionList: ExtensionRuntime[], params: GrootContextParams, layout: GridLayout, level: ExtensionLevel) => void,
   onReady: (callback: Function) => void;
 }
@@ -338,6 +338,6 @@ export type ExtensionHandler = {
     byAssetUrlMap: Map<string, ExtensionInstance>,
     byExtIdMap: Map<number, ExtensionInstance>
   },
-  install: (extensionInstance: ExtensionInstance, level: ExtensionLevel, solutionVersionId?: number) => boolean,
-  uninstall: (extensionInstanceId: number, level: ExtensionLevel, solutionVersionId?: number) => boolean
+  install: (extensionInstance: ExtensionInstance, level: ExtensionLevel, solutionInstanceId?: number) => boolean,
+  uninstall: (extensionInstanceId: number, level: ExtensionLevel, solutionInstanceId?: number) => boolean
 }

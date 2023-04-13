@@ -12,7 +12,7 @@ export const createExtensionHandler = () => {
     }
   }
 
-  const install = (extensionInstance: ExtensionInstance, level: ExtensionLevel, solutionVersionId?: number) => {
+  const install = (extensionInstance: ExtensionInstance, level: ExtensionLevel, solutionInstanceId?: number) => {
 
     if (level === ExtensionLevel.Application) {
       if (extensionMap.application.has(extensionInstance.id)) {
@@ -20,10 +20,10 @@ export const createExtensionHandler = () => {
       }
       extensionMap.application.set(extensionInstance.id, extensionInstance)
     } else if (level === ExtensionLevel.Solution) {
-      if (!extensionMap.solution.has(solutionVersionId!)) {
-        extensionMap.solution.set(solutionVersionId!, new Map<number, ExtensionInstance>())
+      if (!extensionMap.solution.has(solutionInstanceId!)) {
+        extensionMap.solution.set(solutionInstanceId!, new Map<number, ExtensionInstance>())
       }
-      const map = extensionMap.solution.get(solutionVersionId!)!
+      const map = extensionMap.solution.get(solutionInstanceId!)!
       if (map.has(extensionInstance.id)) {
         throw new Error('重复加载扩展实例[solution]')
       }
@@ -50,7 +50,7 @@ export const createExtensionHandler = () => {
     return extensionInstance.status === ExtensionStatus.Active
   }
 
-  const uninstall = (extensionInstanceId: number, level: ExtensionLevel, solutionVersionId?: number) => {
+  const uninstall = (extensionInstanceId: number, level: ExtensionLevel, solutionInstanceId?: number) => {
 
     let extensionInstance: ExtensionInstance;
     if (level === ExtensionLevel.Application) {
@@ -60,8 +60,8 @@ export const createExtensionHandler = () => {
         extensionMap.application.delete(extensionInstanceId)
       }
     } else if (level === ExtensionLevel.Solution) {
-      if (extensionMap.solution.has(solutionVersionId!)) {
-        const map = extensionMap.solution.get(solutionVersionId!)!
+      if (extensionMap.solution.has(solutionInstanceId!)) {
+        const map = extensionMap.solution.get(solutionInstanceId!)!
         if (map.has(extensionInstanceId)) {
           extensionInstance = map.get(extensionInstanceId)
           extensionInstance.status = ExtensionStatus.Destroy

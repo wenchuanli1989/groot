@@ -96,7 +96,7 @@ export class AssetService {
           relationType: ExtensionRelationType.SolutionVersion
         }, { populate: ['extensionVersion.propItemPipelineRaw'] })
 
-        this.installPropItemPipelineModule(solutionExtensionInstanceList, ExtensionLevel.Solution, extHandler, solutionInstance.solutionVersion.id)
+        this.installPropItemPipelineModule(solutionExtensionInstanceList, ExtensionLevel.Solution, extHandler, solutionInstance.id)
       }
 
       const entryExtensionInstanceList = await em.find(ExtensionInstance, {
@@ -107,13 +107,13 @@ export class AssetService {
       this.installPropItemPipelineModule(entryExtensionInstanceList, ExtensionLevel.Entry, extHandler)
       const entryExtScriptModuleList = [...extHandler.entry.values()].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
 
-      const solutionExtScriptModuleList = [...(extHandler.solution.get(rootInstance.solutionInstance.solutionVersion.id)?.values() || [])].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
+      const solutionExtScriptModuleList = [...(extHandler.solution.get(rootInstance.solutionInstance.id)?.values() || [])].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
       const rootMetadata = await this.createMetadata(rootInstance, em, releaseExtScriptModuleList, solutionExtScriptModuleList, entryExtScriptModuleList);
       metadataList.push(rootMetadata);
       const childInstanceList = await em.find(ComponentInstance, { root: rootInstance }, { populate: ['component', 'componentVersion', 'solutionInstance'] });
 
       for (let childInstance of childInstanceList) {
-        const solutionExtScriptModuleList = [...(extHandler.solution.get(childInstance.solutionInstance.solutionVersion.id)?.values() || [])].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
+        const solutionExtScriptModuleList = [...(extHandler.solution.get(childInstance.solutionInstance.id)?.values() || [])].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
 
         const childMetadata = await this.createMetadata(childInstance, em, releaseExtScriptModuleList, solutionExtScriptModuleList, entryExtScriptModuleList);
         metadataList.push(childMetadata);
@@ -125,9 +125,9 @@ export class AssetService {
         extHandler.uninstall(extInstance.id, ExtensionLevel.Entry)
       }
 
-      for (const [solutionVersionId, map] of extHandler.solution) {
+      for (const [solutionInstanceId, map] of extHandler.solution) {
         for (const extInstance of map.values()) {
-          extHandler.uninstall(extInstance.id, ExtensionLevel.Solution, solutionVersionId)
+          extHandler.uninstall(extInstance.id, ExtensionLevel.Solution, solutionInstanceId)
         }
       }
     }
@@ -318,13 +318,13 @@ export class AssetService {
   private installPropItemPipelineModule(
     extensionInstanceList: ExtensionInstance[],
     level: ExtensionLevel,
-    extHandler: { install: (extInstance: IExtensionInstance, level: ExtensionLevel, solutionVersionId?: number) => boolean },
-    solutionVersionId?: number
+    extHandler: { install: (extInstance: IExtensionInstance, level: ExtensionLevel, solutionInstanceId?: number) => boolean },
+    solutionInstanceId?: number
   ) {
     for (const extensionInstance of extensionInstanceList) {
       const extInstance = wrap(extensionInstance).toObject() as IExtensionInstance
 
-      const success = extHandler.install(extInstance, level, solutionVersionId)
+      const success = extHandler.install(extInstance, level, solutionInstanceId)
       if (success && extensionInstance.extensionVersion.propItemPipelineRaw?.text) {
         const code = extensionInstance.extensionVersion.propItemPipelineRaw.text
         const module = vm2.run(code) as ExtScriptModule

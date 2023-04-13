@@ -137,7 +137,7 @@ const instanceToMetadata = (instanceList: ComponentInstance[]) => {
 
     const entryPropItemPipelineModuleList = [...extHandler.entry.values()].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
     const releasePropItemPipelineModuleList = [...extHandler.application.values()].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
-    const solutionPropItemPipelineModuleList = [...(extHandler.solution.get(instance.solutionVersionId)?.values() || [])].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
+    const solutionPropItemPipelineModuleList = [...(extHandler.solution.get(instance.id)?.values() || [])].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
 
     const metadata = metadataFactory(instance.propTree, {
       packageName: instance.component.packageName,
@@ -159,7 +159,7 @@ const fetchRootInstance = (rootInstanceId: number) => {
     const list = [root, ...children]
 
     const solutionPromiseList = solutionInstanceList.map(solutionInstance => {
-      return loadExtension(solutionInstance.extensionInstanceList as ExtensionRuntime[], ExtensionLevel.Solution, solutionInstance.solutionVersionId)
+      return loadExtension(solutionInstance.extensionInstanceList as ExtensionRuntime[], ExtensionLevel.Solution, solutionInstance.id)
     })
 
     const entryPromise = loadExtension(entryExtensionInstanceList as ExtensionRuntime[], ExtensionLevel.Entry)

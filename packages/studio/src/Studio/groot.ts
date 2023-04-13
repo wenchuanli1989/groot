@@ -11,9 +11,9 @@ let __provider: string;
 const extHandler = createExtensionHandler()
 
 
-export const loadExtension = (remoteExtensionList: ExtensionRuntime[], extLevel: ExtensionLevel, solutionVersionId?: number) => {
+export const loadExtension = (remoteExtensionList: ExtensionRuntime[], extLevel: ExtensionLevel, solutionInstanceId?: number) => {
   remoteExtensionList.forEach(extInstance => {
-    extHandler.install(extInstance, extLevel, solutionVersionId)
+    extHandler.install(extInstance, extLevel, solutionInstanceId)
   })
   return Promise.all(remoteExtensionList.map(extInstance => {
     if (extInstance.status === ExtensionStatus.Active) {

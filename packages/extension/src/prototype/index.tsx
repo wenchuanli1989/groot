@@ -1,13 +1,11 @@
 import { AppstoreOutlined } from "@ant-design/icons";
-import { APIPath, ExtScriptModule, PropBlockStructType, PropGroup } from "@grootio/common";
+import { APIPath, PropBlockStructType, PropGroup } from "@grootio/common";
 import { metadataFactory, propItemPipeline, propTreeFactory } from "@grootio/core";
 import { getContext, grootManager } from "context";
 import ViewsContainer from "core/ViewsContainer";
 import { parseOptions } from "util/utils";
 import { Solution } from "./Solution";
 
-
-const propItemPipelineModuleList: ExtScriptModule[] = []
 
 export const prototypeBootstrap = () => {
   const { groot, layout, params } = getContext();
@@ -78,6 +76,7 @@ const fetchComponent = (componentId: number, versionId) => {
 }
 
 const syncDataToStage = (first = false) => {
+  const { groot: { extHandler }, params: { solution } } = getContext()
   const component = grootManager.state.getState('gs.component');
 
   if (!component.propTree) {
@@ -90,6 +89,8 @@ const syncDataToStage = (first = false) => {
     })
     component.propTree = propTree;
   }
+
+  const propItemPipelineModuleList = [...(extHandler.solution.get(solution.id)?.values() || [])].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
 
   const metadata = metadataFactory(component.propTree, {
     packageName: component.packageName,

@@ -32,9 +32,9 @@ const Studio: React.FC<StudioParams & { account: any }> & { Wrapper: React.FC<{ 
     fetchCoreDataPromise.then((data) => {
       setLoadStatus('fetch-extension');
 
-      const solutionVersionId = prototypeMode ? (data as Solution).solutionVersion.id : 0
+      const solutionInstanceId = prototypeMode ? (data as Solution).id : 0
       // todo 研究promise自动刷新视图
-      loadExtension(data.extensionInstanceList as ExtensionRuntime[], extLevel, solutionVersionId).then(() => {
+      loadExtension(data.extensionInstanceList as ExtensionRuntime[], extLevel, solutionInstanceId).then(() => {
         setLoadStatus('ok');
         const layout = new GridLayout();
         setLayout(layout);

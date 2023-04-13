@@ -61,6 +61,9 @@ export class ComponentInstanceService {
     const release = await em.findOne(Release, rawInstance.releaseId);
     LogicException.assertNotFound(release, 'Release', rawInstance.releaseId);
 
+    const solutionInstance = await em.findOne(SolutionInstance, rawInstance.solutionInstanceId);
+    LogicException.assertNotFound(solutionInstance, 'SolutionInstance', rawInstance.solutionInstanceId);
+
     if (rawInstance.key) {
       if (rawInstance.rootId) {
         throw new LogicException(`如果传递参数key，则不能传递参数rootId`, LogicExceptionCode.UnExpect);
@@ -106,6 +109,7 @@ export class ComponentInstanceService {
       componentVersion: component.recentVersion,
       release,
       trackId: 0,
+      solutionInstance
     });
 
     let parentCtx = parentEm ? em.getTransactionContext() : undefined;
@@ -242,6 +246,7 @@ export class ComponentInstanceService {
         releaseId: parentInstance.release.id,
         parentId: parentInstance.id,
         rootId: parentInstance.root?.id || parentInstance.id,
+        solutionInstanceId: rawComponentInstace.solutionInstanceId
       } as ComponentInstance;
 
       const childInstance = await this.add(rawInstance, em);
