@@ -181,13 +181,13 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     componentVersion: tableComponentVersion,
     component: tableComponent,
     order: 2000,
-    defaultValue: `
+    defaultValue: `"
     _exportFn = async function requestData(params, sort, filter) {
       const res = await fetch('http://groot-local.com:10000/workbench/demo');
       const result = await res.json();
       return { data: result.data, success: true };
     }
-    `
+    "`
   })
   await em.persistAndFlush(requestItem);
 
@@ -240,13 +240,12 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     componentVersion: tableComponentVersion,
     componentInstance: tableComponentInstance,
     type: PropValueType.Instance,
-    value: `
+    value: `"
     _exportFn = async function requestData(params, sort, filter) {
       const res = await fetch('http://groot-local.com:10000/workbench/demo');
       const result = await res.json();
       return { data: result.data, success: true };
-    }
-    `
+    }"`
   });
 
   const rowKeyValue = em.create(PropValue, {

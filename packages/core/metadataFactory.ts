@@ -152,26 +152,28 @@ function buildPropObjectForLeafItem(propItem: PropItem, ctx: Object, propKeyChai
 
   const value = propValue.value || propItem.defaultValue
 
+  const defaultFn = () => {
+    if (typeof value === 'string' && value.length) {
+      newCTX[propEnd] = JSON.parse(value.replace(/\n|\r/mg, ''));
+    } else {
+      newCTX[propEnd] = value
+    }
+  }
+
   if (propItem.struct === PropItemStruct.Normal) {
     if (propItem.viewType === PropItemViewType.Json) {
       metadata.advancedProps.push({
         keyChain: propKeyChain,
         type: PropMetadataType.Json,
       })
+      defaultFn()
     } else if (propItem.viewType === PropItemViewType.Function) {
       metadata.advancedProps.push({
         keyChain: propKeyChain,
         type: PropMetadataType.Function,
       })
+      defaultFn()
     } else {
-      const defaultFn = () => {
-        if (typeof value === 'string' && value.length) {
-          newCTX[propEnd] = JSON.parse(value);
-        } else {
-          newCTX[propEnd] = value
-        }
-      }
-
       if (_pipeline) {
         _pipeline({ ctx: newCTX, propKey: propEnd, value, propItem, metadata, propKeyChain, defaultFn })
       } else {

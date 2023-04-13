@@ -15,7 +15,7 @@ type PropType = {
 
 const FormRender: React.FC<PropType> = ({ propItem, simplify, formItemProps, ...props }) => {
   let field = <>未知类型</>
-  let initialValue = formItemProps.initialValue ? JSON.parse(formItemProps.initialValue) : undefined;
+  let initialValue = formItemProps.initialValue ? JSON.parse(formItemProps.initialValue.replace(/\n|\r/mg, '')) : undefined;
 
   if (propItem.viewType === PropItemViewType.Text) {
     field = <Input {...props} />;
