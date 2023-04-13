@@ -4,6 +4,6 @@ import { BaseEntity } from './BaseEntity';
 @Entity()
 export class LargeText extends BaseEntity {
 
-  @Property({ type: 'text', lazy: true })
+  @Property({ type: 'text' })
   text: string
 }
