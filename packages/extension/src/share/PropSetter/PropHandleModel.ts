@@ -318,6 +318,8 @@ export default class PropHandleModel extends BaseModel {
     const rawInstance = {
       id: data.parentInstanceId,
       componentId: data.componentId,
+      solutionInstanceId: data.solutionInstanceId,
+      componentVersionId: data.componentVersionId
     } as ComponentInstance;
 
     this.propPersist.addChildComponentInstance(rawInstance).then((instanceData) => {

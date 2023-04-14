@@ -49,6 +49,8 @@ export type PropMetadataComponent = {
     propKeyChain: string,
     propItemId: number,
     abstractValueIdChain?: string,
+    solutionInstanceId: number,
+    componentVersionId: number
   }
 }
 

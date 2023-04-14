@@ -308,6 +308,8 @@ export class AssetService {
       metadataId: instance.id,
       rootMetadataId: instance.rootId,
       parentMetadataId: instance.parentId,
+      solutionInstanceId: instance.solutionInstance.id,
+      componentVersionId: instance.componentVersion.id
     }, (params) => {
       propItemPipeline(entryExtScriptModuleList, solutionExtScriptModuleList, releaseExtScriptModuleList, params)
     });

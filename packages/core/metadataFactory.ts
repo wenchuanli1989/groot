@@ -14,6 +14,8 @@ type PipelineType = (params: {
 
 let _pipeline: PipelineType
 let _studioMode: boolean
+let _solutionInstanceId: number
+let _componentVersionId: number
 
 export function metadataFactory(
   rootGroupList: PropGroup[],
@@ -23,6 +25,8 @@ export function metadataFactory(
     metadataId: number,
     rootMetadataId?: number,
     parentMetadataId?: number,
+    solutionInstanceId: number,
+    componentVersionId: number
   }, pipeline?: PipelineType, studioMode = false) {
 
   const metadata = {
@@ -37,6 +41,8 @@ export function metadataFactory(
   } as Metadata;
   _pipeline = pipeline
   _studioMode = studioMode
+  _solutionInstanceId = metadataInfo.solutionInstanceId
+  _componentVersionId = metadataInfo.componentVersionId
 
   rootGroupList.forEach((group) => {
     if (group.propKey) {
@@ -188,7 +194,9 @@ function buildPropObjectForLeafItem(propItem: PropItem, ctx: Object, propKeyChai
         propItemId: propItem.id,
         propKeyChain: propKeyChain,
         abstractValueIdChain: abstractValueIdChain,
-        parentId: metadata.id
+        parentId: metadata.id,
+        solutionInstanceId: _solutionInstanceId,
+        componentVersionId: _componentVersionId
       }
     }
 

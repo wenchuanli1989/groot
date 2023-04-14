@@ -96,6 +96,8 @@ const syncDataToStage = (first = false) => {
     packageName: component.packageName,
     componentName: component.componentName,
     metadataId: component.id,
+    solutionInstanceId: null,
+    componentVersionId: null
   }, (params) => {
     propItemPipeline([], [], propItemPipelineModuleList, params)
   }, true);

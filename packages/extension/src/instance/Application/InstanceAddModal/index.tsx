@@ -43,11 +43,11 @@ const InstanceAddModal: React.FC = () => {
       <Form.Item noStyle dependencies={['empty']}>
         {() => {
           const empty = form.getFieldValue('empty');
-          return (<Form.Item label="原型" name="componentId" rules={[{ required: !empty }]}>
+          return (<Form.Item label="原型" name="componentVersionId" rules={[{ required: !empty }]}>
             <Select disabled={empty}>
               {
                 componentList.map((c) => {
-                  return <Select.Option key={c.id} value={c.id}>{c.name}</Select.Option>
+                  return <Select.Option key={c.componentVersionId} value={c.componentVersionId}>{c.name}</Select.Option>
                 })
               }
             </Select>

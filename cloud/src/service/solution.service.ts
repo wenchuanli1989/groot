@@ -41,7 +41,10 @@ export class SolutionService {
       }
 
       return !!item.publish
-    }).map(item => item.component)
+    }).map(item => {
+      item.component.componentVersionId = item.id;
+      return item.component
+    })
 
     return componentList;
   }

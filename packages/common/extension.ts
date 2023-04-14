@@ -288,13 +288,15 @@ export enum PostMessageType {
 
 
 
-
+// todo 需要和PropMetadataComponent.$$runtime 类型对齐
 export type DragAddComponentEventData = {
   propItemId: number,
   abstractValueIdChain?: string,
   parentInstanceId: number
   componentId: number,
   currentInstanceId?: number,
+  solutionInstanceId: number,
+  componentVersionId: number,
   direction?: 'next' | 'pre'
 }
 

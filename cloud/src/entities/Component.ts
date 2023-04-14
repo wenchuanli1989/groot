@@ -60,4 +60,7 @@ export class Component extends BaseEntity {
 
   @Property({ persist: false })
   solutionVersionId?: number;
+
+  @Property({ persist: false })
+  componentVersionId?: number;
 }

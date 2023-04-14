@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { LogicException, LogicExceptionCode } from 'config/logic.exception';
 import { Component } from 'entities/Component';
 import { ComponentInstance } from 'entities/ComponentInstance';
+import { ComponentVersion } from 'entities/ComponentVersion';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
 import { PropBlock } from 'entities/PropBlock';
 import { PropGroup } from 'entities/PropGroup';
@@ -52,14 +53,19 @@ export class ComponentInstanceService {
   async add(rawInstance: ComponentInstance, parentEm?: EntityManager) {
     let em = parentEm || RequestContext.getEntityManager();
 
-    LogicException.assertParamEmpty(rawInstance.componentId, 'componentId');
+    // LogicException.assertParamEmpty(rawInstance.componentId, 'componentId');
     LogicException.assertParamEmpty(rawInstance.releaseId, 'releaseId');
+    LogicException.assertParamEmpty(rawInstance.componentVersionId, 'componentVersionId');
+    LogicException.assertParamEmpty(rawInstance.solutionInstanceId, 'solutionInstanceId');
 
-    const component = await em.findOne(Component, rawInstance.componentId);
-    LogicException.assertNotFound(component, 'Component', rawInstance.componentId);
+    // const component = await em.findOne(Component, rawInstance.componentId);
+    // LogicException.assertNotFound(component, 'Component', rawInstance.componentId);
 
     const release = await em.findOne(Release, rawInstance.releaseId);
     LogicException.assertNotFound(release, 'Release', rawInstance.releaseId);
+
+    const componentVersion = await em.findOne(ComponentVersion, rawInstance.componentVersionId, { populate: ['component'] });
+    LogicException.assertNotFound(componentVersion, 'ComponentVersion', rawInstance.componentVersionId);
 
     const solutionInstance = await em.findOne(SolutionInstance, rawInstance.solutionInstanceId);
     LogicException.assertNotFound(solutionInstance, 'SolutionInstance', rawInstance.solutionInstanceId);
@@ -95,18 +101,18 @@ export class ComponentInstanceService {
     const newValueList = [];
 
     const prototypeValueList = await em.find(PropValue, {
-      component,
-      componentVersion: component.recentVersion,
+      component: componentVersion.component,
+      componentVersion,
       type: PropValueType.Prototype
     });
 
     const newInstance = em.create(ComponentInstance, {
       ...pick(rawInstance, ['key', 'entry']),
-      name: rawInstance.name || component.name,
+      name: rawInstance.name || componentVersion.component.name,
       parent: rawInstance.parentId,
       root: rawInstance.rootId,
-      component,
-      componentVersion: component.recentVersion,
+      component: componentVersion.component,
+      componentVersion,
       release,
       trackId: 0,
       solutionInstance
@@ -236,17 +242,35 @@ export class ComponentInstanceService {
     const component = await em.findOne(Component, rawComponentInstace.componentId);
     LogicException.assertNotFound(component, 'component', rawComponentInstace.componentId);
 
+    LogicException.assertParamEmpty(rawComponentInstace.solutionInstanceId, 'solutionInstanceId');
+    const solutionInstance = await em.findOne(SolutionInstance, rawComponentInstace.solutionInstanceId, {
+      populate: ['solutionVersion.componentVersionList']
+    });
+    LogicException.assertNotFound(solutionInstance, 'SolutionInstance', rawComponentInstace.solutionInstanceId);
+
+    let componentVersionExists = false
+    for (const componentVersion of solutionInstance.solutionVersion.componentVersionList) {
+      if (componentVersion.id === rawComponentInstace.componentVersionId) {
+        componentVersionExists = true
+      }
+    }
+
+    if (componentVersionExists) {
+      throw new LogicException(`组件版本在解决方案版本中未找到`, LogicExceptionCode.NotFound);
+    }
+
     let newInstanceId: number;
 
     await em.begin();
     try {
       const rawInstance = {
         name: `${component.name}`,
-        componentId: rawComponentInstace.componentId,
+        // componentId: rawComponentInstace.componentId,
         releaseId: parentInstance.release.id,
         parentId: parentInstance.id,
         rootId: parentInstance.root?.id || parentInstance.id,
-        solutionInstanceId: rawComponentInstace.solutionInstanceId
+        solutionInstanceId: rawComponentInstace.solutionInstanceId,
+        componentVersionId: rawComponentInstace.componentVersionId
       } as ComponentInstance;
 
       const childInstance = await this.add(rawInstance, em);

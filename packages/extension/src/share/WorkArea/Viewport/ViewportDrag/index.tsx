@@ -37,11 +37,13 @@ const ViewportDrag: React.FC = () => {
 
   function onDrop(event) {
     const componentId = event.dataTransfer.getData('componentId');
+    const componentVersionId = event.dataTransfer.getData('componentVersionId');
     const rect = containerRef.current.getBoundingClientRect();
     callHook(PostMessageType.OuterDragComponentDrop, {
       positionX: event.pageX - rect.left,
       positionY: event.pageY - rect.top,
-      componentId
+      componentId,
+      componentVersionId
     })
     containerRef.current.style.display = 'none';
   }

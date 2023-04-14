@@ -153,7 +153,7 @@ export function respondDragLeave() {
   draging = false;
 }
 
-export function respondDragDrop(positionX: number, positionY: number, componentId: number) {
+export function respondDragDrop(positionX: number, positionY: number, componentId: number, componentVersionId: number) {
   if (!activeSlotEle) {
     return;
   }
@@ -165,7 +165,7 @@ export function respondDragDrop(positionX: number, positionY: number, componentI
   if (propMetadata.type !== PropMetadataType.Component) {
     throw new Error('参数错误')
   }
-  const { propItemId, abstractValueIdChain } = propMetadata.data.$$runtime;
+  const { propItemId, abstractValueIdChain, solutionInstanceId } = propMetadata.data.$$runtime;
   if (activeSlotEle.dataset.grootAllowHighlight) {
     window.parent.postMessage({
       type: PostMessageType.InnerDragHitSlot,
@@ -174,6 +174,8 @@ export function respondDragDrop(positionX: number, positionY: number, componentI
         componentId,
         propItemId,
         abstractValueIdChain,
+        solutionInstanceId,
+        componentVersionId
       } as DragAddComponentEventData
     }, '*');
   } else {
@@ -189,6 +191,8 @@ export function respondDragDrop(positionX: number, positionY: number, componentI
         propItemId,
         abstractValueIdChain,
         currentInstanceId,
+        solutionInstanceId,
+        componentVersionId,
         direction: { top: 'pre', bottom: 'next' }[markerInfo.direction]
       } as DragAddComponentEventData
     }, '*');

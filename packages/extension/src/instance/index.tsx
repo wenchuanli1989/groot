@@ -145,6 +145,8 @@ const instanceToMetadata = (instanceList: ComponentInstance[]) => {
       metadataId: instance.id,
       rootMetadataId: instance.rootId,
       parentMetadataId: instance.parentId,
+      solutionInstanceId: instance.solutionInstanceId,
+      componentVersionId: instance.componentVersion.id
     }, (params) => {
       propItemPipeline(entryPropItemPipelineModuleList, releasePropItemPipelineModuleList, solutionPropItemPipelineModuleList, params)
     }, true);
