@@ -1,5 +1,5 @@
 import { ExtensionRelationType } from '@grootio/common';
-import { RequestContext } from '@mikro-orm/core';
+import { RequestContext, wrap } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { LogicException } from 'config/logic.exception';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
@@ -21,7 +21,7 @@ export class SolutionService {
     const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId)
     LogicException.assertNotFound(solutionVersion, 'SolutionVersion', solutionVersionId);
 
-    solution.solutionVersion = solutionVersion
+    solution.solutionVersion = wrap(solutionVersion).toObject() as any
 
     solution.extensionInstanceList = await em.find(ExtensionInstance, {
       relationType: ExtensionRelationType.SolutionVersion,
