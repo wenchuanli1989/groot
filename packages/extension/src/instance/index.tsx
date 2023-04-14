@@ -1,8 +1,7 @@
 import { AppstoreOutlined } from "@ant-design/icons";
-import { APIPath, ComponentInstance, ExtensionLevel, ExtensionRuntime, PropBlockStructType, PropGroup, State, StateCategory } from "@grootio/common";
+import { APIPath, ComponentInstance, ExtensionLevel, ExtensionRuntime, PropBlockStructType, PropGroup, State, StateCategory, ViewsContainer } from "@grootio/common";
 import { metadataFactory, propItemPipeline, propTreeFactory } from "@grootio/core";
 import { getContext, grootManager } from "context";
-import ViewsContainer from "core/ViewsContainer";
 import { parseOptions, uuid } from "util/utils";
 import { Application } from "./Application";
 import { Material } from "./Material";
@@ -24,7 +23,7 @@ export const instanceBootstrap = () => {
         return <AppstoreOutlined />
       },
       view: function () {
-        return <ViewsContainer context={this} />
+        return <ViewsContainer context={this} groot={groot} />
       },
     }, {
       id: 'material',
@@ -33,14 +32,14 @@ export const instanceBootstrap = () => {
         return <AppstoreOutlined />
       },
       view: function () {
-        return <ViewsContainer context={this} />
+        return <ViewsContainer context={this} groot={groot} />
       },
     }, {
       id: 'state',
       name: '状态',
       icon: <AppstoreOutlined />,
       view: function () {
-        return <ViewsContainer context={this} />
+        return <ViewsContainer context={this} groot={groot} />
       }
     },
   ])

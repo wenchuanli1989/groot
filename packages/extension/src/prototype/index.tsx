@@ -1,8 +1,7 @@
 import { AppstoreOutlined } from "@ant-design/icons";
-import { APIPath, PropBlockStructType, PropGroup } from "@grootio/common";
+import { APIPath, PropBlockStructType, PropGroup, ViewsContainer } from "@grootio/common";
 import { metadataFactory, propItemPipeline, propTreeFactory } from "@grootio/core";
 import { getContext, grootManager } from "context";
-import ViewsContainer from "core/ViewsContainer";
 import { parseOptions } from "util/utils";
 import { Solution } from "./Solution";
 
@@ -20,7 +19,7 @@ export const prototypeBootstrap = () => {
         return <AppstoreOutlined />
       },
       view: function () {
-        return <ViewsContainer context={this} />
+        return <ViewsContainer context={this} groot={groot} />
       },
     }
   ])

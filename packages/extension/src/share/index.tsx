@@ -1,13 +1,13 @@
 import { commandBridge, getContext, grootManager, isPrototypeMode } from "context";
-import ViewsContainer from "core/ViewsContainer";
 import { PropSetter } from "./PropSetter";
 import ToolBar from "./ToolBar";
 import { WorkArea } from "./WorkArea";
 import FormRender from './FormRender'
+import { ViewsContainer } from "@grootio/common";
 
 
 export const shareBootstrap = () => {
-  const { layout } = getContext();
+  const { layout, groot } = getContext();
   const { registerState } = grootManager.state
 
   registerState('gs.ui.viewsContainers', [
@@ -15,13 +15,13 @@ export const shareBootstrap = () => {
       id: 'propSetter',
       name: '属性设置器',
       view: function () {
-        return <ViewsContainer context={this} />
+        return <ViewsContainer context={this} groot={groot} />
       },
     }, {
       id: 'workArea',
       name: '工作区',
       view: function () {
-        return <ViewsContainer context={this} />
+        return <ViewsContainer context={this} groot={groot} />
       }
     }
   ], true)
