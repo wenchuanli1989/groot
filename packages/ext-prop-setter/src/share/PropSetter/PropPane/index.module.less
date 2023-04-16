@@ -1,0 +1,23 @@
+.container {
+  height: 100%;
+
+  :global(.ant-tabs) {
+    height: 100%;
+  }
+
+  :global(.ant-tabs .ant-tabs-content-holder) {
+    overflow: auto;
+    padding-bottom: 12px;
+  }
+
+  :global(.ant-tabs .ant-tabs-nav) {
+    margin-bottom: 0 !important;
+    padding: 0 var(--groot-padding-x);
+
+    :global(.ant-tabs-tab) {
+      color: #aaa;
+      margin-left: 0;
+      margin-right: var(--groot-padding-x);
+    }
+  }
+}
