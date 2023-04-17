@@ -1,7 +1,5 @@
-import { ExtensionRelationType, PropBlockLayout, PropBlockStructType, PropItemStruct, PropItemViewType, PropValueType } from "@grootio/common";
+import { PropBlockLayout, PropBlockStructType, PropItemStruct, PropItemViewType, PropValueType } from "@grootio/common";
 import { EntityManager } from "@mikro-orm/core";
-import { ExtensionInstance } from "../../entities/ExtensionInstance";
-import { ExtensionVersion } from "../../entities/ExtensionVersion";
 import { SolutionEntry } from "../../entities/SolutionEntry";
 import { SolutionInstance } from "../../entities/SolutionInstance";
 
@@ -15,7 +13,7 @@ import { PropValue } from "../../entities/PropValue";
 import { Release } from "../../entities/Release";
 import { Solution } from "../../entities/Solution";
 
-export const create = async (em: EntityManager, solution: Solution, release: Release, extensionVersion: ExtensionVersion) => {
+export const create = async (em: EntityManager, solution: Solution, release: Release) => {
   // 创建组件
   const tableComponent = em.create(Component, {
     name: '列表查询',
@@ -208,16 +206,6 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   tableComponentInstance.trackId = tableComponentInstance.id;
   await em.persistAndFlush(tableComponentInstance);
 
-
-  // 创建组件级别扩展实例
-  const entryExtensionInstance = em.create(ExtensionInstance, {
-    extension: extensionVersion.extension,
-    extensionVersion,
-    config: '',
-    relationType: ExtensionRelationType.Entry,
-    relationId: tableComponentInstance.id,
-  });
-  await em.persistAndFlush(entryExtensionInstance);
 
   // 创建入口解决方案实例
   const solutionInstance = em.create(SolutionInstance, {

@@ -28,11 +28,15 @@ export class DatabaseSeeder extends Seeder {
     await em.persistAndFlush(org);
 
     // 创建插件
-    const extension = em.create(Extension, {
-      name: '@groot/core-extension',
-      org,
-    });
-    await em.persistAndFlush(extension);
+    const extWebVisual = em.create(Extension, { name: '@groot/ext-web-visual', org });
+    await em.persistAndFlush(extWebVisual);
+
+    const extPropSetter = em.create(Extension, { name: '@groot/ext-prop-setter', org });
+    await em.persistAndFlush(extPropSetter);
+
+    const extWorkArea = em.create(Extension, { name: '@groot/ext-work-area', org });
+    await em.persistAndFlush(extWorkArea);
+
 
     const code = em.create(LargeText, {
       text: defaultPropItemPipeline
@@ -46,19 +50,45 @@ export class DatabaseSeeder extends Seeder {
     await em.persistAndFlush(codeRaw);
 
     // 创建插件版本
-    const extensionVersion = em.create(ExtensionVersion, {
+    const extWebVisualVersion = em.create(ExtensionVersion, {
       name: '0.0.1',
-      packageName: '_groot_core_extension',
+      packageName: '_ext_web_visual',
       moduleName: 'Main',
-      assetUrl: 'http://groot-local.com:12000/groot-core-extension/index.js',
-      propItemPipeline: code,
-      propItemPipelineRaw: codeRaw,
-      extension
+      assetUrl: 'http://groot-local.com:20000/ext-web-visual/index.js',
+      extension: extWebVisual
     })
-    await em.persistAndFlush(extension);
+    await em.persistAndFlush(extWebVisualVersion);
 
-    extension.recentVersion = extensionVersion
-    await em.persistAndFlush(extension);
+    extWebVisual.recentVersion = extWebVisualVersion
+    await em.persistAndFlush(extWebVisual);
+
+    const extPropSetterVersion = em.create(ExtensionVersion, {
+      name: '0.0.1',
+      packageName: '_ext_prop_setter',
+      moduleName: 'Main',
+      assetUrl: 'http://groot-local.com:21000/ext-prop-setter/index.js',
+      extension: extPropSetter,
+      propItemPipeline: code,
+      propItemPipelineRaw: codeRaw
+    })
+    await em.persistAndFlush(extPropSetterVersion);
+
+    extPropSetter.recentVersion = extPropSetterVersion
+    await em.persistAndFlush(extPropSetter);
+
+    const extWorkAreaVersion = em.create(ExtensionVersion, {
+      name: '0.0.1',
+      packageName: '_ext_work_area',
+      moduleName: 'Main',
+      assetUrl: 'http://groot-local.com:22000/ext-work-area/index.js',
+      extension: extWorkArea
+    })
+    await em.persistAndFlush(extWorkAreaVersion);
+
+    extWorkArea.recentVersion = extWorkAreaVersion
+    await em.persistAndFlush(extWorkArea);
+
+
     // 创建解决方案
     const solution = em.create(Solution, {
       name: '通用解决方案',
@@ -79,14 +109,32 @@ export class DatabaseSeeder extends Seeder {
     await em.persistAndFlush(solution);
 
     // 解决方案关联扩展实例
-    const solutionExtensionInstance = em.create(ExtensionInstance, {
-      extension,
-      extensionVersion,
+    const extWebVisualSolutionInstance = em.create(ExtensionInstance, {
+      extension: extWebVisual,
+      extensionVersion: extWebVisualVersion,
       config: '',
       relationType: ExtensionRelationType.SolutionVersion,
       relationId: solutionVersion.id,
     });
-    await em.persistAndFlush(solutionExtensionInstance);
+    await em.persistAndFlush(extWebVisualSolutionInstance);
+
+    const extPropSetterSolutionInstance = em.create(ExtensionInstance, {
+      extension: extPropSetter,
+      extensionVersion: extPropSetterVersion,
+      config: '',
+      relationType: ExtensionRelationType.SolutionVersion,
+      relationId: solutionVersion.id,
+    });
+    await em.persistAndFlush(extPropSetterSolutionInstance);
+
+    const extWorkAreaSolutionInstance = em.create(ExtensionInstance, {
+      extension: extWorkArea,
+      extensionVersion: extWorkAreaVersion,
+      config: '',
+      relationType: ExtensionRelationType.SolutionVersion,
+      relationId: solutionVersion.id,
+    });
+    await em.persistAndFlush(extWorkAreaSolutionInstance);
 
     // 创建项目
     const project = em.create(Project, {
@@ -119,21 +167,39 @@ export class DatabaseSeeder extends Seeder {
     await em.persistAndFlush(release);
 
     // 创建应用迭代级别扩展实例
-    const releaseExtensionInstance = em.create(ExtensionInstance, {
-      extension,
-      extensionVersion,
+    const extWebVisualReleaseInstance = em.create(ExtensionInstance, {
+      extension: extWebVisual,
+      extensionVersion: extWebVisualVersion,
       config: '',
       relationType: ExtensionRelationType.Release,
       relationId: release.id,
     });
-    await em.persistAndFlush(releaseExtensionInstance);
+    await em.persistAndFlush(extWebVisualReleaseInstance);
+
+    const extPropSetterReleaseInstance = em.create(ExtensionInstance, {
+      extension: extPropSetter,
+      extensionVersion: extPropSetterVersion,
+      config: '',
+      relationType: ExtensionRelationType.Release,
+      relationId: release.id,
+    });
+    await em.persistAndFlush(extPropSetterReleaseInstance);
+
+    const extWorkAreaReleaseInstance = em.create(ExtensionInstance, {
+      extension: extWorkArea,
+      extensionVersion: extWorkAreaVersion,
+      config: '',
+      relationType: ExtensionRelationType.Release,
+      relationId: release.id,
+    });
+    await em.persistAndFlush(extWorkAreaReleaseInstance);
 
 
-    await proTableCreate(em, solution, release, extensionVersion);
+    await proTableCreate(em, solution, release);
 
-    await btnCreate(em, solution, release, extensionVersion);
+    await btnCreate(em, solution, release);
 
-    await profileCreate(em, solution, release, extensionVersion);
+    await profileCreate(em, solution, release);
 
     await containerCreate(em, solution);
 

@@ -10,12 +10,10 @@ import { PropGroup } from "../../entities/PropGroup";
 import { PropItem } from "../../entities/PropItem";
 import { Release } from "../../entities/Release";
 import { Solution } from "../../entities/Solution";
-import { ExtensionInstance } from "../../entities/ExtensionInstance";
-import { ExtensionVersion } from "../../entities/ExtensionVersion";
 import { SolutionInstance } from "../../entities/SolutionInstance";
 import { SolutionEntry } from "../../entities/SolutionEntry";
 
-export const create = async (em: EntityManager, solution: Solution, release: Release, extensionVersion: ExtensionVersion) => {
+export const create = async (em: EntityManager, solution: Solution, release: Release) => {
   // 创建组件
   const avatarComponent = em.create(Component, {
     name: '头像',
@@ -215,15 +213,6 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   profileComponentInstance.trackId = profileComponentInstance.id;
   await em.persistAndFlush(profileComponentInstance);
 
-  // 创建组件级别扩展实例
-  const entryExtensionInstance = em.create(ExtensionInstance, {
-    extension: extensionVersion.extension,
-    extensionVersion,
-    config: '',
-    relationType: ExtensionRelationType.Entry,
-    relationId: profileComponentInstance.id,
-  });
-  await em.persistAndFlush(entryExtensionInstance);
 
   // 创建入口解决方案实例
   const solutionInstance = em.create(SolutionInstance, {
