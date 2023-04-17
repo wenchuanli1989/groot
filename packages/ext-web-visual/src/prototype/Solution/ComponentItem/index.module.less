@@ -1,0 +1,16 @@
+.componentItem {
+  display: flex;
+  padding-left: var(--groot-padding-x);
+
+  &.active .componentItemVersion {
+    visibility: visible;
+  }
+}
+
+.componentItemName {
+  flex-grow: 1;
+}
+
+.componentItemVersion {
+  visibility: hidden
+}

@@ -1,0 +1,28 @@
+.container {
+
+  height: 100%;
+  --item-height: 40px;
+
+  .componentItemHeader {
+    display: flex;
+    border-bottom: solid #ddd 1px;
+    line-height: var(--item-height);
+    height: var(var(--item-height));
+    padding: 0 var(--groot-padding-x);
+  }
+
+  .componentItem {
+    line-height: var(--item-height);
+    height: var(var(--item-height));
+    cursor: pointer;
+
+    &:hover {
+      background-color: #ddd;
+    }
+
+    &.active {
+      background-color: #ddd;
+    }
+  }
+
+}

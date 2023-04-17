@@ -1,0 +1,81 @@
+@item-bg: #fafafa;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  --height: var(--groot-banner-height);
+  --padding: var(--groot-padding-x);
+  --border-color: #dedede;
+}
+
+.groupContainer:first-of-type {
+  height: 200px;
+  border-bottom: solid 1px var(--border-color);
+}
+
+.groupContainer:last-of-type {
+  height: calc(100% - 200px)
+}
+
+.groupBar {
+  height: var(--height);
+  line-height: var(--height);
+  display: flex;
+  border-bottom: solid 1px var(--border-color);
+  padding-left: var(--padding);
+}
+
+.groupTitle {
+  flex-grow: 1;
+}
+
+.groupAction {
+  padding: 0 var(--padding);
+  line-height: var(--height);
+}
+
+.itemContainer {
+  max-height: calc(100% - var(--height));
+  height: 100%;
+  overflow: auto;
+  background-color: @item-bg;
+}
+
+.item {
+  display: flex;
+  height: var(--height);
+  line-height: var(--height);
+  padding-left: var(--padding);
+}
+
+.itemTitle {
+  flex-grow: 1;
+}
+
+.item:hover {
+  background-color: darken(@item-bg, 5%);
+
+  .itemAction {
+    visibility: visible;
+  }
+}
+
+
+.itemAction {
+  padding: 0 var(--padding);
+  visibility: hidden;
+  line-height: var(--height);
+}
+
+.popoverOverlay {
+
+  :global(.ant-popover-content) {
+    margin-left: -10px;
+    min-width: 300px;
+  }
+
+  :global(.ant-popover-arrow) {
+    display: none;
+  }
+}
