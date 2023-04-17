@@ -302,7 +302,7 @@ export default class PropHandleModel extends BaseModel {
         }
 
         const [propTree, propTreeCancel] = wrapperState(originPropTree, () => {
-          this.emitter();
+          this.emitter('propTree change ');
         })
         this.propTree = propTree;
         this.propTreeCancel = propTreeCancel;

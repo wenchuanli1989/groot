@@ -66,7 +66,7 @@ export function wrapperState(target: any, listener: Function) {
             }
 
             const result = Reflect.apply(value, receiver, args);
-            listener();
+            listener(`Array method ${sKey}`);
             return result;
           }
         }
@@ -89,7 +89,7 @@ export function wrapperState(target: any, listener: Function) {
 
       ++setCount;
       const result = Reflect.set(oTarget, sKey, vValue);
-      listener();
+      listener(`set key ${sKey.toString()}`);
       return result;
     },
     deleteProperty(oTarget, sKey) {
@@ -99,7 +99,7 @@ export function wrapperState(target: any, listener: Function) {
 
       ++setCount;
       const result = Reflect.deleteProperty(oTarget, sKey);
-      listener();
+      listener(`delete key ${sKey.toString()}`);
       return result;
     },
   })
