@@ -1,8 +1,9 @@
 .container {
   padding: 0 var(--groot-padding-x);
+  height: var(--groot-banner-height);
 
-  .breadcrumbItem {
-    line-height: var(--groot-banner-height);
+  :global(.ant-breadcrumb > ol) {
     cursor: pointer;
+    line-height: var(--groot-banner-height);
   }
 }

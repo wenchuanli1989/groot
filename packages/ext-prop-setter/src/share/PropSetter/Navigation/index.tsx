@@ -15,8 +15,8 @@ export const Navigation = () => {
   return <div className={styles.container}>
     <Breadcrumb separator=">" items={
       breadcrumbList.map((item, index) => {
-        return (<Breadcrumb.Item key={item.id} className={styles.breadcrumbItem}
-          onClick={() => {
+        return {
+          title: <span onClick={() => {
             if (index === breadcrumbList.length - 1) {
               return;
             } else if (index > 0) {
@@ -27,8 +27,11 @@ export const Navigation = () => {
               callHook(PostMessageType.OuterOutlineReset)
             }
           }}>
-          {index === 0 ? (<><HomeOutlined /></>) : item.name}
-        </Breadcrumb.Item>)
+            {
+              index === 0 ? (<HomeOutlined />) : item.name
+            }
+          </span>
+        }
       })
     } />
   </div>

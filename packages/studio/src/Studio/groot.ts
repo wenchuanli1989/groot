@@ -46,7 +46,10 @@ export const launchExtension = (remoteExtensionList: ExtensionRuntime[], params:
       }
     });
 
-    extInstance.propItemPipeline = createExtScriptModule(extInstance.extensionVersion.propItemPipelineRaw)
+    if (extInstance.extensionVersion.propItemPipelineRaw) {
+      extInstance.propItemPipeline = createExtScriptModule(extInstance.extensionVersion.propItemPipelineRaw)
+      extInstance.propItemPipeline.id = extInstance.id;
+    }
 
     __provider = `ext:${extInstance.id}`;
     const configSchema = extInstance.main({
@@ -76,7 +79,6 @@ export const launchExtension = (remoteExtensionList: ExtensionRuntime[], params:
     callback()
   })
 }
-
 
 const registerCommand: GrootContextRegisterCommand<Record<string, [any[], any]>> = (command, callback) => {
   if (registorReady) {

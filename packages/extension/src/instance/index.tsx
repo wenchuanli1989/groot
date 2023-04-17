@@ -1,8 +1,7 @@
 import { AppstoreOutlined } from "@ant-design/icons";
-import { APIPath, ComponentInstance, ExtensionLevel, ExtensionRuntime, PropBlockStructType, PropGroup, State, StateCategory, ViewsContainer } from "@grootio/common";
-import { metadataFactory, propItemPipeline, propTreeFactory } from "@grootio/core";
+import { APIPath, ExtensionLevel, ExtensionRuntime, State, StateCategory, ViewsContainer } from "@grootio/common";
 import { getContext, grootManager } from "context";
-import { parseOptions, uuid } from "util/utils";
+import { uuid } from "util/utils";
 import { Application } from "./Application";
 import { Material } from "./Material";
 import StateList from "./State";
@@ -13,7 +12,6 @@ export const instanceBootstrap = () => {
   const { groot, params } = getContext();
   const { registerState, getState } = grootManager.state;
   const { registerCommand, executeCommand } = grootManager.command;
-  const { callHook } = grootManager.hook;
 
   getState('gs.ui.viewsContainers').push(...[
     {
@@ -73,7 +71,6 @@ export const instanceBootstrap = () => {
   registerState('gs.componentInstance', null, false)
   registerState('gs.component', null, false)
   registerState('gs.allComponentInstance', [], true)
-  registerState('gs.propSetting.breadcrumbList', [], true)
   registerState('gs.release', null, false)
   registerState('gs.globalStateList', [], true)
   registerState('gs.localStateList', [], true)
@@ -86,76 +83,26 @@ export const instanceBootstrap = () => {
     switchComponentInstance(instanceId)
   })
 
-  registerCommand('gc.makeDataToStage', (_, refreshId) => {
-    const list = getState('gs.allComponentInstance')
-    if (refreshId === 'all' || refreshId === 'first') {
-      const metadataList = instanceToMetadata(list);
-      callHook('gh.component.propChange', metadataList, refreshId === 'first')
-      return;
-    }
-
-    let instanceId = refreshId;
-    if (refreshId === 'current') {
-      instanceId = getState('gs.componentInstance').id;
-    }
-
-    const refreshInstance = list.find(i => i.id === instanceId);
-    const [refreshMetadata] = instanceToMetadata([refreshInstance]);
-    callHook('gh.component.propChange', refreshMetadata)
-  })
-
   groot.onReady(() => {
     executeCommand('gc.fetch.instance', params.instanceId)
   })
 }
 
 
-const instanceToMetadata = (instanceList: ComponentInstance[]) => {
-  const { groot: { extHandler } } = getContext();
-  return instanceList.map((instance) => {
-    const { groupList, blockList, itemList } = instance;
-    const valueList = instance.valueList;
-    if (!instance.propTree) {
-
-      itemList.forEach(item => {
-        parseOptions(item);
-        delete item.valueOptions
-      })
-
-      blockList.filter(block => block.struct === PropBlockStructType.List).forEach((block) => {
-        block.listStructData = JSON.parse(block.listStructData as any || '[]');
-      })
-
-      instance.propTree = propTreeFactory(groupList, blockList, itemList, valueList) as PropGroup[];
-      groupList.forEach((group) => {
-        if (!Array.isArray(group.expandBlockIdList)) {
-          group.expandBlockIdList = group.propBlockList.map(block => block.id);
-        }
-      })
-    }
-
-    const entryPropItemPipelineModuleList = [...extHandler.entry.values()].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
-    const releasePropItemPipelineModuleList = [...extHandler.application.values()].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
-    const solutionPropItemPipelineModuleList = [...(extHandler.solution.get(instance.id)?.values() || [])].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
-
-    const metadata = metadataFactory(instance.propTree, {
-      packageName: instance.component.packageName,
-      componentName: instance.component.componentName,
-      metadataId: instance.id,
-      rootMetadataId: instance.rootId,
-      parentMetadataId: instance.parentId,
-      solutionInstanceId: instance.solutionInstanceId,
-      componentVersionId: instance.componentVersion.id
-    }, (params) => {
-      propItemPipeline(entryPropItemPipelineModuleList, releasePropItemPipelineModuleList, solutionPropItemPipelineModuleList, params)
-    }, true);
-    return metadata;
-  })
-}
-
 const fetchRootInstance = (rootInstanceId: number) => {
-  const { request, groot: { loadExtension, launchExtension }, params, layout } = getContext();
+  const { request, groot: { loadExtension, launchExtension, extHandler }, params, layout } = getContext();
   request(APIPath.componentInstance_rootDetail_instanceId, { instanceId: rootInstanceId }).then(({ data: { children, root, release, solutionInstanceList, entryExtensionInstanceList } }) => {
+
+    // 卸载
+    [...extHandler.entry.values()].forEach(ext => {
+      extHandler.uninstall(ext.id, ExtensionLevel.Entry)
+    })
+
+    Array.from(extHandler.solution.entries()).forEach(([solutionId, solution]) => {
+      [...solution.values()].forEach(ext => {
+        extHandler.uninstall(ext.id, ExtensionLevel.Solution, solutionId)
+      })
+    })
 
     const list = [root, ...children]
 
@@ -233,14 +180,4 @@ export const switchComponentInstance = (instanceId: number) => {
   const instance = list.find(item => item.id === instanceId);
   grootManager.state.setState('gs.componentInstance', instance);
   grootManager.state.setState('gs.component', instance.component);
-
-  const breadcrumbList = grootManager.state.getState('gs.propSetting.breadcrumbList')
-  breadcrumbList.length = 0;
-
-  let ctxInstance = instance;
-  do {
-    breadcrumbList.push({ id: ctxInstance.id, name: ctxInstance.name });
-    ctxInstance = list.find((item) => item.id === ctxInstance.parentId);
-  } while (ctxInstance);
-  breadcrumbList.reverse();
 }

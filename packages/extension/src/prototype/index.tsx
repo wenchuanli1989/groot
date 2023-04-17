@@ -1,6 +1,5 @@
 import { AppstoreOutlined } from "@ant-design/icons";
-import { APIPath, PropBlockStructType, PropGroup, ViewsContainer } from "@grootio/common";
-import { metadataFactory, propItemPipeline, propTreeFactory } from "@grootio/core";
+import { APIPath, PropBlockStructType, ViewsContainer } from "@grootio/common";
 import { getContext, grootManager } from "context";
 import { parseOptions } from "util/utils";
 import { Solution } from "./Solution";
@@ -43,9 +42,6 @@ export const prototypeBootstrap = () => {
     fetchComponent(componentId, versionId);
   })
 
-  registerCommand('gc.makeDataToStage', (_, refreshId) => {
-    syncDataToStage(refreshId === 'first');
-  })
 
   layout.primarySidebarWidth = '220px'
 
@@ -68,37 +64,7 @@ const fetchComponent = (componentId: number, versionId) => {
       parseOptions(item);
     })
 
-
     grootManager.state.setState('gs.component', data)
     grootManager.command.executeCommand('gc.makeDataToStage', 'first')
   })
-}
-
-const syncDataToStage = (first = false) => {
-  const { groot: { extHandler }, params: { solution } } = getContext()
-  const component = grootManager.state.getState('gs.component');
-
-  if (!component.propTree) {
-    const { groupList, blockList, itemList, valueList } = component;
-    const propTree = propTreeFactory(groupList, blockList, itemList, valueList) as any as PropGroup[];
-    groupList.forEach((group) => {
-      if (!Array.isArray(group.expandBlockIdList)) {
-        group.expandBlockIdList = group.propBlockList.map(block => block.id);
-      }
-    })
-    component.propTree = propTree;
-  }
-
-  const propItemPipelineModuleList = [...(extHandler.solution.get(solution.id)?.values() || [])].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
-
-  const metadata = metadataFactory(component.propTree, {
-    packageName: component.packageName,
-    componentName: component.componentName,
-    metadataId: component.id,
-    solutionInstanceId: null,
-    componentVersionId: null
-  }, (params) => {
-    propItemPipeline([], [], propItemPipelineModuleList, params)
-  }, true);
-  grootManager.hook.callHook('gh.component.propChange', metadata, first)
 }

@@ -6,7 +6,7 @@ import { parseOptions } from "../util";
 
 export const instanceBootstrap = () => {
   const { groot } = getContext();
-  const { registerState, getState } = grootManager.state;
+  const { registerState, getState, watchState } = grootManager.state;
   const { registerCommand } = grootManager.command;
   const { callHook } = grootManager.hook;
 
@@ -34,6 +34,7 @@ export const instanceBootstrap = () => {
   })
 
   groot.onReady(() => {
+    watchState('gs.componentInstance', updateBreadcrumbList)
   })
 }
 
@@ -62,9 +63,9 @@ const instanceToMetadata = (instanceList: ComponentInstance[]) => {
       })
     }
 
-    const entryPropItemPipelineModuleList = [...extHandler.entry.values()].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
-    const releasePropItemPipelineModuleList = [...extHandler.application.values()].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
-    const solutionPropItemPipelineModuleList = [...(extHandler.solution.get(instance.id)?.values() || [])].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
+    const entryPropItemPipelineModuleList = [...extHandler.entry.values()].filter(ext => !!ext.propItemPipeline?.id).map(ext => ext.propItemPipeline)
+    const releasePropItemPipelineModuleList = [...extHandler.application.values()].filter(ext => !!ext.propItemPipeline?.id).map(ext => ext.propItemPipeline)
+    const solutionPropItemPipelineModuleList = [...(extHandler.solution.get(instance.id)?.values() || [])].filter(ext => !!ext.propItemPipeline?.id).map(ext => ext.propItemPipeline)
 
     const metadata = metadataFactory(instance.propTree, {
       packageName: instance.component.packageName,
@@ -81,3 +82,16 @@ const instanceToMetadata = (instanceList: ComponentInstance[]) => {
   })
 }
 
+const updateBreadcrumbList = (newInstance: ComponentInstance) => {
+  const { getState } = grootManager.state
+  const list = getState('gs.allComponentInstance')
+  const breadcrumbList = grootManager.state.getState('gs.propSetting.breadcrumbList')
+  breadcrumbList.length = 0;
+
+  let ctxInstance = newInstance;
+  do {
+    breadcrumbList.push({ id: ctxInstance.id, name: ctxInstance.name });
+    ctxInstance = list.find((item) => item.id === ctxInstance.parentId);
+  } while (ctxInstance);
+  breadcrumbList.reverse();
+}

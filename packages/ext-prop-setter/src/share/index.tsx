@@ -44,10 +44,6 @@ export const shareBootstrap = () => {
     { label: '函数', value: 'function' },
   ], true)
 
-  grootManager.command.registerCommand('gc.stageRefresh', (_, callback) => {
-    commandBridge.stageRefresh(callback)
-  })
-
   grootManager.command.registerCommand('gc.pushPropItemToStack', (_, propItem) => {
     commandBridge.pushPropItemToStack(propItem)
   })

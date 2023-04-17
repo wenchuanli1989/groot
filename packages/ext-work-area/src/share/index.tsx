@@ -1,10 +1,10 @@
-import { getContext, grootManager } from "context";
+import { commandBridge, getContext, grootManager } from "context";
 import { WorkArea } from "./WorkArea";
 import { ViewsContainer } from "@grootio/common";
 
 
 export const shareBootstrap = () => {
-  const { layout, groot } = getContext();
+  const { groot } = getContext();
   const { registerState } = grootManager.state
 
   registerState('gs.ui.viewsContainers', [
@@ -28,4 +28,10 @@ export const shareBootstrap = () => {
 
   registerState('gs.ui.stageViewport', 'desktop', false)
 
+  registerState('gs.stage.debugBaseUrl', '', false)
+  registerState('gs.stage.playgroundPath', '', false)
+
+  grootManager.command.registerCommand('gc.stageRefresh', (_, callback) => {
+    commandBridge.stageRefresh(callback)
+  })
 }

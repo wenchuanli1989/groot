@@ -32,7 +32,7 @@ const syncDataToStage = (first = false) => {
     component.propTree = propTree;
   }
 
-  const propItemPipelineModuleList = [...(extHandler.solution.get(solution.id)?.values() || [])].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
+  const propItemPipelineModuleList = [...(extHandler.solution.get(solution.id)?.values() || [])].filter(ext => !!ext.propItemPipeline?.id).map(ext => ext.propItemPipeline)
 
   const metadata = metadataFactory(component.propTree, {
     packageName: component.packageName,
