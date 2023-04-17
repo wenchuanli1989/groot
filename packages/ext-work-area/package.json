@@ -1,9 +1,9 @@
 {
-  "name": "@grootio/extension",
+  "name": "@groot/ext-work-area",
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "start": "webpack serve --host groot-local.com --port 21000 ",
+    "start": "webpack serve --host groot-local.com --port 22000 ",
     "build": "webpack --env prod",
     "analyzer": "webpack --env prod analyzer "
   },

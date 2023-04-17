@@ -93,8 +93,8 @@ const config = (env, args) => {
 			}),
 
 			new ModuleFederationPlugin({
-				name: '_groot_core_extension',
-				filename: 'groot-core-extension/index.js',
+				name: '_ext_web_visual',
+				filename: 'ext-web-visual/index.js',
 				exposes: {
 					Main: './src',
 				},
