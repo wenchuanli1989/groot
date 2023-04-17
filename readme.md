@@ -15,5 +15,7 @@
   - `examples/webpack-demo` demo项目：groot-local.com:11000
   - `pangu` 微模块系统基座项目：groot-local.com:15000
   - `packages/studio` 微模块系统主项目：groot-local.com:13000
-  - `packages/extension` 微模块系统子项目：groot-local.com:12000
+  - `packages/ext-web-visual` web可视化插件项目：groot-local.com:20000
+  - `packages/ext-prop-setter` 属性配置面板插件项目：groot-local.com:21000
+  - `packages/ext-work-area` 工作台插件项目：groot-local.com:22000
   - `examples/groot-studio-demo` 工作台宿主项目：groot-local.com:14000
