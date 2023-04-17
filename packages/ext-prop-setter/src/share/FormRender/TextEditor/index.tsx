@@ -37,6 +37,10 @@ function TextEditor({ onChange, value, type = 'json' }: propsType) {
 
   useEffect(() => {
     monacoLoader().then(() => {
+      if (!codeEditorContainerRef.current) {
+        return
+      }
+
       monaco = (window as any).monaco;
       const [model, modelUri] = createModel(type) as any;
 
