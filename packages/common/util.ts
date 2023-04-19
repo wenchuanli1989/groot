@@ -64,3 +64,5 @@ export const viewRender = (view: ViewElement, props?: any) => {
     return React.createElement(React.Fragment, props || {}, view)
   }
 }
+
+export const interpolationRegExp = /\{\{(\s*)([^\s]+)(\s*)\}\}/m

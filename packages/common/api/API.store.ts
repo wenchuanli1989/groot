@@ -27,6 +27,7 @@ export type APIStore = {
     release: Release,
     entryExtensionInstanceList: ExtensionInstance[],
     solutionInstanceList: SolutionInstance[],
+    stateList: State[]
   }>];
   [APIPath.componentInstance_addRoot]: [ComponentInstance, API.Response<ComponentInstance>];
   [APIPath.release_add]: [Release, API.Response<Release>],

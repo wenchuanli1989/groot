@@ -72,7 +72,7 @@ export const instanceBootstrap = () => {
   registerState('gs.component', null, false)
   registerState('gs.allComponentInstance', [], true)
   registerState('gs.release', null, false)
-  registerState('gs.globalStateList', [], true)
+  registerState('gs.globalStateList', params.application.stateList as any as State[], true)
   registerState('gs.localStateList', [], true)
 
   registerCommand('gc.fetch.instance', (_, rootInstanceId) => {
@@ -91,7 +91,7 @@ export const instanceBootstrap = () => {
 
 const fetchRootInstance = (rootInstanceId: number) => {
   const { request, groot: { loadExtension, launchExtension, extHandler }, params, layout } = getContext();
-  request(APIPath.componentInstance_rootDetail_instanceId, { instanceId: rootInstanceId }).then(({ data: { children, root, release, solutionInstanceList, entryExtensionInstanceList } }) => {
+  request(APIPath.componentInstance_rootDetail_instanceId, { instanceId: rootInstanceId }).then(({ data: { children, root, release, solutionInstanceList, entryExtensionInstanceList, stateList } }) => {
 
     // 卸载
     [...extHandler.entry.values()].forEach(ext => {
@@ -153,22 +153,7 @@ const fetchRootInstance = (rootInstanceId: number) => {
     grootManager.state.setState('gs.release', release)
     grootManager.state.setState('gs.allComponentInstance', list)
 
-    const globalStateList = root.stateList.filter(item => !item.instanceId)
-    const localStateList = root.stateList.filter(item => !!item.instanceId)
-
-    const runtimeStateList: Partial<State>[] = []
-
-    runtimeStateList.push({
-      id: uuid(),
-      name: '标题',
-      value: 'xxx',
-      type: StateCategory.Str,
-      isReadonly: true,
-      instanceId: root.id
-    })
-
-    grootManager.state.setState('gs.localStateList', [...(runtimeStateList as any), ...localStateList])
-    grootManager.state.setState('gs.globalStateList', globalStateList)
+    grootManager.state.setState('gs.localStateList', stateList)
 
     grootManager.command.executeCommand('gc.makeDataToStage', 'first');
     switchComponentInstance(root.id);

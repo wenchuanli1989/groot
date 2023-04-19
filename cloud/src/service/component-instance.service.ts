@@ -218,7 +218,9 @@ export class ComponentInstanceService {
 
     const release = await em.findOne(Release, rootInstance.release.id)
 
-    return { root: rootInstance, children: instanceList, release, entryExtensionInstanceList, solutionInstanceList };
+    const stateList = await em.find(State, { componentInstance: rootInstance })
+
+    return { root: rootInstance, children: instanceList, release, stateList, entryExtensionInstanceList, solutionInstanceList };
   }
 
   async reverseDetectId(trackId: number, releaseId: number) {

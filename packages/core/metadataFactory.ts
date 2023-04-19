@@ -1,4 +1,4 @@
-import { Metadata, PropBlockStructType, PropGroup, PropItem, PropItemStruct, PropItemViewType, PropMetadataComponent, PropMetadataType, PropValue } from '@grootio/common';
+import { Metadata, PropBlockStructType, PropGroup, PropItem, PropItemStruct, PropItemViewType, PropMetadataComponent, PropMetadataType, PropValue, State, interpolationRegExp } from '@grootio/common';
 
 import { fillPropChainGreed, fillPropChain } from './utils';
 
@@ -9,7 +9,8 @@ type PipelineType = (params: {
   propItem: PropItem,
   metadata: Metadata,
   propKeyChain: string,
-  defaultFn: () => void
+  defaultFn: () => void,
+  valueInterpolation: boolean
 }) => void
 
 let _pipeline: PipelineType
@@ -157,6 +158,7 @@ function buildPropObjectForLeafItem(propItem: PropItem, ctx: Object, propKeyChai
   }
 
   const value = propValue?.value || propItem.defaultValue
+  const valueInterpolation = interpolationRegExp.test(value)
 
   const defaultFn = () => {
     if (typeof value === 'string' && value.length) {
@@ -181,10 +183,17 @@ function buildPropObjectForLeafItem(propItem: PropItem, ctx: Object, propKeyChai
       defaultFn()
     } else {
       if (_pipeline) {
-        _pipeline({ ctx: newCTX, propKey: propEnd, value, propItem, metadata, propKeyChain, defaultFn })
+        _pipeline({ ctx: newCTX, propKey: propEnd, value, propItem, metadata, propKeyChain, defaultFn, valueInterpolation })
       } else {
         defaultFn()
       }
+    }
+
+    if (interpolationRegExp.test(newCTX[propEnd])) {
+      metadata.advancedProps.push({
+        keyChain: propKeyChain,
+        type: PropMetadataType.Interpolation
+      })
     }
   } else if (propItem.struct === PropItemStruct.Component) {
     const data = (!value ? { list: [] } : JSON.parse(value)) as PropMetadataComponent
