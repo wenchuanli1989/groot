@@ -184,6 +184,9 @@ function buildPropObjectForLeafItem(propItem: PropItem, ctx: Object, propKeyChai
     } else {
       if (_pipeline) {
         _pipeline({ ctx: newCTX, propKey: propEnd, value, propItem, metadata, propKeyChain, defaultFn, valueInterpolation })
+        if (newCTX[propEnd] === undefined) {
+          defaultFn()
+        }
       } else {
         defaultFn()
       }

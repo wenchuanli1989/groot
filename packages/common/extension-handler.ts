@@ -37,6 +37,9 @@ export const createExtensionHandler = () => {
 
     const extensionId = extensionInstance.extension.id;
     const assetUrl = extensionInstance.extensionVersion.assetUrl
+    if (!extensionId || !assetUrl) {
+      throw new Error('extensionId为空或assetUrl为空')
+    }
     if (extensionMap.runtime.byExtIdMap.has(extensionId)) {
       extensionInstance.status = ExtensionStatus.Conflict
     } else if (extensionMap.runtime.byAssetUrlMap.has(assetUrl)) {
