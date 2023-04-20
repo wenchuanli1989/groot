@@ -1,9 +1,10 @@
-import { PropMetadataType } from "./enum";
+import { State } from "./entities";
 
 export type ApplicationData = {
   name: string,
   key: string,
   views: ViewData[],
+  stateList: State[],
   envData: Record<string, any>
 }
 
@@ -11,6 +12,7 @@ export type ViewData = {
   key: string;
   metadataUrl?: string;
   metadataList?: Metadata[];
+  stateList: State[]
 }
 
 export type Metadata = {

@@ -24,6 +24,7 @@ import { NodeVM } from 'vm2';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
 import { SolutionInstance } from 'entities/SolutionInstance';
 import { LargeText } from 'entities/LargeText';
+import { State } from 'entities/State';
 
 
 const vm2 = new NodeVM()
@@ -75,7 +76,7 @@ export class AssetService {
     const releaseExtensionInstanceList = await em.find(ExtensionInstance, {
       relationId: releaseId,
       relationType: ExtensionRelationType.Release,
-    }, { populate: ['extensionVersion', 'extensionVersion.propItemPipelineRaw'] })
+    }, { populate: ['extensionVersion.propItemPipelineRaw', 'extension'] })
 
     this.installPropItemPipelineModule(releaseExtensionInstanceList, ExtensionLevel.Application, extHandler)
     const releaseExtScriptModuleList = [...extHandler.application.values()].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
@@ -94,7 +95,7 @@ export class AssetService {
         const solutionExtensionInstanceList = await em.find(ExtensionInstance, {
           relationId: solutionInstance.solutionVersion.id,
           relationType: ExtensionRelationType.SolutionVersion
-        }, { populate: ['extensionVersion.propItemPipelineRaw'] })
+        }, { populate: ['extensionVersion.propItemPipelineRaw', 'extension'] })
 
         this.installPropItemPipelineModule(solutionExtensionInstanceList, ExtensionLevel.Solution, extHandler, solutionInstance.id)
       }
@@ -102,7 +103,7 @@ export class AssetService {
       const entryExtensionInstanceList = await em.find(ExtensionInstance, {
         relationId: rootInstance.id,
         relationType: ExtensionRelationType.Entry
-      }, { populate: ['extensionVersion.propItemPipelineRaw'] })
+      }, { populate: ['extensionVersion.propItemPipelineRaw', 'extension'] })
 
       this.installPropItemPipelineModule(entryExtensionInstanceList, ExtensionLevel.Entry, extHandler)
       const entryExtScriptModuleList = [...extHandler.entry.values()].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
@@ -132,6 +133,12 @@ export class AssetService {
       }
     }
 
+    const manifest = {
+      metadataList: [],
+      stateList: []
+    }
+
+    manifest.stateList = await em.find(State, { release, componentInstance: null })
 
     const bundle = em.create(Bundle, {
       release,
@@ -145,12 +152,13 @@ export class AssetService {
 
       // 创建InstanceAsset
       const newAssetList = [];
-      const manifest = []
+
       for (const instance of rootInstanceList) {
+        const stateList = await em.find(State, { componentInstance: instance })
         const metadataList = instanceMetadataMap.get(instance);
 
         const content = em.create(LargeText, {
-          text: JSON.stringify(metadataList)
+          text: JSON.stringify({ metadataList, stateList })
         })
 
         await em.flush()
@@ -164,7 +172,7 @@ export class AssetService {
 
         await em.flush()
 
-        manifest.push({
+        manifest.metadataList.push({
           key: asset.manifestKey,
           metadataUrl: `http://groot-local.com:10000/asset/instance/${asset.id}`
         })
@@ -180,7 +188,9 @@ export class AssetService {
       await em.flush();
 
       // 更新newAssetList
-      bundle.newAssetList.add(newAssetList);
+      newAssetList.forEach(asset => {
+        bundle.newAssetList.add(asset);
+      })
       await em.flush();
 
       await em.commit();
@@ -258,15 +268,18 @@ export class AssetService {
       deploy.application.onlineRelease = deploy.release
     }
 
+    const { metadataList, stateList } = JSON.parse(deploy.bundle.manifest.text)
+
     const appData: ApplicationData = {
       name: deploy.application.name,
       key: deploy.application.key,
-      views: '#manifest#' as any,
-      envData: {}
+      views: metadataList,
+      envData: {},
+      stateList
     }
 
     const content = em.create(LargeText, {
-      text: JSON.stringify(appData).replace(/"#manifest#"/, deploy.bundle.manifest.text)
+      text: JSON.stringify(appData)
     })
 
     const manifest = em.create(DeployManifest, {

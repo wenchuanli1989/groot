@@ -62,6 +62,7 @@ export default class WorkAreaModel extends BaseModel {
 
     const { registerHook, callHook } = grootManager.hook
     const { executeCommand } = grootManager.command
+    const { getState } = grootManager.state
 
     registerHook(PostMessageType.InnerReady, () => {
       this.iframeReady = true;
@@ -100,11 +101,14 @@ export default class WorkAreaModel extends BaseModel {
 
     registerHook(PostMessageType.OuterUpdateComponent, (data) => {
       guard();
+      const localStateList = getState('gs.localStateList')
+      const globalStateList = getState('gs.globalStateList')
       this.iframeEle.contentWindow.postMessage({
         type: PostMessageType.OuterUpdateComponent,
         data: {
           key: this.iframeDebuggerConfig.controlView,
-          data
+          metadataList: data,
+          stateList: [...localStateList, ...globalStateList]
         }
       }, '*');
     })
@@ -193,14 +197,16 @@ export default class WorkAreaModel extends BaseModel {
 
     const viewData = {
       key: playgroundPath,
-      metadataList: []
+      metadataList: [],
+      stateList: []
     };
 
     const appData: ApplicationData = {
       name,
       key,
       views: [viewData],
-      envData: {}
+      envData: {},
+      stateList: []
     };
 
     return appData;
