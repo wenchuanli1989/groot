@@ -7,7 +7,7 @@ const ArrayPatchMethods = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 
 /**
  * 检测对象属性变化
  */
-export function wrapperState(target: any, listener: Function) {
+export function wrapperState(target: any, listener: Function, directChange = true) {
   if (isNativeType(target)) {
     throw new Error('不能使用原生引用类型')
   }
@@ -66,7 +66,7 @@ export function wrapperState(target: any, listener: Function) {
             }
 
             const result = Reflect.apply(value, receiver, args);
-            listener(`Array method ${sKey}`);
+            listener(`Array method ${sKey}`, directChange);
             return result;
           }
         }
@@ -79,7 +79,7 @@ export function wrapperState(target: any, listener: Function) {
           return value;
         }
         // 除函数之外引用应用类型需要递归包裹生成代理对象
-        return wrapperState(value, listener)[0];
+        return wrapperState(value, listener, false)[0];
       }
     },
     set(oTarget, sKey, vValue, receiver) {
@@ -89,7 +89,7 @@ export function wrapperState(target: any, listener: Function) {
 
       ++setCount;
       const result = Reflect.set(oTarget, sKey, vValue);
-      listener(`set key ${sKey.toString()}`);
+      listener(`set key ${sKey.toString()}`, directChange);
       return result;
     },
     deleteProperty(oTarget, sKey) {
@@ -99,7 +99,7 @@ export function wrapperState(target: any, listener: Function) {
 
       ++setCount;
       const result = Reflect.deleteProperty(oTarget, sKey);
-      listener(`delete key ${sKey.toString()}`);
+      listener(`delete key ${sKey.toString()}`, directChange);
       return result;
     },
   })

@@ -79,7 +79,7 @@ export type GrootContextRegisterState<ST extends Record<string, [any, boolean]>>
   B extends ST[K][1],
   D extends (B extends true ? T[] : T),
   N extends D
-> (name: K, defaultValue: D, multi: B, onChange?: (newValue: N) => void) => boolean;
+> (name: K, defaultValue: D, multi: B, onChange?: (newValue: N, event: { reason: string, directChange: boolean }) => void) => boolean;
 
 export type GrootContextGetState<ST extends Record<string, [any, boolean]>> = <
   K extends keyof ST & string,
@@ -93,7 +93,7 @@ export type GrootContextWatchState<ST extends Record<string, [any, boolean]>> = 
   T extends ST[K][0],
   B extends ST[K][1],
   N extends (B extends true ? T[] : T),
->(name: K, onChange: (newValue: N) => void) => Function;
+>(name: K, onChange: (newValue: N, event: { reason: string, directChange: boolean }) => void) => Function;
 
 export type GrootContextSetState<ST extends Record<string, [any, boolean]>> = <
   K extends keyof ST & string,

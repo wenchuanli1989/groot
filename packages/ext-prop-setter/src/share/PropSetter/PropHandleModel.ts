@@ -291,8 +291,8 @@ export default class PropHandleModel extends BaseModel {
     commandBridge.pushPropItemToStack = this.pushPropItemToStack.bind(this)
   }
 
-  private propTreeListener(newValue: { propTree: PropGroup[] }) {
-    if (newValue?.propTree) {
+  private propTreeListener(newValue: { propTree: PropGroup[] }, event) {
+    if (newValue?.propTree && event.directChange) {
       const originPropTree = getOrigin(newValue.propTree)
 
       // 擦除外部包裹的代理对象，取内部原生对象，避免外部代理对象不能监听对象属性变化

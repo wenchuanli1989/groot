@@ -128,10 +128,10 @@ const registerState: GrootContextRegisterState<Record<string, [any, boolean]>> =
 
   if (originState) {
     if (onChange) {
-      originState.eventTarget.addEventListener('change', () => {
+      originState.eventTarget.addEventListener('change', (event) => {
         if (!registorReady) return;
 
-        onChange(originState.value);
+        onChange(originState.value, (event as any).detail as any);
       })
     }
 
@@ -143,8 +143,11 @@ const registerState: GrootContextRegisterState<Record<string, [any, boolean]>> =
       // 切断对原有对象监听
       originState.cancel()
 
-      const [stateValue, cancel] = wrapperState(defaultValue, () => {
-        originState.eventTarget.dispatchEvent(new Event('change'))
+      const [stateValue, cancel] = wrapperState(defaultValue, (reason, directChange) => {
+        const event = new CustomEvent('change', {
+          detail: { reason, directChange }
+        })
+        originState.eventTarget.dispatchEvent(event)
       })
       originState.value = stateValue
       originState.cancel = cancel
@@ -154,15 +157,18 @@ const registerState: GrootContextRegisterState<Record<string, [any, boolean]>> =
   } else {
     const eventTarget = new EventTarget();
     if (onChange) {
-      eventTarget.addEventListener('change', () => {
+      eventTarget.addEventListener('change', (event) => {
         if (!registorReady) return;
 
-        onChange(stateMap.get(name).value);
+        onChange(stateMap.get(name).value, (event as any).detail as any);
       })
     }
 
-    const [stateValue, cancel] = wrapperState(defaultValue, () => {
-      eventTarget.dispatchEvent(new Event('change'))
+    const [stateValue, cancel] = wrapperState(defaultValue, (reason, directChange) => {
+      const event = new CustomEvent('change', {
+        detail: { reason, directChange }
+      })
+      eventTarget.dispatchEvent(event)
     })
 
     stateMap.set(name, {
@@ -192,8 +198,8 @@ const watchState: GrootContextWatchState<Record<string, [any, boolean]>> = (name
   }
 
   const stateData = stateMap.get(name);
-  const listener = () => {
-    callback(stateData.value);
+  const listener = (event) => {
+    callback(stateMap.get(name).value, event.detail);
   }
   stateData.eventTarget.addEventListener('change', listener)
 
@@ -216,13 +222,20 @@ const setState: GrootContextSetState<Record<string, [any, boolean]>> = (name, ne
       stateData.value = newValue;
     } else {
       stateData.cancel()
-      const [proxyObj, cancel] = wrapperState(newValue, () => {
-        stateData.eventTarget.dispatchEvent(new Event('change'))
+      const [proxyObj, cancel] = wrapperState(newValue, (reason, directChange) => {
+        const event = new CustomEvent('change', {
+          detail: { reason, directChange }
+        })
+        stateData.eventTarget.dispatchEvent(event)
       })
       stateData.value = proxyObj
       stateData.cancel = cancel
     }
-    stateData.eventTarget.dispatchEvent(new Event('change'))
+
+    const event = new CustomEvent('change', {
+      detail: { reason: 'setState', directChange: true }
+    })
+    stateData.eventTarget.dispatchEvent(event)
   }
 
   return stateData.value;
