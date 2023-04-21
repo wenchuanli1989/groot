@@ -47,7 +47,7 @@ export default class WorkAreaModel extends BaseModel {
     if (eventTypeList.includes(event.data.type)) {
       callHook(event.data.type, event.data.data)
     } else {
-      console.warn(`未知的iframe消息: ${event.data.type}`)
+      console.warn(`未知的iframe消息: ${event.data}`)
     }
 
   }
@@ -101,14 +101,20 @@ export default class WorkAreaModel extends BaseModel {
 
     registerHook(PostMessageType.OuterUpdateComponent, (data) => {
       guard();
-      const localStateList = getState('gs.localStateList')
-      const globalStateList = getState('gs.globalStateList')
+      let stateList = []
+      if (!isPrototypeMode()) {
+        stateList = [
+          ...getState('gs.localStateList').map(item => ({ ...item })),
+          ...getState('gs.globalStateList').map(item => ({ ...item }))
+        ]
+      }
+
       this.iframeEle.contentWindow.postMessage({
         type: PostMessageType.OuterUpdateComponent,
         data: {
           key: this.iframeDebuggerConfig.controlView,
           metadataList: data,
-          stateList: [...localStateList, ...globalStateList]
+          stateList
         }
       }, '*');
     })
