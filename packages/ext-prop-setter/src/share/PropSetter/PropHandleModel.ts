@@ -1,4 +1,4 @@
-import { ComponentInstance, PropMetadataComponentItem, PropMetadataComponent, DragAddComponentEventData, getOrigin, PostMessageType, PropBlock, PropGroup, PropItem, PropValueType, ValueStruct, wrapperState, BaseModel, PropItemStruct, ViewElement, viewRender } from "@grootio/common";
+import { ComponentInstance, PropMetadataComponentItem, PropMetadataComponent, DragAddComponentEventData, getOrigin, PostMessageType, PropBlock, PropGroup, PropItem, PropValueType, ValueStruct, wrapperState, BaseModel, PropItemStruct, viewRender, FormItemRender } from "@grootio/common";
 import { commandBridge, grootManager, isPrototypeMode } from "context";
 import React from "react";
 
@@ -28,7 +28,7 @@ export default class PropHandleModel extends BaseModel {
   public propPathChainEle: HTMLElement;
 
   public propItemViewTypeObj = {} as Record<string, string>;
-  public propFormItemObj = {} as Record<string, ViewElement>;
+  public propFormItemObj = {} as Record<string, React.FC<FormItemRender>>;
 
 
   public inject(propPersist: PropPersistModel) {

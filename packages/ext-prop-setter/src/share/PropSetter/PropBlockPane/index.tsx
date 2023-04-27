@@ -9,6 +9,7 @@ import PropPersistModel from "../PropPersistModel";
 import PropHandleModel from "../PropHandleModel";
 import { grootManager, isPrototypeMode } from "context";
 import { calcPropValueIdChain } from "util/index";
+import FormItemView from "../FormItemView";
 
 type PropType = {
   block: PropBlock,
@@ -160,22 +161,22 @@ function PropBlockPane({ block, freezeSetting, noWrapMode }: PropType) {
               {
                 block.layout === PropBlockLayout.Vertical ? (
                   <div className={`${styles.propItemContainer} ${styles.vertical} ${noSetting ? '' : styles.hasAction}`}>
-                    {propHandleModel.renderFormItem(item, {
+                    <FormItemView propItem={item} simplify={false} formItemProps={{
                       label: renderItemLabel(item, index, true),
                       name: item.propKey,
                       preserve: false,
                       initialValue: getInitValue(item)
-                    }, false)}
+                    }} />
                   </div>
                 ) : (
                   <div className={`${styles.propItemContainer} ${styles.horizontal} ${noSetting ? '' : styles.hasAction}`}>
                     <div className="content">
-                      {propHandleModel.renderFormItem(item, {
+                      <FormItemView propItem={item} simplify={false} formItemProps={{
                         label: renderItemLabel(item, index, false),
                         name: item.propKey,
                         preserve: false,
                         initialValue: getInitValue(item)
-                      }, false)}
+                      }} />
                     </div>
                     <div className="action">{renderItemSetting(item, index)}</div>
                   </div>

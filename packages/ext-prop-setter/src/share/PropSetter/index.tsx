@@ -40,8 +40,8 @@ export const PropSetter = () => {
             <SubPropPane key={activeSubPropItem.id} item={activeSubPropItem} />
           </div>
         ) : (
-          <div className={`${styles.propPaneItem}  `}>
-            {!!component ? <PropPane /> : <>loading ...</>}
+          <div className={`${styles.propPaneItem}`}>
+            <PropPane />
           </div>
         )
       }

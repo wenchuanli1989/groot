@@ -175,8 +175,8 @@ export type GrootStateDict = {
   'gs.globalStateList': [State, true],
   'gs.localStateList': [State, true],
   'gs.propItem.viewTypeList': [{ label: string, value: string }, true],
-  'gs.propItem.formRenderList': [{ viewType: string, render: ViewElement }, true],
-  'gs.propItem.settingRenderList': [{ viewType: string, render: ViewElement }, true],
+  'gs.propItem.formRenderList': [{ viewType: string, render: React.FC<FormItemRender> }, true],
+  'gs.propItem.settingRenderList': [{ viewType: string, render: React.FC<FormItemRender> }, true],
 }
 
 export type GrootHookDict = {
@@ -342,4 +342,11 @@ export type ExtensionHandler = {
   },
   install: (extensionInstance: ExtensionInstance, level: ExtensionLevel, solutionInstanceId?: number) => boolean,
   uninstall: (extensionInstanceId: number, level: ExtensionLevel, solutionInstanceId?: number) => boolean
+}
+
+
+export type FormItemRender = {
+  propItem: PropItem,
+  simplify: boolean,
+  formItemProps: any
 }
