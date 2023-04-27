@@ -25,7 +25,7 @@ export const prototypeBootstrap = () => {
 
   getState('gs.ui.views').push(...[
     {
-      id: 'solutio',
+      id: 'solution',
       name: '组件',
       view: <Solution />,
       parent: 'solution'
