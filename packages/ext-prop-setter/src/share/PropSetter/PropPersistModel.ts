@@ -28,6 +28,10 @@ export default class PropPersistModel extends BaseModel {
    */
   public settingModalSubmitting = false;
 
+  public updateValueInterval = 1000
+
+  private updateValueTimeout: number
+
   private request = getContext().request;
 
   private propHandle: PropHandleModel
@@ -341,7 +345,19 @@ export default class PropPersistModel extends BaseModel {
     })
   }
 
-  public updateValue({ propItem, value, abstractValueId, abstractValueIdChain, valueStruct, hostComponentInstanceId }: { propItem: PropItem, value: any, abstractValueId?: number, abstractValueIdChain?: string, valueStruct?: ValueStruct, hostComponentInstanceId?: number }) {
+  public updateValue(params: { propItem: PropItem, value: any, abstractValueId?: number, abstractValueIdChain?: string, valueStruct?: ValueStruct, hostComponentInstanceId?: number }) {
+    if (this.updateValueTimeout) {
+      clearTimeout(this.updateValueTimeout)
+    }
+
+    return new Promise((resolve, reject) => {
+      this.updateValueTimeout = window.setTimeout(() => {
+        this._updateValue(params).then((data) => resolve(data), (e) => reject(e))
+      }, this.updateValueInterval)
+    })
+  }
+
+  public _updateValue({ propItem, value, abstractValueId, abstractValueIdChain, valueStruct, hostComponentInstanceId }: { propItem: PropItem, value: any, abstractValueId?: number, abstractValueIdChain?: string, valueStruct?: ValueStruct, hostComponentInstanceId?: number }) {
     if (!abstractValueIdChain) {
       abstractValueIdChain = calcPropValueIdChain(propItem, abstractValueId);
     }
