@@ -168,6 +168,7 @@ export default class WorkAreaModel extends BaseModel {
     commandBridge.stageRefresh = this.refresh;
 
     registerHook('gh.component.propChange', (data, first = false) => {
+      console.info(data)
       if (first) {
         executeCommand('gc.stageRefresh')
       } else {

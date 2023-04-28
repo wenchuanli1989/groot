@@ -21,7 +21,6 @@ export const PropSetter = () => {
     propHandleModel.inject(propPersistModel);
   });
 
-  const [component] = grootManager.state.useStateByName('gs.component');
 
   const containerRef = useRef<HTMLDivElement>({} as any);
 
