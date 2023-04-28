@@ -29,7 +29,7 @@ export type UIManagerConfig = {
   /**
    * 加载应用前方法回调
    */
-  beforeLoadApplication?: Promise<void> | Function;
+  beforeLoadApplication?: () => Promise<any> | void;
   /**
    * 是否是调试模式，可输出详细的日志信息
    */

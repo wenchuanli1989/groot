@@ -15,9 +15,9 @@ export const createComponent = (metadata: Metadata, isRoot: boolean, viewEleMap,
   function ComponentFunction() {
     const [, metadataRefresh] = useReducer((bool) => !bool, true);
     const containerEleRef = useRef<HTMLElement>();
+    refreshFnMap.set(metadata.id, metadataRefresh);
 
     useEffect(() => {
-      refreshFnMap.set(metadata.id, metadataRefresh);
       viewEleMap.set(metadata.id, containerEleRef.current);
       viewMetadataMap.set(metadata.id, metadata);
 
@@ -33,23 +33,22 @@ export const createComponent = (metadata: Metadata, isRoot: boolean, viewEleMap,
     }
 
     // react不接受$开头的属性
-    const propsObj = Object.assign({}, metadata.propsObj);
+    const propsObj = metadata.propsObj
     delete propsObj.$setting;
     propsObj._groot = groot;
-    if (!groot.controlMode && !globalConfig.useWrapper) {
-      return React.createElement(module, propsObj)
-    } else {
-
-      const props = {
+    if (groot.controlMode || globalConfig.useWrapper) {
+      const eleProps = {
         'data-groot-component-instance-id': metadata.id,
         style: { display: metadata.propsObj.$setting?.wrapperDisplay || 'block' },
         ref: containerEleRef
       }
 
       if (isRoot) {
-        props['data-groot-root'] = 'true';
+        eleProps['data-groot-root'] = 'true';
       }
-      return React.createElement('div', props, React.createElement(module, propsObj));
+      return React.createElement('div', eleProps, React.createElement(module, propsObj));
+    } else {
+      return React.createElement(module, propsObj)
     }
 
   }

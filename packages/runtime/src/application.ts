@@ -19,6 +19,7 @@ const instance = {
   hasView,
   viewLoading,
   loadView,
+  beforeLoadAppPromise: Promise.resolve('执行异常'),
 
   groot
 };
@@ -31,6 +32,7 @@ let iframeDebuggerConfig: IframeDebuggerConfig;
 let activeView: View;
 // 包含所有界面视图
 const allViewMap = new Map<string, View>();
+const loadingViewMap = new Map<string, Promise<any>>()
 
 
 export function bootstrap(customConfig: UIManagerConfig, defaultConfig: UIManagerConfig): ApplicationInstance {
@@ -83,20 +85,24 @@ function onMessage(event: any) {
 }
 
 function loadApplication(success = () => { }, fail = (e) => { throw e }) {
-  if (globalConfig.beforeLoadApplication instanceof Promise) {
-    instance.status = ApplicationStatus.BeforeLoading;
-    globalConfig.beforeLoadApplication.then(() => {
-      loadApplicationData().then(success, fail);
-    });
+  if (globalConfig.beforeLoadApplication && typeof globalConfig.beforeLoadApplication === 'function') {
+    const result = globalConfig.beforeLoadApplication() as Promise<any>
+
+    if (result instanceof Promise) {
+      instance.status = ApplicationStatus.BeforeLoading;
+      instance.beforeLoadAppPromise = result;
+      result.then(() => {
+        loadApplicationData().then(success, fail);
+      });
+    }
   } else {
-    globalConfig.beforeLoadApplication && globalConfig.beforeLoadApplication();
     loadApplicationData().then(success, fail);
   }
 }
 
 function loadApplicationData(): Promise<void> {
   if (instance.status === ApplicationStatus.Finish) {
-    throw new Error('应用重复加载');
+    throw new Error('groot应用重复加载');
   }
 
   instance.status = ApplicationStatus.Loading;
@@ -143,7 +149,12 @@ function hasView(key: string) {
 
 function viewLoading(key: string) {
   const view = allViewMap.get(key);
-  return view && view.status === 'loading';
+  const loadingResult = loadingViewMap.get(key)
+  if (view && view.status === 'loading' && !loadingResult) {
+    throw new Error('加载异常')
+  }
+
+  return loadingResult
 }
 
 function loadView(key: string): Promise<View> | View {
@@ -156,7 +167,12 @@ function loadView(key: string): Promise<View> | View {
     return view;
   }
 
-  return view.init();
+  const result = view.init();
+  loadingViewMap.set(key, result)
+  result.finally(() => {
+    loadingViewMap.delete(key)
+  })
+  return result;
 }
 
 

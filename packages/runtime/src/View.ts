@@ -30,7 +30,7 @@ export class View {
   public init(): Promise<View> {
     return this.loadMetadata().then(({ metadataList, stateList }) => {
       this.metadataList = metadataList;
-      this.stateList = stateList;
+      this.stateList = stateList || [];
       const rootMetadata = this.metadataList.find(m => !m.parentId);
       this.rootComponent = buildComponent(rootMetadata, this.metadataList, true);
       this.status = 'finish';
@@ -70,7 +70,7 @@ export class View {
       }
 
       return this.metadataPromise;
-    } else if (this.metadataList && this.stateList) {
+    } else if (this.metadataList) {
       return Promise.resolve({ metadataList: this.metadataList, stateList: this.stateList });
     } else if (this.metadataUrl) {// 从远程地址加载配置信息
       if (!this.metadataPromise) {
@@ -79,7 +79,7 @@ export class View {
 
       return this.metadataPromise;
     } else {
-      return Promise.reject('metadataUrl and metadata can not both be empty');
+      return Promise.reject('view数据异常');
     }
   }
 
@@ -97,6 +97,7 @@ export class View {
 
     rootMetadata.propsObj = newRootMetadata.propsObj;
     rootMetadata.advancedProps = newRootMetadata.advancedProps;
+    // 组件属性对象引用不能变
     list.splice(newRootIndex, 1, rootMetadata);
     this.metadataList = list;
 
