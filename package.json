@@ -9,7 +9,9 @@
     "packages/runtime",
     "packages/react"
   ],
-  "scripts": {},
+  "scripts": {
+    "code-stat": "cloc --exclude-dir='node_modules' --include-ext='ts,tsx' ."
+  },
   "lint-staged": {
     "packages/**/*.{ts,tsx}": [
       "eslint --ext .ts,.tsx"
