@@ -6,7 +6,7 @@ import config from 'config/mikro-orm.config';
 import { PropBlockService } from 'service/prop-block.service';
 import { PropGroupService } from 'service/prop-group.service';
 import { PropItemService } from 'service/prop-item.service';
-import { ComponentService } from 'service/Component.service';
+import { ComponentService } from 'service/component.service';
 import { ApplicationService } from 'service/application.service';
 import { OrgService } from 'service/org.service';
 import { CommonService } from 'service/common.service';
