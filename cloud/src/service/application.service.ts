@@ -5,7 +5,7 @@ import { LogicException } from 'config/logic.exception';
 import { Application } from 'entities/Application';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
 import { Release } from 'entities/Release';
-import { State } from 'entities/State';
+import { Resource } from 'entities/Resource';
 
 
 @Injectable()
@@ -27,7 +27,7 @@ export class ApplicationService {
       relationType: ExtensionRelationType.Release
     }, { populate: ['extension', 'extensionVersion.propItemPipelineRaw', 'extensionVersion'] })
 
-    application.stateList = await em.find(State, { componentInstance: null })
+    application.resourceList = await em.find(Resource, { componentInstance: null })
 
     return application;
   }

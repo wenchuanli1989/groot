@@ -65,7 +65,7 @@ function onMessage(event: any) {
       throw new Error('内外层界面标识不一致')
     }
 
-    activeView.update(event.data.data.metadataList, event.data.data.stateList);
+    activeView.update(event.data.data.metadataList, event.data.data.resourceList);
     setTimeout(updateActiveRect);
   } else if (messageType === PostMessageType.OuterRefreshView) {
     window.location.reload();

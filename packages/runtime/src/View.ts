@@ -1,4 +1,4 @@
-import type { Metadata, State, ViewData } from "@grootio/common";
+import type { Metadata, Resource, ViewData } from "@grootio/common";
 import { PostMessageType } from "@grootio/common";
 
 import { buildComponent, reBuildComponent } from "./compiler";
@@ -11,15 +11,15 @@ export class View {
   status: 'loading' | 'finish';
   private metadataUrl: string;
   private metadataList: Metadata[];
-  private stateList: State[];
-  private metadataPromise?: Promise<{ metadataList: Metadata[], stateList: State[] }>;
-  private fetchMetadataResolve?: (data: { metadataList: Metadata[], stateList: State[] }) => void;
+  private resourceList: Resource[];
+  private metadataPromise?: Promise<{ metadataList: Metadata[], resourceList: Resource[] }>;
+  private fetchMetadataResolve?: (data: { metadataList: Metadata[], resourceList: Resource[] }) => void;
 
   constructor(data: ViewData, controlMode: boolean) {
     this.key = data.key;
     this.metadataUrl = data.metadataUrl;
     this.metadataList = data.metadataList;
-    this.stateList = data.stateList;
+    this.resourceList = data.resourceList;
     this.controlMode = controlMode;
 
     if (!controlMode && !this.metadataUrl && (!Array.isArray(this.metadataList) || this.metadataList.length === 0)) {
@@ -28,9 +28,9 @@ export class View {
   }
 
   public init(): Promise<View> {
-    return this.loadMetadata().then(({ metadataList, stateList }) => {
+    return this.loadMetadata().then(({ metadataList, resourceList }) => {
       this.metadataList = metadataList;
-      this.stateList = stateList || [];
+      this.resourceList = resourceList || [];
       const rootMetadata = this.metadataList.find(m => !m.parentId);
       this.rootComponent = buildComponent(rootMetadata, this.metadataList, true);
       this.status = 'finish';
@@ -38,7 +38,7 @@ export class View {
     })
   }
 
-  public update(metadataList: Metadata | Metadata[], stateList?: State[]) {
+  public update(metadataList: Metadata | Metadata[], resourceList?: Resource[]) {
     const multi = Array.isArray(metadataList);
     if (this.status === 'finish') {
       if (multi) {
@@ -47,14 +47,14 @@ export class View {
         this.incrementUpdate(metadataList)
       }
     } else {
-      this.fetchMetadataResolve({ metadataList: multi ? metadataList : [metadataList], stateList });
+      this.fetchMetadataResolve({ metadataList: multi ? metadataList : [metadataList], resourceList });
     }
   }
 
   /**
    * 加载页面配置信息
    */
-  private loadMetadata(): Promise<{ metadataList: Metadata[], stateList: State[] }> {
+  private loadMetadata(): Promise<{ metadataList: Metadata[], resourceList: Resource[] }> {
     if (this.status !== 'finish') {
       this.status = 'loading';
     }
@@ -71,7 +71,7 @@ export class View {
 
       return this.metadataPromise;
     } else if (this.metadataList) {
-      return Promise.resolve({ metadataList: this.metadataList, stateList: this.stateList });
+      return Promise.resolve({ metadataList: this.metadataList, resourceList: this.resourceList });
     } else if (this.metadataUrl) {// 从远程地址加载配置信息
       if (!this.metadataPromise) {
         this.metadataPromise = fetch(this.metadataUrl).then((res) => res.json())

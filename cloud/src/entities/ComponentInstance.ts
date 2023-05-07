@@ -9,7 +9,7 @@ import { PropGroup } from "./PropGroup";
 import { PropItem } from "./PropItem";
 import { PropValue } from "./PropValue";
 import { Release } from "./Release";
-import { State } from "./State";
+import { Resource } from "./Resource";
 import { SolutionInstance } from './SolutionInstance'
 
 @Entity()
@@ -81,7 +81,7 @@ export class ComponentInstance extends BaseEntity {
   wrapper?: string;
 
   @Property({ persist: false })
-  stateList?: State[];
+  resourceList?: Resource[];
 
   @Property({ persist: false })
   solutionInstanceId?: number;

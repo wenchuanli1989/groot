@@ -1,10 +1,9 @@
 import { AppstoreOutlined } from "@ant-design/icons";
-import { APIPath, ExtensionLevel, ExtensionRuntime, State, StateCategory, ViewsContainer } from "@grootio/common";
+import { APIPath, ExtensionLevel, ExtensionRuntime, Resource, ViewsContainer } from "@grootio/common";
 import { getContext, grootManager } from "context";
-import { uuid } from "util/index";
 import { Application } from "./Application";
 import { Material } from "./Material";
-import StateList from "./State";
+import ResourceList from "./Resource";
 
 
 
@@ -33,7 +32,7 @@ export const instanceBootstrap = () => {
         return <ViewsContainer context={this} groot={groot} />
       },
     }, {
-      id: 'state',
+      id: 'resource',
       name: '状态',
       icon: <AppstoreOutlined />,
       view: function () {
@@ -54,16 +53,16 @@ export const instanceBootstrap = () => {
       view: <Material />,
       parent: 'material'
     }, {
-      id: 'state',
+      id: 'resource',
       name: '状态',
-      view: <StateList />,
-      parent: 'state'
+      view: <ResourceList />,
+      parent: 'resource'
     },
 
   ])
 
 
-  registerState('gs.ui.activityBar.viewsContainers', ['application', 'material', 'state'], true)
+  registerState('gs.ui.activityBar.viewsContainers', ['application', 'material', 'resource'], true)
   registerState('gs.ui.activityBar.active', 'application', false);
   registerState('gs.ui.primarySidebar.active', 'application', false);
 
@@ -72,8 +71,8 @@ export const instanceBootstrap = () => {
   registerState('gs.component', null, false)
   registerState('gs.allComponentInstance', [], true)
   registerState('gs.release', null, false)
-  registerState('gs.globalStateList', params.application.stateList as any as State[], true)
-  registerState('gs.localStateList', [], true)
+  registerState('gs.globalResourceList', params.application.resourceList as any as Resource[], true)
+  registerState('gs.localResourceList', [], true)
 
   registerCommand('gc.fetch.instance', (_, rootInstanceId) => {
     fetchRootInstance(rootInstanceId);
@@ -91,7 +90,7 @@ export const instanceBootstrap = () => {
 
 const fetchRootInstance = (rootInstanceId: number) => {
   const { request, groot: { loadExtension, launchExtension, extHandler }, params, layout } = getContext();
-  request(APIPath.componentInstance_rootDetail_instanceId, { instanceId: rootInstanceId }).then(({ data: { children, root, release, solutionInstanceList, entryExtensionInstanceList, stateList } }) => {
+  request(APIPath.componentInstance_rootDetail_instanceId, { instanceId: rootInstanceId }).then(({ data: { children, root, release, solutionInstanceList, entryExtensionInstanceList, resourceList } }) => {
 
     // 卸载
     [...extHandler.entry.values()].forEach(ext => {
@@ -153,7 +152,7 @@ const fetchRootInstance = (rootInstanceId: number) => {
     grootManager.state.setState('gs.release', release)
     grootManager.state.setState('gs.allComponentInstance', list)
 
-    grootManager.state.setState('gs.localStateList', stateList)
+    grootManager.state.setState('gs.localResourceList', resourceList)
 
     grootManager.command.executeCommand('gc.makeDataToStage', 'first');
     switchComponentInstance(root.id);

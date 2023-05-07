@@ -4,7 +4,7 @@ import { BaseEntity } from "./BaseEntity";
 import { ExtensionInstance } from "./ExtensionInstance";
 import { Project } from "./Project";
 import { Release } from "./Release";
-import { State } from "./State";
+import { Resource } from "./Resource";
 
 @Entity()
 export class Application extends BaseEntity {
@@ -49,7 +49,7 @@ export class Application extends BaseEntity {
   extensionInstanceList: ExtensionInstance[]
 
   @Property({ persist: false })
-  stateList: State[]
+  resourceList: Resource[]
 
   @Property({ persist: false })
   releaseId: number

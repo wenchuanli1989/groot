@@ -40,9 +40,9 @@ export enum APIPath {
   value_update = 'POST value/update',
   move_position = 'POST move/position',
 
-  state_add = 'POST state/add',
-  state_remove_stateId = 'state/remove/:stateId',
-  state_update = 'POST state/update',
+  resource_add = 'POST resource/add',
+  resource_remove_resourceId = 'resource/remove/:resourceId',
+  resource_update = 'POST resource/update',
 
   solution_componentList_solutionVersionId = 'solution/component-list/:solutionVersionId',
 

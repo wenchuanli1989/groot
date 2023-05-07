@@ -1,10 +1,10 @@
-import { State } from "./entities";
+import { Resource } from "./entities";
 
 export type ApplicationData = {
   name: string,
   key: string,
   views: ViewData[],
-  stateList: State[],
+  resourceList: Resource[],
   envData: Record<string, any>
 }
 
@@ -12,7 +12,7 @@ export type ViewData = {
   key: string;
   metadataUrl?: string;
   metadataList?: Metadata[];
-  stateList: State[]
+  resourceList: Resource[]
 }
 
 export type Metadata = {

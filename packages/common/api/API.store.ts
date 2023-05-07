@@ -1,4 +1,4 @@
-import { SolutionInstance, State, Application, Component, ComponentInstance, ComponentVersion, Deploy, Organization, PropBlock, PropGroup, PropItem, PropValue, Release, Solution, ExtensionInstance } from '../entities';
+import { SolutionInstance, Resource, Application, Component, ComponentInstance, ComponentVersion, Deploy, Organization, PropBlock, PropGroup, PropItem, PropValue, Release, Solution, ExtensionInstance } from '../entities';
 import { EnvType } from '../enum';
 import { API } from './API.common';
 import type { APIPath } from './API.path';
@@ -27,7 +27,7 @@ export type APIStore = {
     release: Release,
     entryExtensionInstanceList: ExtensionInstance[],
     solutionInstanceList: SolutionInstance[],
-    stateList: State[]
+    resourceList: Resource[]
   }>];
   [APIPath.componentInstance_addRoot]: [ComponentInstance, API.Response<ComponentInstance>];
   [APIPath.release_add]: [Release, API.Response<Release>],
@@ -73,9 +73,9 @@ export type APIStore = {
   [APIPath.value_update]: [PropValue, API.Response<PropValue>],
   [APIPath.componentInstance_remove_instanceId]: [{ instanceId: number }],
 
-  [APIPath.state_add]: [State, API.Response<State>],
-  [APIPath.state_remove_stateId]: [{ stateId: number }],
-  [APIPath.state_update]: [State, API.Response<State>],
+  [APIPath.resource_add]: [Resource, API.Response<Resource>],
+  [APIPath.resource_remove_resourceId]: [{ resourceId: number }],
+  [APIPath.resource_update]: [Resource, API.Response<Resource>],
 
   [APIPath.solution_componentList_solutionVersionId]: [{ solutionVersionId: number, all: boolean }, API.Response<Component[]>],
   [APIPath.release_instanceList_releaseId]: [{ releaseId: number }, API.Response<ComponentInstance[]>],

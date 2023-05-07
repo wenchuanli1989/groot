@@ -13,7 +13,7 @@ import { PropItem } from 'entities/PropItem';
 import { PropValue } from 'entities/PropValue';
 import { Release } from 'entities/Release';
 import { SolutionInstance } from 'entities/SolutionInstance';
-import { State } from 'entities/State';
+import { Resource } from 'entities/Resource';
 
 @Injectable()
 export class ComponentInstanceService {
@@ -201,7 +201,7 @@ export class ComponentInstanceService {
     rootInstance.blockList = await em.find(PropBlock, { component: rootInstance.component, componentVersion: rootInstance.componentVersion });
     rootInstance.itemList = await em.find(PropItem, { component: rootInstance.component, componentVersion: rootInstance.componentVersion });
     rootInstance.valueList = await em.find(PropValue, { componentInstance: rootInstance });
-    rootInstance.stateList = await em.find(State, { release: rootInstance.release, $or: [{ componentInstance: rootInstance }, { componentInstance: null }] });
+    rootInstance.resourceList = await em.find(Resource, { release: rootInstance.release, $or: [{ componentInstance: rootInstance }, { componentInstance: null }] });
 
     const instanceList = await em.find(ComponentInstance, { root: instanceId }, {
       populate: ['component', 'componentVersion'],
@@ -218,9 +218,9 @@ export class ComponentInstanceService {
 
     const release = await em.findOne(Release, rootInstance.release.id)
 
-    const stateList = await em.find(State, { componentInstance: rootInstance })
+    const resourceList = await em.find(Resource, { componentInstance: rootInstance })
 
-    return { root: rootInstance, children: instanceList, release, stateList, entryExtensionInstanceList, solutionInstanceList };
+    return { root: rootInstance, children: instanceList, release, resourceList, entryExtensionInstanceList, solutionInstanceList };
   }
 
   async reverseDetectId(trackId: number, releaseId: number) {

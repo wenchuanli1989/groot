@@ -1,4 +1,4 @@
-import { Metadata, PropBlockStructType, PropGroup, PropItem, PropItemStruct, PropItemViewType, PropMetadataComponent, PropMetadataType, PropValue, State, interpolationRegExp } from '@grootio/common';
+import { Metadata, PropBlockStructType, PropGroup, PropItem, PropItemStruct, PropItemViewType, PropMetadataComponent, PropMetadataType, PropValue, interpolationRegExp } from '@grootio/common';
 
 import { fillPropChainGreed, fillPropChain } from './utils';
 

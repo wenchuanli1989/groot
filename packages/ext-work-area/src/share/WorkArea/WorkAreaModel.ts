@@ -101,11 +101,11 @@ export default class WorkAreaModel extends BaseModel {
 
     registerHook(PostMessageType.OuterUpdateComponent, (data) => {
       guard();
-      let stateList = []
+      let resourceList = []
       if (!isPrototypeMode()) {
-        stateList = [
-          ...getState('gs.localStateList').map(item => ({ ...item })),
-          ...getState('gs.globalStateList').map(item => ({ ...item }))
+        resourceList = [
+          ...getState('gs.localResourceList').map(item => ({ ...item })),
+          ...getState('gs.globalResourceList').map(item => ({ ...item }))
         ]
       }
 
@@ -114,7 +114,7 @@ export default class WorkAreaModel extends BaseModel {
         data: {
           key: this.iframeDebuggerConfig.controlView,
           metadataList: data,
-          stateList
+          resourceList
         }
       }, '*');
     })
@@ -205,7 +205,7 @@ export default class WorkAreaModel extends BaseModel {
     const viewData = {
       key: playgroundPath,
       metadataList: [],
-      stateList: []
+      resourceList: []
     };
 
     const appData: ApplicationData = {
@@ -213,7 +213,7 @@ export default class WorkAreaModel extends BaseModel {
       key,
       views: [viewData],
       envData: {},
-      stateList: []
+      resourceList: []
     };
 
     return appData;

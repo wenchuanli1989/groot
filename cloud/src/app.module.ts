@@ -15,7 +15,7 @@ import { ComponentVersionService } from 'service/component-version.service';
 import { ComponentInstanceService } from 'service/component-instance.service';
 import { ReleaseService } from 'service/release.service';
 import { AssetService } from 'service/asset.service';
-import { StateService } from 'service/state.service';
+import { ResourceService } from 'service/resource.service';
 import { AssetController } from 'asset.controller';
 import { SolutionService } from 'service/solution.service';
 @Module({
@@ -36,7 +36,7 @@ import { SolutionService } from 'service/solution.service';
     ComponentInstanceService,
     ReleaseService,
     AssetService,
-    StateService,
+    ResourceService,
     SolutionService
   ],
 })

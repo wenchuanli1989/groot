@@ -18,9 +18,9 @@ import { ReleaseService } from 'service/release.service';
 import { Release } from 'entities/Release';
 import { StandardResultInterceptor } from 'config/standard-result.interceptor';
 import { AssetService } from 'service/asset.service';
-import { StateService } from 'service/state.service';
+import { ResourceService } from 'service/resource.service';
 import { EnvType } from '@grootio/common';
-import { State } from 'entities/State';
+import { Resource } from 'entities/Resource';
 import { SolutionService } from 'service/solution.service';
 import { Application } from 'entities/Application';
 import { Solution } from 'entities/Solution';
@@ -41,7 +41,7 @@ export class WorkbenchController {
     private readonly componentInstanceService: ComponentInstanceService,
     private readonly releaseService: ReleaseService,
     private readonly assetService: AssetService,
-    private readonly stateService: StateService,
+    private readonly resourceService: ResourceService,
     private readonly solutionService: SolutionService,
   ) { }
 
@@ -205,19 +205,19 @@ export class WorkbenchController {
     return await this.componentInstanceService.remove(instanceId);
   }
 
-  @Post('/state/add')
-  async stateAdd(@Body() rawState: State) {
-    return await this.stateService.add(rawState);
+  @Post('/resource/add')
+  async resourceAdd(@Body() rawResource: Resource) {
+    return await this.resourceService.add(rawResource);
   }
 
-  @Get('/state/remove/:stateId')
-  async stateRemove(@Param('stateId') stateId: number) {
-    return await this.stateService.remove(stateId);
+  @Get('/resource/remove/:resourceId')
+  async resourceRemove(@Param('resourceId') resourceId: number) {
+    return await this.resourceService.remove(resourceId);
   }
 
-  @Post('/state/update')
-  async stateUpdate(@Body() rawState: State) {
-    return await this.stateService.update(rawState);
+  @Post('/resource/update')
+  async resourceUpdate(@Body() rawResource: Resource) {
+    return await this.resourceService.update(rawResource);
   }
 
   @Get('/demo')

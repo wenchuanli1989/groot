@@ -78,12 +78,10 @@ export enum ValueStruct {
   ChildComponentList = 2
 }
 
-export enum StateCategory {
-  Str = 1,
-  Bool = 2,
-  Num = 3,
-  Obj = 4,
-  Arr = 5
+export enum ResourceCategory {
+  State = 1,
+  Storage = 2,
+  DataSource = 3,
 }
 
 export enum StudioMode {

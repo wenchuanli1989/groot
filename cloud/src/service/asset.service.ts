@@ -24,7 +24,7 @@ import { NodeVM } from 'vm2';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
 import { SolutionInstance } from 'entities/SolutionInstance';
 import { LargeText } from 'entities/LargeText';
-import { State } from 'entities/State';
+import { Resource } from 'entities/Resource';
 
 
 const vm2 = new NodeVM()
@@ -135,10 +135,10 @@ export class AssetService {
 
     const manifest = {
       metadataList: [],
-      stateList: []
+      resourceList: []
     }
 
-    manifest.stateList = await em.find(State, { release, componentInstance: null })
+    manifest.resourceList = await em.find(Resource, { release, componentInstance: null })
 
     const bundle = em.create(Bundle, {
       release,
@@ -154,11 +154,11 @@ export class AssetService {
       const newAssetList = [];
 
       for (const instance of rootInstanceList) {
-        const stateList = await em.find(State, { componentInstance: instance })
+        const resourceList = await em.find(Resource, { componentInstance: instance })
         const metadataList = instanceMetadataMap.get(instance);
 
         const content = em.create(LargeText, {
-          text: JSON.stringify({ metadataList, stateList })
+          text: JSON.stringify({ metadataList, resourceList })
         })
 
         await em.flush()
@@ -268,14 +268,14 @@ export class AssetService {
       deploy.application.onlineRelease = deploy.release
     }
 
-    const { metadataList, stateList } = JSON.parse(deploy.bundle.manifest.text)
+    const { metadataList, resourceList } = JSON.parse(deploy.bundle.manifest.text)
 
     const appData: ApplicationData = {
       name: deploy.application.name,
       key: deploy.application.key,
       views: metadataList,
       envData: {},
-      stateList
+      resourceList
     }
 
     const content = em.create(LargeText, {
