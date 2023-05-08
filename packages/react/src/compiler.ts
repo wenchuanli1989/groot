@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useRef } from "react";
 
-import { globalConfig, groot } from "@grootio/runtime";
+import { globalConfig, groot } from "@grootio/web-runtime";
 import { Metadata } from "@grootio/common";
 
 const refreshFnMap = new Map<number, Function>();

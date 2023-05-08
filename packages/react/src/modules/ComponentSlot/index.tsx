@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { groot } from "@grootio/runtime";
+import { groot } from "@grootio/web-runtime";
 import { PropMetadataComponent } from "@grootio/common";
 
 type PropType = {

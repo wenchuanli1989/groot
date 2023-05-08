@@ -1,6 +1,6 @@
 import React, { useReducer } from 'react';
 
-import { ApplicationStatus, View, ApplicationInstance, bootstrap } from '@grootio/runtime';
+import { ApplicationStatus, View, ApplicationInstance, bootstrap } from '@grootio/web-runtime';
 import { UIManagerConfig } from '@grootio/common';
 import { defaultConfig } from './config';
 
