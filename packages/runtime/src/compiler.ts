@@ -1,6 +1,7 @@
 import { Metadata, PropMetadata, PropMetadataType, StudioMode } from "@grootio/common";
 import { controlMode, globalConfig, groot } from "./config";
 import { launchWatch } from "./monitor";
+import { wrapperProp } from "./reactive";
 
 
 const viewEleMap = new Map<number, HTMLElement>();
@@ -13,11 +14,15 @@ export const buildComponent = (metadata: Metadata, store: Metadata[], isRoot = f
 
   processAdvancedProp(metadata, store);
 
+  metadata.propsObj = wrapperProp(metadata.propsObj)
+
   return globalConfig.createComponent(metadata, isRoot, viewEleMap, viewMetadataMap);
 }
 
 export const reBuildComponent = (metadata: Metadata, store: Metadata[]) => {
   processAdvancedProp(metadata, store);
+
+  metadata.propsObj = wrapperProp(metadata.propsObj)
 
   globalConfig.refreshComponent && globalConfig.refreshComponent(metadata.id);
 }

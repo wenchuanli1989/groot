@@ -18,7 +18,7 @@ export class Resource extends BaseEntity {
   @Enum({ type: 'tinyint' })
   type: ResourceCategory = ResourceCategory.State;
 
-  @Enum({ length: 20 })
+  @Property({ length: 20 })
   subType = '';
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'releaseId' })
