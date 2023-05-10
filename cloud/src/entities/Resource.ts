@@ -1,5 +1,4 @@
-import { ResourceCategory } from "@grootio/common";
-import { Entity, Enum, ManyToOne, Property } from "@mikro-orm/core";
+import { Entity, ManyToOne, Property } from "@mikro-orm/core";
 import { BaseEntity } from "./BaseEntity";
 import { ComponentInstance } from "./ComponentInstance";
 import { Release } from "./Release";
@@ -9,14 +8,14 @@ export class Resource extends BaseEntity {
   @Property({ length: 20 })
   name: string;
 
-  @Property({ length: 100 })
-  value = '';
+  @Property({ length: 1000 })
+  value: string;
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'instanceId' })
   componentInstance?: ComponentInstance;
 
-  @Enum({ type: 'tinyint' })
-  type: ResourceCategory = ResourceCategory.State;
+  @Property({ length: 20 })
+  type: string;
 
   @Property({ length: 20 })
   subType = '';

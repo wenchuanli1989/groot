@@ -273,7 +273,7 @@ export class AssetService {
     const appData: ApplicationData = {
       name: deploy.application.name,
       key: deploy.application.key,
-      views: metadataList,
+      viewList: metadataList,
       envData: {},
       resourceList
     }

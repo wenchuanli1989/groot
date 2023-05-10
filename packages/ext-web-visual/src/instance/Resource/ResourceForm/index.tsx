@@ -46,7 +46,7 @@ const ResourceForm: React.FC = () => {
         <Input />
       </Form.Item>
 
-      <Form.Item label="类型" name="type" initialValue="String">
+      <Form.Item label="类型" name="subType" initialValue="String">
         <Select options={ResourceTypeMap} />
       </Form.Item>
     </Form>

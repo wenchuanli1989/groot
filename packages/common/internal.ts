@@ -3,7 +3,7 @@ import { Resource } from "./entities";
 export type ApplicationData = {
   name: string,
   key: string,
-  views: ViewData[],
+  viewList: ViewData[],
   resourceList: Resource[],
   envData: Record<string, any>
 }

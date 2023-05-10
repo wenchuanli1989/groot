@@ -78,12 +78,6 @@ export enum ValueStruct {
   ChildComponentList = 2
 }
 
-export enum ResourceCategory {
-  State = 1,
-  Storage = 2,
-  DataSource = 3,
-}
-
 export enum StudioMode {
   Prototype = 'prototype',
   Instance = 'instance'

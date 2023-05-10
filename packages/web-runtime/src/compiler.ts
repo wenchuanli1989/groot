@@ -24,7 +24,7 @@ export const reBuildComponent = (metadata: Metadata, store: Metadata[]) => {
 
   metadata.propsObj = wrapperProp(metadata.propsObj)
 
-  globalConfig.refreshComponent && globalConfig.refreshComponent(metadata.id);
+  globalConfig.refreshComponent(metadata.id);
 }
 
 const processAdvancedProp = (metadata: Metadata, store: Metadata[]) => {

@@ -89,7 +89,7 @@ export default class WorkAreaModel extends BaseModel {
     registerHook(PostMessageType.InnerFetchView, () => {
       guard();
       if (this.viewData) {
-        callHook(PostMessageType.OuterUpdateComponent, this.viewData);
+        callHook(PostMessageType.OuterUpdateComponent, this.viewData, true);
       }
 
       if (this.pageNavCallback) {
@@ -99,10 +99,10 @@ export default class WorkAreaModel extends BaseModel {
       }
     })
 
-    registerHook(PostMessageType.OuterUpdateComponent, (data) => {
+    registerHook(PostMessageType.OuterUpdateComponent, (data, first) => {
       guard();
       let resourceList = []
-      if (!isPrototypeMode()) {
+      if (!isPrototypeMode() && first) {
         resourceList = [
           ...getState('gs.localResourceList').map(item => ({ ...item })),
           ...getState('gs.globalResourceList').map(item => ({ ...item }))
@@ -165,17 +165,33 @@ export default class WorkAreaModel extends BaseModel {
       }, '*');
     })
 
-    commandBridge.stageRefresh = this.refresh;
-
     registerHook('gh.component.propChange', (data, first = false) => {
       console.info(data)
       if (first) {
         executeCommand('gc.stageRefresh')
       } else {
-        callHook(PostMessageType.OuterUpdateComponent, data);
+        callHook(PostMessageType.OuterUpdateComponent, data, false);
       }
       this.viewData = data;
     }, true)
+
+    registerHook(PostMessageType.OuterUpdateResource, (data) => {
+      guard()
+      this.iframeEle.contentWindow.postMessage({
+        type: PostMessageType.OuterUpdateResource,
+        data
+      }, '*');
+    })
+
+    registerHook(PostMessageType.OuterRemoveResource, (data) => {
+      guard()
+      this.iframeEle.contentWindow.postMessage({
+        type: PostMessageType.OuterRemoveResource,
+        data
+      }, '*');
+    })
+
+    commandBridge.stageRefresh = this.refresh;
   }
 
   private refresh = (callback?: Function) => {
@@ -211,7 +227,7 @@ export default class WorkAreaModel extends BaseModel {
     const appData: ApplicationData = {
       name,
       key,
-      views: [viewData],
+      viewList: [viewData],
       envData: {},
       resourceList: []
     };

@@ -193,7 +193,9 @@ export type GrootHookDict = {
   [PostMessageType.OuterSetApplication]: [[ApplicationData] | [], void],
   [PostMessageType.InnerApplicationReady]: [[], void],
   [PostMessageType.InnerFetchView]: [[], void],
-  [PostMessageType.OuterUpdateComponent]: [[Metadata | Metadata[]], void],
+  [PostMessageType.OuterUpdateComponent]: [[Metadata | Metadata[], boolean], void],
+  [PostMessageType.OuterUpdateResource]: [[Resource], void],
+  [PostMessageType.OuterRemoveResource]: [[Resource], void],
 
   [PostMessageType.OuterDragComponentEnter]: [[], void],
   [PostMessageType.OuterDragComponentOver]: [[{ positionX: number, positionY: number }], void],
@@ -260,6 +262,8 @@ export enum PostMessageType {
   OuterUpdateState = 'outer_update_state',
   OuterUpdateComponent = 'outer_update_component',
   OuterRefreshView = 'outer_refresh_view',
+  OuterUpdateResource = 'outer_update_resource',
+  OuterRemoveResource = 'outer_remove_resource',
 
   OuterDragComponentOver = 'outer_drag_component_over',
   OuterDragComponentEnter = 'outer_drag_component_enter',

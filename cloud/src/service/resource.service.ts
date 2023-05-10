@@ -1,4 +1,4 @@
-import { pick, ResourceCategory } from '@grootio/common';
+import { pick } from '@grootio/common';
 import { FilterQuery, RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { LogicException, LogicExceptionCode } from 'config/logic.exception';
@@ -14,7 +14,6 @@ export class ResourceService {
 
     LogicException.assertParamEmpty(rawResource.name, 'name');
     LogicException.assertParamEmpty(rawResource.releaseId, 'releaseId');
-    rawResource.type && LogicException.assertEnum(ResourceCategory, 'type', rawResource.type);
 
     const release = await em.findOne(ComponentInstance, rawResource.releaseId);
     LogicException.assertNotFound(release, 'Release', rawResource.releaseId);

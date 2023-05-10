@@ -1,4 +1,4 @@
-import { APIPath, BaseModel, pick, Resource } from "@grootio/common";
+import { APIPath, BaseModel, pick, PostMessageType, Resource } from "@grootio/common";
 import { getContext, grootManager } from "context";
 
 export default class ResourceModel extends BaseModel {
@@ -26,6 +26,8 @@ export default class ResourceModel extends BaseModel {
     if (!this.isGlobalResource) {
       rawResource.instanceId = grootManager.state.getState('gs.componentInstance').id
     }
+
+    rawResource.type = this.isGlobalResource ? '$globalState' : '$state'
     getContext().request(APIPath.resource_add, rawResource).then((res) => {
       if (this.isGlobalResource) {
         const globalResourceList = grootManager.state.getState('gs.globalResourceList');
@@ -34,6 +36,7 @@ export default class ResourceModel extends BaseModel {
         const localSttateList = grootManager.state.getState('gs.localResourceList');
         localSttateList.push(res.data);
       }
+      grootManager.hook.callHook(PostMessageType.OuterUpdateResource, rawResource)
       this.hideForm();
     });
   }
@@ -43,7 +46,7 @@ export default class ResourceModel extends BaseModel {
       const list = this.isGlobalResource ? grootManager.state.getState('gs.globalResourceList') : grootManager.state.getState('gs.localResourceList');
       const originResource = list.find(item => item.id === this.currResource.id);
       Object.assign(originResource, pick(res.data, ['type', 'name', 'value']));
-
+      grootManager.hook.callHook(PostMessageType.OuterUpdateResource, JSON.parse(JSON.stringify(originResource)))
       this.hideForm();
     });
   }
@@ -53,10 +56,11 @@ export default class ResourceModel extends BaseModel {
       const list = this.isGlobalResource ? grootManager.state.getState('gs.globalResourceList') : grootManager.state.getState('gs.localResourceList');
 
       const index = list.findIndex((item) => item.id === this.currResource.id);
+      const resource = list[index]
+      grootManager.hook.callHook(PostMessageType.OuterRemoveResource, JSON.parse(JSON.stringify(resource)))
       if (index !== -1) {
         list.splice(index, 1);
       }
-
       this.hideForm();
     });
   }

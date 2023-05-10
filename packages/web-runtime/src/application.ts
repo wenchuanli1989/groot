@@ -3,6 +3,7 @@ import { ApplicationData, IframeDebuggerConfig, PostMessageType, UIManagerConfig
 import { resetWatch, outerSelected, updateActiveRect, respondDragOver, respondDragEnter, respondDragLeave, respondDragDrop } from './monitor';
 import { controlMode, globalConfig, groot, setConfig } from './config';
 import { View } from './View';
+import { initResource, removeResource, updateResource } from './resource';
 
 export enum ApplicationStatus {
   Init = 'init',
@@ -17,6 +18,7 @@ const instance = {
   status: ApplicationStatus.Init,
   loadApp: loadApplication,
   hasView,
+  getView,
   viewLoading,
   loadView,
   beforeLoadAppPromise: Promise.resolve('执行异常'),
@@ -69,7 +71,16 @@ function onMessage(event: any) {
     setTimeout(updateActiveRect);
   } else if (messageType === PostMessageType.OuterRefreshView) {
     window.location.reload();
-  } else if (messageType === PostMessageType.OuterDragComponentOver) {
+  } else if (messageType === PostMessageType.OuterUpdateResource) {
+    updateResource(event.data.data.type, event.data.data.name, event.data.data.value)
+    activeView.refresh()
+  } else if (messageType === PostMessageType.OuterRemoveResource) {
+    removeResource(event.data.data.type, event.data.data.name)
+    activeView.refresh()
+  }
+
+
+  else if (messageType === PostMessageType.OuterDragComponentOver) {
     respondDragOver(event.data.data.positionX, event.data.data.positionY);
   } else if (messageType === PostMessageType.OuterDragComponentEnter) {
     respondDragEnter();
@@ -134,10 +145,11 @@ function fetchApplicationData(): Promise<ApplicationData> {
 
 function initApplication(data: ApplicationData) {
   // 初始化view
-  data.views.forEach((viewData) => {
+  data.viewList.forEach((viewData) => {
     const view = new View(viewData, controlMode && viewData.key === iframeDebuggerConfig.controlView);
     allViewMap.set(view.key, view);
   });
+  initResource(data.resourceList);
   if (controlMode) {
     window.parent.postMessage({ type: PostMessageType.InnerApplicationReady }, '*');
   }
@@ -145,6 +157,10 @@ function initApplication(data: ApplicationData) {
 
 function hasView(key: string) {
   return allViewMap.has(key);
+}
+
+function getView(key: string) {
+  return allViewMap.get(key);
 }
 
 function viewLoading(key: string) {

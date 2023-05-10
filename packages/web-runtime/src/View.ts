@@ -2,7 +2,8 @@ import type { Metadata, Resource, ViewData } from "@grootio/common";
 import { PostMessageType } from "@grootio/common";
 
 import { buildComponent, reBuildComponent } from "./compiler";
-import { controlMode } from "./config";
+import { controlMode, globalConfig } from "./config";
+import { destoryResource, initResource } from "./resource";
 
 export class View {
   readonly key: string;
@@ -12,8 +13,10 @@ export class View {
   private metadataUrl: string;
   private metadataList: Metadata[];
   private resourceList: Resource[];
+  private resourceNamespaceKeyList: string[] = [];
   private metadataPromise?: Promise<{ metadataList: Metadata[], resourceList: Resource[] }>;
   private fetchMetadataResolve?: (data: { metadataList: Metadata[], resourceList: Resource[] }) => void;
+  private rootMetadata: Metadata;
 
   constructor(data: ViewData, controlMode: boolean) {
     this.key = data.key;
@@ -31,8 +34,9 @@ export class View {
     return this.loadMetadata().then(({ metadataList, resourceList }) => {
       this.metadataList = metadataList;
       this.resourceList = resourceList || [];
-      const rootMetadata = this.metadataList.find(m => !m.parentId);
-      this.rootComponent = buildComponent(rootMetadata, this.metadataList, true);
+      this.resourceNamespaceKeyList = initResource(this.resourceList)
+      this.rootMetadata = this.metadataList.find(m => !m.parentId);
+      this.rootComponent = buildComponent(this.rootMetadata, this.metadataList, true);
       this.status = 'finish';
       return this;
     })
@@ -49,6 +53,14 @@ export class View {
     } else {
       this.fetchMetadataResolve({ metadataList: multi ? metadataList : [metadataList], resourceList });
     }
+  }
+
+  public destory() {
+    destoryResource(this.resourceNamespaceKeyList)
+  }
+
+  public refresh() {
+    globalConfig.refreshComponent(this.rootMetadata.id);
   }
 
   /**

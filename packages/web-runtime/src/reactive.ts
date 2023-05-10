@@ -1,11 +1,12 @@
 import { interpolationRegExp } from "@grootio/common";
+import { resourceManager } from "./resource";
 
 export const wrapperProp = (target) => {
   return new Proxy(target, {
-    get(oTarget, sKey, receiver) {
-      const value = Reflect.get(oTarget, sKey);
+    get(target, key, receiver) {
+      const value = Reflect.get(target, key);
       if (typeof value !== 'string' || !interpolationRegExp.test(value)) {
-        return Reflect.get(oTarget, sKey, receiver);
+        return Reflect.get(target, key, receiver);
       }
 
       const matchGroup = value.match(interpolationRegExp)
@@ -22,15 +23,9 @@ export const wrapperProp = (target) => {
 }
 
 function expression(code: string) {
-  const paramsObj = {
-    $component: {},
-    $state: {},
-    $storage: {},
-    $session: {}
-  }
 
-  const paramsKeys = Object.keys(paramsObj)
-  const paramsValues = paramsKeys.map(k => paramsObj[k])
+  const paramsKeys = [...resourceManager.keys()]
+  const paramsValues = [...resourceManager.values()]
 
   let newFunction, result
 
@@ -48,5 +43,5 @@ function expression(code: string) {
     console.error('表达式编译异常')
   }
 
-  return result || 'Null'
+  return result || '*Null*'
 }

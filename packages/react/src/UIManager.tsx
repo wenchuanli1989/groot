@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useRef } from 'react';
 
 import { ApplicationStatus, View, ApplicationInstance, bootstrap } from '@grootio/web-runtime';
 import { UIManagerConfig } from '@grootio/common';
@@ -8,6 +8,8 @@ let app: ApplicationInstance;
 
 export const UIManager: IUIManager<{ viewKey: string }> = ({ viewKey }) => {
   const [, refresh] = useReducer((bool) => !bool, true);
+  const viewKeyRef = useRef<string>();
+
 
   // 确保首先执行 UIManager.init
   if (!app) {
@@ -31,6 +33,13 @@ export const UIManager: IUIManager<{ viewKey: string }> = ({ viewKey }) => {
     // todo 设计统一加载动画
     return <>应用加载失败</>;
   } else {
+    if (viewKeyRef.current !== viewKey) {
+      if (app.hasView(viewKey)) {
+        app.getView(viewKey).destory()
+      }
+      viewKeyRef.current = viewKey
+    }
+
     if (!app.hasView(viewKey)) {
       // todo 设计统一404页面
       return <>页面找不到</>;
