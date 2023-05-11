@@ -1,11 +1,11 @@
 import { ExtensionPipelineLevel, ExtScriptModule } from '@grootio/common'
 
-export const propItemPipeline = (entryExtList: ExtScriptModule[], solutionExtList: ExtScriptModule[], releaseExtList: ExtScriptModule[], params: any) => {
-  const entryExtMap = new Map<ExtensionPipelineLevel, ExtScriptModule[]>()
-  const releaseExtMap = new Map<ExtensionPipelineLevel, ExtScriptModule[]>()
-  const solutionExtMap = new Map<ExtensionPipelineLevel, ExtScriptModule[]>()
+export const pipeline = <P>(entryExtList: ExtScriptModule<P>[], solutionExtList: ExtScriptModule<P>[], releaseExtList: ExtScriptModule<P>[], params: P) => {
+  const entryExtMap = new Map<ExtensionPipelineLevel, ExtScriptModule<P>[]>()
+  const releaseExtMap = new Map<ExtensionPipelineLevel, ExtScriptModule<P>[]>()
+  const solutionExtMap = new Map<ExtensionPipelineLevel, ExtScriptModule<P>[]>()
 
-  const prePipeline = (extList: ExtScriptModule[], extMap: Map<ExtensionPipelineLevel, ExtScriptModule[]>, params: any) => {
+  const prePipeline = (extList: ExtScriptModule<P>[], extMap: Map<ExtensionPipelineLevel, ExtScriptModule<P>[]>, params: P) => {
     extList.forEach(ext => {
       const level = ext.check(params)
       if (level === ExtensionPipelineLevel.Ignore) {
@@ -20,7 +20,7 @@ export const propItemPipeline = (entryExtList: ExtScriptModule[], solutionExtLis
     })
   }
 
-  const pipeline = (extList: ExtScriptModule[], params: any) => {
+  const pipeline = (extList: ExtScriptModule<P>[], params: P) => {
     const taskIds: number[] = []
     for (const ext of extList) {
       if (taskIds.includes(ext.id)) {

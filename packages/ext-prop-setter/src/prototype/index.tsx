@@ -1,5 +1,5 @@
-import { PropGroup } from "@grootio/common";
-import { metadataFactory, propItemPipeline, propTreeFactory } from "@grootio/core";
+import { PropGroup, PropItemPipelineParams } from "@grootio/common";
+import { metadataFactory, pipeline, propTreeFactory } from "@grootio/core";
 import { getContext, grootManager } from "context";
 
 
@@ -41,7 +41,7 @@ const syncDataToStage = (first = false) => {
     solutionInstanceId: null,
     componentVersionId: null
   }, (params) => {
-    propItemPipeline([], [], propItemPipelineModuleList, params)
+    pipeline<PropItemPipelineParams>([], [], propItemPipelineModuleList, params)
   }, true);
   grootManager.hook.callHook('gh.component.propChange', metadata, first)
 }

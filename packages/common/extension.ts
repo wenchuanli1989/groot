@@ -329,10 +329,10 @@ export type ComponentDragAnchor = {
 
 
 
-export type ExtScriptModule = {
+export type ExtScriptModule<P = any> = {
   id: number,
-  check: (params: any) => ExtensionPipelineLevel,
-  task: (params: any) => boolean
+  check: (params: P) => ExtensionPipelineLevel,
+  task: (params: P) => boolean
 }
 
 
@@ -353,4 +353,15 @@ export type FormItemRender = {
   propItem: PropItem,
   simplify: boolean,
   formItemProps: any
+}
+
+export type PropItemPipelineParams = {
+  ctx: Record<string, any>,
+  propKey: string,
+  value: any,
+  propItem: PropItem,
+  metadata: Metadata,
+  propKeyChain: string,
+  defaultFn: () => void,
+  valueInterpolation: boolean
 }

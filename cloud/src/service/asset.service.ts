@@ -1,11 +1,11 @@
 import {
   ApplicationData, DeployStatusType, EnvType, Metadata,
   PropGroup as IPropGroup, PropBlock as IPropBlock, PropItem as IPropItem, PropValue as IPropValue, EnvTypeStr,
-  ExtScriptModule, ExtensionRelationType, createExtensionHandler, ExtensionLevel, ExtensionInstance as IExtensionInstance
+  ExtScriptModule, ExtensionRelationType, createExtensionHandler, ExtensionLevel, ExtensionInstance as IExtensionInstance, PropItemPipelineParams
 } from '@grootio/common';
 import { EntityManager, RequestContext, wrap } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { propTreeFactory, metadataFactory, propItemPipeline } from '@grootio/core';
+import { propTreeFactory, metadataFactory, pipeline } from '@grootio/core';
 
 
 import { LogicException, LogicExceptionCode } from 'config/logic.exception';
@@ -324,7 +324,7 @@ export class AssetService {
       solutionInstanceId: instance.solutionInstance.id,
       componentVersionId: instance.componentVersion.id
     }, (params) => {
-      propItemPipeline(entryExtScriptModuleList, solutionExtScriptModuleList, releaseExtScriptModuleList, params)
+      pipeline<PropItemPipelineParams>(entryExtScriptModuleList, solutionExtScriptModuleList, releaseExtScriptModuleList, params)
     });
 
     return metadata;

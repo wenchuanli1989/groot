@@ -1,19 +1,10 @@
-import { Metadata, PropBlockStructType, PropGroup, PropItem, PropItemStruct, PropItemViewType, PropMetadataComponent, PropMetadataType, PropValue, interpolationRegExp } from '@grootio/common';
+import { Metadata, PropBlockStructType, PropGroup, PropItem, PropItemPipelineParams, PropItemStruct, PropItemViewType, PropMetadataComponent, PropMetadataType, PropValue, interpolationRegExp } from '@grootio/common';
 
 import { fillPropChainGreed, fillPropChain } from './utils';
 
-type PipelineType = (params: {
-  ctx: Record<string, any>,
-  propKey: string,
-  value: any,
-  propItem: PropItem,
-  metadata: Metadata,
-  propKeyChain: string,
-  defaultFn: () => void,
-  valueInterpolation: boolean
-}) => void
 
-let _pipeline: PipelineType
+
+let _pipeline: (params: PropItemPipelineParams) => void
 let _studioMode: boolean
 let _solutionInstanceId: number
 let _componentVersionId: number
@@ -28,7 +19,7 @@ export function metadataFactory(
     parentMetadataId?: number,
     solutionInstanceId: number,
     componentVersionId: number
-  }, pipeline?: PipelineType, studioMode = false) {
+  }, pipeline?: (params: PropItemPipelineParams) => void, studioMode = false) {
 
   const metadata = {
     id: metadataInfo.metadataId,
