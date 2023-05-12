@@ -1,6 +1,6 @@
 import { ExtensionPipelineLevel, ExtScriptModule } from '@grootio/common'
 
-export const pipeline = <P>(entryExtList: ExtScriptModule<P>[], solutionExtList: ExtScriptModule<P>[], releaseExtList: ExtScriptModule<P>[], params: P) => {
+export const pipelineExec = <P>(entryExtList: ExtScriptModule<P>[], solutionExtList: ExtScriptModule<P>[], releaseExtList: ExtScriptModule<P>[], params: P) => {
   const entryExtMap = new Map<ExtensionPipelineLevel, ExtScriptModule<P>[]>()
   const releaseExtMap = new Map<ExtensionPipelineLevel, ExtScriptModule<P>[]>()
   const solutionExtMap = new Map<ExtensionPipelineLevel, ExtScriptModule<P>[]>()
@@ -27,7 +27,7 @@ export const pipeline = <P>(entryExtList: ExtScriptModule<P>[], solutionExtList:
         continue
       }
 
-      const next = ext.task!(params)
+      const next = ext.exec!(params)
       taskIds.push(ext.id)
 
       if (!next) {

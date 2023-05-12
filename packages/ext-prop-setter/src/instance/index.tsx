@@ -1,5 +1,5 @@
 import { ComponentInstance, PropBlockStructType, PropGroup, PropItemPipelineParams } from "@grootio/common";
-import { metadataFactory, pipeline, propTreeFactory } from "@grootio/core";
+import { metadataFactory, pipelineExec, propTreeFactory } from "@grootio/core";
 import { getContext, grootManager } from "context";
 import { parseOptions } from "../util";
 
@@ -76,7 +76,7 @@ const instanceToMetadata = (instanceList: ComponentInstance[]) => {
       solutionInstanceId: instance.solutionInstanceId,
       componentVersionId: instance.componentVersion.id
     }, (params) => {
-      pipeline<PropItemPipelineParams>(entryPropItemPipelineModuleList, releasePropItemPipelineModuleList, solutionPropItemPipelineModuleList, params)
+      pipelineExec<PropItemPipelineParams>(entryPropItemPipelineModuleList, releasePropItemPipelineModuleList, solutionPropItemPipelineModuleList, params)
     }, true);
     return metadata;
   })

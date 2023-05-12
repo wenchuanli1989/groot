@@ -5,7 +5,7 @@ import {
 } from '@grootio/common';
 import { EntityManager, RequestContext, wrap } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { propTreeFactory, metadataFactory, pipeline } from '@grootio/core';
+import { propTreeFactory, metadataFactory, pipelineExec } from '@grootio/core';
 
 
 import { LogicException, LogicExceptionCode } from 'config/logic.exception';
@@ -324,7 +324,7 @@ export class AssetService {
       solutionInstanceId: instance.solutionInstance.id,
       componentVersionId: instance.componentVersion.id
     }, (params) => {
-      pipeline<PropItemPipelineParams>(entryExtScriptModuleList, solutionExtScriptModuleList, releaseExtScriptModuleList, params)
+      pipelineExec<PropItemPipelineParams>(entryExtScriptModuleList, solutionExtScriptModuleList, releaseExtScriptModuleList, params)
     });
 
     return metadata;

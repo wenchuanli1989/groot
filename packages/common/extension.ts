@@ -332,7 +332,7 @@ export type ComponentDragAnchor = {
 export type ExtScriptModule<P = any> = {
   id: number,
   check: (params: P) => ExtensionPipelineLevel,
-  task: (params: P) => boolean
+  exec: (params: P) => boolean
 }
 
 
