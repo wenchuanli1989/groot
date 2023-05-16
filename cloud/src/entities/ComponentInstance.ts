@@ -1,5 +1,5 @@
 import { ComponentParserType } from "@grootio/common";
-import { Entity, Enum, ManyToOne, Property } from "@mikro-orm/core";
+import { Collection, Entity, Enum, ManyToMany, ManyToOne, Property } from "@mikro-orm/core";
 
 import { BaseEntity } from "./BaseEntity";
 import { Component } from "./Component";
@@ -9,8 +9,8 @@ import { PropGroup } from "./PropGroup";
 import { PropItem } from "./PropItem";
 import { PropValue } from "./PropValue";
 import { Release } from "./Release";
-import { Resource } from "./Resource";
 import { SolutionInstance } from './SolutionInstance'
+import { ProjectResource } from "./ProjectResource";
 
 @Entity()
 export class ComponentInstance extends BaseEntity {
@@ -48,6 +48,9 @@ export class ComponentInstance extends BaseEntity {
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'solutionInstanceId' })
   solutionInstance?: SolutionInstance;
+
+  @ManyToMany()
+  projectResourceList = new Collection<ProjectResource>(this);
   //************************已下是接口入参或者查询返回需要定义的属性************************
 
   @Property({ persist: false })
@@ -79,9 +82,6 @@ export class ComponentInstance extends BaseEntity {
 
   @Property({ persist: false })
   wrapper?: string;
-
-  @Property({ persist: false })
-  resourceList?: Resource[];
 
   @Property({ persist: false })
   solutionInstanceId?: number;
