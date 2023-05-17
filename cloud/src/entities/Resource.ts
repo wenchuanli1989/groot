@@ -1,7 +1,6 @@
 import { ManyToOne, Property } from "@mikro-orm/core";
 import { BaseEntity } from "./BaseEntity";
-import { Release } from "./Release";
-import { ResourceContext } from "./ResourceContext";
+import { ResourceConfig } from "./ResourceConfig";
 
 export abstract class Resource extends BaseEntity {
   @Property({ length: 20 })
@@ -16,11 +15,8 @@ export abstract class Resource extends BaseEntity {
   @Property({ length: 20 })
   subType = '';
 
-  @ManyToOne({ serializer: value => value?.id, serializedName: 'releaseId' })
-  release: Release;
-
-  @ManyToOne({ serializer: value => value?.id, serializedName: 'resourceContextId' })
-  resourceContext: ResourceContext;
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'resourceConfigId' })
+  resourceConfig?: ResourceConfig;
   //************************已下是接口入参或者查询返回需要定义的属性************************
 
 }

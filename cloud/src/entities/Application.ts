@@ -26,7 +26,7 @@ export class Application extends BaseEntity {
   devRelease: Release = { id: 0 } as any;
 
   // 此处必须为可选，否则创建application会引发qaRelease非空校验
-  @OneToOne({ serializer: value => value?.id, serializedName: 'qaeleaseId' })
+  @OneToOne({ serializer: value => value?.id, serializedName: 'qaReleaseId' })
   qaRelease: Release = { id: 0 } as any;
 
   // 此处必须为可选，否则创建application会引发plRelease非空校验

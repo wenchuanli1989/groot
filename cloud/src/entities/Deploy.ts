@@ -1,11 +1,10 @@
-import { Entity, ManyToOne, OneToOne, Property } from "@mikro-orm/core";
+import { Entity, ManyToOne, Property } from "@mikro-orm/core";
 import { DeployStatusType, EnvType } from "@grootio/common";
 
 import { Application } from "./Application";
 import { BaseEntity } from "./BaseEntity";
 import { Bundle } from "./Bundle";
 import { Release } from "./Release";
-import { DeployManifest } from "./DeployManifest";
 
 @Entity()
 export class Deploy extends BaseEntity {

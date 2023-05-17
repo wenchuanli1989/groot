@@ -2,6 +2,7 @@ import { Entity, ManyToOne } from "@mikro-orm/core";
 import { Application } from "./Application";
 import { Resource } from "./Resource";
 import { Release } from "./Release";
+import { ProjectResource } from "./ProjectResource";
 
 @Entity()
 export class AppResource extends Resource {
@@ -12,6 +13,8 @@ export class AppResource extends Resource {
   @ManyToOne({ serializer: value => value?.id, serializedName: 'releaseId' })
   release: Release;
 
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'imageResourceId' })
+  imageResource?: ProjectResource;
   //************************已下是接口入参或者查询返回需要定义的属性************************
 
 }
