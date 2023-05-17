@@ -1,22 +1,23 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
-import { Application } from '../../entities/Application';
-import { Release } from '../../entities/Release';
-import { Organization } from '../../entities/Organization';
-import { Project } from '../../entities/Project';
-import { Extension } from '../../entities/Extension';
+import { ExtensionRelationType } from '@grootio/common';
+
+import { Application } from '../entities/Application';
+import { Release } from '../entities/Release';
+import { Organization } from '../entities/Organization';
+import { Project } from '../entities/Project';
+import { Extension } from '../entities/Extension';
+import { Solution } from '../entities/Solution';
+import { ExtensionInstance } from '../entities/ExtensionInstance';
+import { ExtensionVersion } from '../entities/ExtensionVersion';
+import { SolutionVersion } from '../entities/SolutionVersion';
+import { LargeText } from '../entities/LargeText';
 
 import { create as btnCreate } from './button';
 import { create as profileCreate } from './profile';
 import { create as proTableCreate } from './pro-table';
 import { create as containerCreate } from './groot-container';
 import { create as pageContainerCreate } from './groot-page-container';
-import { Solution } from '../../entities/Solution';
-import { ExtensionInstance } from '../../entities/ExtensionInstance';
-import { ExtensionRelationType } from '@grootio/common';
-import { ExtensionVersion } from '../../entities/ExtensionVersion';
-import { SolutionVersion } from '../../entities/SolutionVersion';
-import { LargeText } from '../../entities/LargeText';
 
 export class DatabaseSeeder extends Seeder {
 

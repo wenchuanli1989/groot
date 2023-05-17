@@ -1,26 +1,27 @@
 import { PropBlockLayout, PropBlockStructType, PropItemStruct, PropItemViewType } from "@grootio/common";
 import { EntityManager } from "@mikro-orm/core";
-import { SolutionEntry } from "../../entities/SolutionEntry";
-import { Component } from "../../entities/Component";
-import { ComponentVersion } from "../../entities/ComponentVersion";
-import { PropBlock } from "../../entities/PropBlock";
-import { PropGroup } from "../../entities/PropGroup";
-import { PropItem } from "../../entities/PropItem";
-import { Solution } from "../../entities/Solution";
+
+import { SolutionEntry } from "../entities/SolutionEntry";
+import { Component } from "../entities/Component";
+import { ComponentVersion } from "../entities/ComponentVersion";
+import { PropBlock } from "../entities/PropBlock";
+import { PropGroup } from "../entities/PropGroup";
+import { PropItem } from "../entities/PropItem";
+import { Solution } from "../entities/Solution";
 
 export const create = async (em: EntityManager, solution: Solution) => {
   // 创建组件
   const pageComponent = em.create(Component, {
-    name: '容器',
+    name: '页面',
     packageName: 'groot',
-    componentName: 'Container',
+    componentName: 'PageContainer',
   });
   await em.persistAndFlush(pageComponent);
 
   // 创建组件版本
   const pageComponentVersion = em.create(ComponentVersion, {
     name: 'v0.0.1',
-    component: pageComponent,
+    component: pageComponent
   });
   pageComponent.recentVersion = pageComponentVersion;
   await em.persistAndFlush(pageComponentVersion);
@@ -81,4 +82,6 @@ export const create = async (em: EntityManager, solution: Solution) => {
     component: pageComponent
   });
   await em.persistAndFlush(contentItem);
+
+
 }

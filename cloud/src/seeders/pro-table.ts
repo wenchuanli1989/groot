@@ -1,17 +1,17 @@
 import { PropBlockLayout, PropBlockStructType, PropItemStruct, PropItemViewType, PropValueType } from "@grootio/common";
 import { EntityManager } from "@mikro-orm/core";
-import { SolutionEntry } from "../../entities/SolutionEntry";
-import { SolutionInstance } from "../../entities/SolutionInstance";
 
-import { Component } from "../../entities/Component";
-import { ComponentInstance } from "../../entities/ComponentInstance";
-import { ComponentVersion } from "../../entities/ComponentVersion";
-import { PropBlock } from "../../entities/PropBlock";
-import { PropGroup } from "../../entities/PropGroup";
-import { PropItem } from "../../entities/PropItem";
-import { PropValue } from "../../entities/PropValue";
-import { Release } from "../../entities/Release";
-import { Solution } from "../../entities/Solution";
+import { SolutionEntry } from "../entities/SolutionEntry";
+import { SolutionInstance } from "../entities/SolutionInstance";
+import { Component } from "../entities/Component";
+import { ComponentInstance } from "../entities/ComponentInstance";
+import { ComponentVersion } from "../entities/ComponentVersion";
+import { PropBlock } from "../entities/PropBlock";
+import { PropGroup } from "../entities/PropGroup";
+import { PropItem } from "../entities/PropItem";
+import { PropValue } from "../entities/PropValue";
+import { Release } from "../entities/Release";
+import { Solution } from "../entities/Solution";
 
 export const create = async (em: EntityManager, solution: Solution, release: Release) => {
   // 创建组件
