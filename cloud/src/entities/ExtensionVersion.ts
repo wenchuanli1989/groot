@@ -29,6 +29,12 @@ export class ExtensionVersion extends BaseEntity {
   @OneToOne({ serializer: value => value?.text })
   propItemPipelineRaw?: LargeText
 
+  @OneToOne({ serializer: value => value?.text })
+  resourcePipeline?: LargeText;
+
+  @OneToOne({ serializer: value => value?.text })
+  resourcePipelineRaw?: LargeText
+
   @ManyToOne({ serializer: value => value?.id, serializedName: 'extensionId' })
   extension: Extension;
 

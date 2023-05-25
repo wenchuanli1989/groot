@@ -117,9 +117,9 @@ export enum ExtensionLevel {
 }
 
 export enum ExtensionRelationType {
-  Release = 1,
+  Application = 1,
   Entry = 2,
-  SolutionVersion = 3,
+  Solution = 3,
 }
 
 export enum ExtensionStatus {

@@ -1,5 +1,5 @@
 import { PropMetadataComponent, pick, PropValueType, ValueStruct, ExtensionRelationType } from '@grootio/common';
-import { EntityManager, RequestContext } from '@mikro-orm/core';
+import { EntityManager, RequestContext, wrap } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 
 import { LogicException, LogicExceptionCode } from 'config/logic.exception';
@@ -13,7 +13,7 @@ import { PropItem } from 'entities/PropItem';
 import { PropValue } from 'entities/PropValue';
 import { Release } from 'entities/Release';
 import { SolutionInstance } from 'entities/SolutionInstance';
-import { Resource } from 'entities/Resource';
+import { InstanceResource } from 'entities/InstanceResource';
 
 @Injectable()
 export class ComponentInstanceService {
@@ -193,7 +193,7 @@ export class ComponentInstanceService {
     for (const solutionInstance of solutionInstanceList) {
       solutionInstance.extensionInstanceList = await em.find(ExtensionInstance, {
         relationId: solutionInstance.solutionVersion.id,
-        relationType: ExtensionRelationType.SolutionVersion
+        relationType: ExtensionRelationType.Solution
       }, { populate: ['extension', 'extensionVersion.propItemPipelineRaw'] })
     }
 
@@ -201,7 +201,6 @@ export class ComponentInstanceService {
     rootInstance.blockList = await em.find(PropBlock, { component: rootInstance.component, componentVersion: rootInstance.componentVersion });
     rootInstance.itemList = await em.find(PropItem, { component: rootInstance.component, componentVersion: rootInstance.componentVersion });
     rootInstance.valueList = await em.find(PropValue, { componentInstance: rootInstance });
-    rootInstance.resourceList = await em.find(Resource, { release: rootInstance.release, $or: [{ componentInstance: rootInstance }, { componentInstance: null }] });
 
     const instanceList = await em.find(ComponentInstance, { root: instanceId }, {
       populate: ['component', 'componentVersion'],
@@ -218,7 +217,14 @@ export class ComponentInstanceService {
 
     const release = await em.findOne(Release, rootInstance.release.id)
 
-    const resourceList = await em.find(Resource, { componentInstance: rootInstance })
+    let resourceList = await em.find(InstanceResource, { componentInstance: rootInstance }, { populate: ['imageResource'] })
+
+    resourceList = resourceList.map(resource => {
+      if (resource.imageResource) {
+        return wrap(resource.imageResource).toObject() as any as InstanceResource;
+      }
+      return wrap(resource).toObject() as any as InstanceResource;
+    })
 
     return { root: rootInstance, children: instanceList, release, resourceList, entryExtensionInstanceList, solutionInstanceList };
   }

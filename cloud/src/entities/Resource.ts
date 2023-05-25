@@ -10,13 +10,15 @@ export abstract class Resource extends BaseEntity {
   value: string;
 
   @Property({ length: 20 })
-  type: string;
+  namespace: string;
 
   @Property({ length: 20 })
-  subType = '';
+  type = '';
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'resourceConfigId' })
   resourceConfig?: ResourceConfig;
   //************************已下是接口入参或者查询返回需要定义的属性************************
 
+  @Property({ persist: false })
+  resourceConfigId?: number
 }

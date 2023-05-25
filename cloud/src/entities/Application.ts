@@ -4,7 +4,8 @@ import { BaseEntity } from "./BaseEntity";
 import { ExtensionInstance } from "./ExtensionInstance";
 import { Project } from "./Project";
 import { Release } from "./Release";
-import { Resource } from "./Resource";
+import { AppResource } from "./AppResource";
+import { ResourceConfig } from "./ResourceConfig";
 
 @Entity()
 export class Application extends BaseEntity {
@@ -49,10 +50,13 @@ export class Application extends BaseEntity {
   extensionInstanceList: ExtensionInstance[]
 
   @Property({ persist: false })
-  resourceList: Resource[]
+  resourceList: AppResource[]
 
   @Property({ persist: false })
   releaseId: number
+
+  @Property({ persist: false })
+  resourceConfigList: ResourceConfig[]
 
   // @Property({ persist: false })
   // release: Release;

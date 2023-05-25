@@ -1,7 +1,7 @@
 import {
-  ApplicationData, DeployStatusType, EnvType, Metadata,
+  ApplicationData, DeployStatusType, EnvType,
   PropGroup as IPropGroup, PropBlock as IPropBlock, PropItem as IPropItem, PropValue as IPropValue, EnvTypeStr,
-  ExtScriptModule, ExtensionRelationType, createExtensionHandler, ExtensionLevel, ExtensionInstance as IExtensionInstance, PropItemPipelineParams
+  ExtScriptModule, ExtensionRelationType, createExtensionHandler, ExtensionLevel, ExtensionInstance as IExtensionInstance, PropItemPipelineParams, ResourcePipelineParams, ViewData, Resource
 } from '@grootio/common';
 import { EntityManager, RequestContext, wrap } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
@@ -24,7 +24,8 @@ import { NodeVM } from 'vm2';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
 import { SolutionInstance } from 'entities/SolutionInstance';
 import { LargeText } from 'entities/LargeText';
-import { Resource } from 'entities/Resource';
+import { AppResource } from 'entities/AppResource';
+import { InstanceResource } from 'entities/InstanceResource';
 
 
 const vm2 = new NodeVM()
@@ -65,80 +66,165 @@ export class AssetService {
   async build(releaseId: number) {
     const em = RequestContext.getEntityManager();
 
+    // 必要校验
     LogicException.assertParamEmpty(releaseId, 'releaseId');
     const release = await em.findOne(Release, releaseId);
     LogicException.assertNotFound(release, 'Release', releaseId);
-
     const application = await em.findOne(Application, release.application.id);
 
     const extHandler = createExtensionHandler();
+    const instanceToViewDataMap = new Map<ComponentInstance, ViewData>();
+    const appData = {
+      name: application.name,
+      key: application.key,
+      viewList: [],
+      resourceList: [],
+      resourceConfigList: [],
+      resourceTaskList: [],
+      envData: []
+    } as ApplicationData
 
-    const releaseExtensionInstanceList = await em.find(ExtensionInstance, {
+    // 加载应用级别插件
+    const appExtensionInstanceList = await em.find(ExtensionInstance, {
       relationId: releaseId,
-      relationType: ExtensionRelationType.Release,
+      relationType: ExtensionRelationType.Application,
     }, { populate: ['extensionVersion.propItemPipelineRaw', 'extension'] })
+    this.installPipelineModule(appExtensionInstanceList, ExtensionLevel.Application, extHandler)
 
-    this.installPropItemPipelineModule(releaseExtensionInstanceList, ExtensionLevel.Application, extHandler)
-    const releaseExtScriptModuleList = [...extHandler.application.values()].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
+    // 处理全局资源
+    const appResourceExtScriptModuleList = [...extHandler.application.values()].filter(ext => !!ext.resourcePipeline).map(ext => ext.resourcePipeline)
+    const appResourceList = await em.find(AppResource, {
+      app: application,
+      release
+    }, { populate: ['imageResource'] })
+    appResourceList.map(resource => {
+      if (resource.imageResource) {
+        return wrap(resource.imageResource).toObject() as any as AppResource;
+      }
+      return wrap(resource).toObject() as AppResource;
+    }).forEach(resource => {
+      // delete resource.app;
+      // delete resource.release
+      // delete resource.imageResource
+      pipelineExec<ResourcePipelineParams>([], [], appResourceExtScriptModuleList, {
+        resource: resource as any,
+        defaultFn: () => { },
+        appendTask: (taskName, taskCode) => {
+          (resource as any).taskName = taskName
+          appData.resourceTaskList.push({ key: taskName, content: taskCode })
+        }
+      })
 
+      if (resource.resourceConfig) {
+        appData.resourceConfigList.push(resource.resourceConfig)
+        // resource.resourceConfigId = resource.resourceConfig.id
+        // delete resource.resourceConfig
+      }
+      appData.resourceList.push(resource as any)
+    })
+
+
+    const appPropItemExtScriptModuleList = [...extHandler.application.values()].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
     const rootInstanceList = await em.find(ComponentInstance, { release, root: null }, { populate: ['solutionInstance', 'component'] });
-    const instanceMetadataMap = new Map<ComponentInstance, Metadata[]>();
-    // 生成metadata
     for (let rootInstance of rootInstanceList) {
-      const metadataList = [];
+      const viewData = {
+        key: '',
+        url: '',
+        metadataList: [],
+        resourceList: [],
+
+        // propTasks的key和advancedProps的type关联对应
+        propTaskMap: {},
+        resourceTaskMap: {},
+        resourceConfigMap: {}
+      } as ViewData
 
       const solutionInstanceList = await em.find(SolutionInstance, {
         entry: rootInstance
       })
 
+      // 加载解决方案级别插件
       for (const solutionInstance of solutionInstanceList) {
         const solutionExtensionInstanceList = await em.find(ExtensionInstance, {
           relationId: solutionInstance.solutionVersion.id,
-          relationType: ExtensionRelationType.SolutionVersion
+          relationType: ExtensionRelationType.Solution
         }, { populate: ['extensionVersion.propItemPipelineRaw', 'extension'] })
 
-        this.installPropItemPipelineModule(solutionExtensionInstanceList, ExtensionLevel.Solution, extHandler, solutionInstance.id)
+        this.installPipelineModule(solutionExtensionInstanceList, ExtensionLevel.Solution, extHandler, solutionInstance.id)
       }
+      const solutionResourceExtScriptModuleList = [...extHandler.solution.values()].reduce((pre, curr) => {
+        pre.push([...curr.values()])
+        return pre;
+      }, [])
 
+      // 加载实例级别插件
       const entryExtensionInstanceList = await em.find(ExtensionInstance, {
         relationId: rootInstance.id,
         relationType: ExtensionRelationType.Entry
       }, { populate: ['extensionVersion.propItemPipelineRaw', 'extension'] })
+      this.installPipelineModule(entryExtensionInstanceList, ExtensionLevel.Entry, extHandler)
+      const entryPropItemExtScriptModuleList = [...extHandler.entry.values()].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
+      const entryResourceExtScriptModuleList = [...extHandler.entry.values()].filter(item => !!item.resourcePipeline).map(item => item.resourcePipeline)
 
-      this.installPropItemPipelineModule(entryExtensionInstanceList, ExtensionLevel.Entry, extHandler)
-      const entryExtScriptModuleList = [...extHandler.entry.values()].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
+      // 处理实例资源
+      const entryResourceList = await em.find(InstanceResource, {
+        componentInstance: rootInstance
+      }, { populate: ['imageResource'] })
+      entryResourceList.map(resource => {
+        if (resource.imageResource) {
+          return wrap(resource.imageResource).toObject() as any as InstanceResource;
+        }
+        return wrap(resource).toObject() as any as InstanceResource;
+      }).forEach(resource => {
+        // delete resource.release
+        // delete resource.componentInstance
+        // delete resource.imageResource
+        pipelineExec<ResourcePipelineParams>(entryResourceExtScriptModuleList, solutionResourceExtScriptModuleList, appResourceExtScriptModuleList, {
+          resource: resource as any,
+          defaultFn: () => { },
+          appendTask: (taskName, taskCode) => {
+            (resource as any).taskName = taskName
+            viewData.resourceTaskList.push({ key: taskName, content: taskCode })
+          }
+        })
 
-      const solutionExtScriptModuleList = [...(extHandler.solution.get(rootInstance.solutionInstance.id)?.values() || [])].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
-      const rootMetadata = await this.createMetadata(rootInstance, em, releaseExtScriptModuleList, solutionExtScriptModuleList, entryExtScriptModuleList);
-      metadataList.push(rootMetadata);
+        if (resource.resourceConfig) {
+          viewData.resourceConfigList.push(resource.resourceConfig);
+          // resource.resourceConfigId = resource.resourceConfig.id
+          // delete resource.resourceConfig
+        }
+        viewData.resourceList.push(resource as any)
+      })
+
+      // 生成根实例metadata
+      const solutionPropItemExtScriptModuleList = [...(extHandler.solution.get(rootInstance.solutionInstance.id)?.values() || [])].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
+      const rootMetadata = await this.createMetadata(rootInstance, em, appPropItemExtScriptModuleList, solutionPropItemExtScriptModuleList, entryPropItemExtScriptModuleList, viewData);
+      viewData.metadataList.push(rootMetadata);
+
       const childInstanceList = await em.find(ComponentInstance, { root: rootInstance }, { populate: ['component', 'componentVersion', 'solutionInstance'] });
 
+      // 生成子实例metadata
       for (let childInstance of childInstanceList) {
-        const solutionExtScriptModuleList = [...(extHandler.solution.get(childInstance.solutionInstance.id)?.values() || [])].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
+        const solutionPropItemExtScriptModuleList = [...(extHandler.solution.get(childInstance.solutionInstance.id)?.values() || [])].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
 
-        const childMetadata = await this.createMetadata(childInstance, em, releaseExtScriptModuleList, solutionExtScriptModuleList, entryExtScriptModuleList);
-        metadataList.push(childMetadata);
+        const childMetadata = await this.createMetadata(childInstance, em, appPropItemExtScriptModuleList, solutionPropItemExtScriptModuleList, entryPropItemExtScriptModuleList, viewData);
+        viewData.metadataList.push(childMetadata);
       }
 
-      instanceMetadataMap.set(rootInstance, metadataList);
+      instanceToViewDataMap.set(rootInstance, viewData);
 
+      // 卸载实例级别插件
       for (const extInstance of extHandler.entry.values()) {
         extHandler.uninstall(extInstance.id, ExtensionLevel.Entry)
       }
 
+      // 卸载解决方案级别插件
       for (const [solutionInstanceId, map] of extHandler.solution) {
         for (const extInstance of map.values()) {
           extHandler.uninstall(extInstance.id, ExtensionLevel.Solution, solutionInstanceId)
         }
       }
     }
-
-    const manifest = {
-      metadataList: [],
-      resourceList: []
-    }
-
-    manifest.resourceList = await em.find(Resource, { release, componentInstance: null })
 
     const bundle = em.create(Bundle, {
       release,
@@ -154,11 +240,9 @@ export class AssetService {
       const newAssetList = [];
 
       for (const instance of rootInstanceList) {
-        const resourceList = await em.find(Resource, { componentInstance: instance })
-        const metadataList = instanceMetadataMap.get(instance);
 
         const content = em.create(LargeText, {
-          text: JSON.stringify({ metadataList, resourceList })
+          text: JSON.stringify(instanceToViewDataMap.get(instance))
         })
 
         await em.flush()
@@ -172,15 +256,15 @@ export class AssetService {
 
         await em.flush()
 
-        manifest.metadataList.push({
+        appData.viewList.push({
           key: asset.manifestKey,
-          metadataUrl: `http://groot-local.com:10000/asset/instance/${asset.id}`
+          url: `http://groot-local.com:10000/asset/instance/${asset.id}`
         })
         newAssetList.push(asset);
       }
 
       const manifestLargeText = em.create(LargeText, {
-        text: JSON.stringify(manifest)
+        text: JSON.stringify(appData)
       })
       await em.flush()
 
@@ -268,18 +352,15 @@ export class AssetService {
       deploy.application.onlineRelease = deploy.release
     }
 
-    const { metadataList, resourceList } = JSON.parse(deploy.bundle.manifest.text)
+    const manifestData = JSON.parse(deploy.bundle.manifest.text)
 
-    const appData: ApplicationData = {
-      name: deploy.application.name,
-      key: deploy.application.key,
-      viewList: metadataList,
-      envData: {},
-      resourceList
+    const newManifestData: ApplicationData = {
+      ...manifestData,
+      envData: {},// todo 更具环境选择不同的环境变量
     }
 
     const content = em.create(LargeText, {
-      text: JSON.stringify(appData)
+      text: JSON.stringify(newManifestData)
     })
 
     const manifest = em.create(DeployManifest, {
@@ -298,9 +379,10 @@ export class AssetService {
 
   private async createMetadata(
     instance: ComponentInstance, em: EntityManager,
-    releaseExtScriptModuleList: ExtScriptModule[],
+    appExtScriptModuleList: ExtScriptModule[],
     solutionExtScriptModuleList: ExtScriptModule[],
     entryExtScriptModuleList: ExtScriptModule[],
+    viewData: ViewData
   ) {
 
     const groupList = await em.find(PropGroup, { component: instance.component, componentVersion: instance.componentVersion });
@@ -324,13 +406,23 @@ export class AssetService {
       solutionInstanceId: instance.solutionInstance.id,
       componentVersionId: instance.componentVersion.id
     }, (params) => {
-      pipelineExec<PropItemPipelineParams>(entryExtScriptModuleList, solutionExtScriptModuleList, releaseExtScriptModuleList, params)
+      pipelineExec<PropItemPipelineParams>(entryExtScriptModuleList, solutionExtScriptModuleList, appExtScriptModuleList, {
+        ...params,
+        appendTask: (taskName, taskCode) => {
+          params.metadata.advancedProps.push({
+            keyChain: params.propKeyChain,
+            type: taskName
+          })
+          viewData.propTaskList.push({ key: taskName, content: taskCode })
+        }
+      })
     });
 
     return metadata;
   }
 
-  private installPropItemPipelineModule(
+  // 创建ExtScriptModule模块赋值给插件实例的propItemPipeline属性
+  private installPipelineModule(
     extensionInstanceList: ExtensionInstance[],
     level: ExtensionLevel,
     extHandler: { install: (extInstance: IExtensionInstance, level: ExtensionLevel, solutionInstanceId?: number) => boolean },
@@ -338,13 +430,26 @@ export class AssetService {
   ) {
     for (const extensionInstance of extensionInstanceList) {
       const extInstance = wrap(extensionInstance).toObject() as IExtensionInstance
-
+      // 一定要先加载安装在初始化 module
       const success = extHandler.install(extInstance, level, solutionInstanceId)
-      if (success && extensionInstance.extensionVersion.propItemPipelineRaw?.text) {
-        const code = extensionInstance.extensionVersion.propItemPipelineRaw.text
-        const module = vm2.run(code) as ExtScriptModule
-        module.id = extInstance.id;
-        extInstance.propItemPipeline = module
+
+      const extensionVersion = extensionInstance.extensionVersion
+
+      if (success && extensionVersion) {
+        const resourcePipelineModuleCode = extensionVersion.resourcePipelineRaw?.text
+        const propItemPipelineModuleCode = extensionVersion.propItemPipelineRaw?.text
+
+        if (resourcePipelineModuleCode) {
+          const resourceModule = vm2.run(resourcePipelineModuleCode) as ExtScriptModule
+          resourceModule.id = extInstance.id;
+          extInstance.resourcePipeline = resourceModule;
+        }
+
+        if (propItemPipelineModuleCode) {
+          const propItemModule = vm2.run(propItemPipelineModuleCode) as ExtScriptModule
+          propItemModule.id = extInstance.id;
+          extInstance.propItemPipeline = propItemModule;
+        }
       }
     }
   }

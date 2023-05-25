@@ -20,8 +20,8 @@ export default {
     createForeignKeyConstraints: false,
   },
   seeder: {
-    path: './dist/database/seeders',
-    pathTs: './src/database/seeders',
+    path: './dist/seeders',
+    pathTs: './src/seeders',
   },
 
   // developer

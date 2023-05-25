@@ -90,6 +90,8 @@ export default class WorkAreaModel extends BaseModel {
       guard();
       if (this.viewData) {
         callHook(PostMessageType.OuterUpdateComponent, this.viewData, true);
+      } else {
+        throw new Error('流程异常:viewData不能为空')
       }
 
       if (this.pageNavCallback) {
@@ -220,16 +222,12 @@ export default class WorkAreaModel extends BaseModel {
 
     const viewData = {
       key: playgroundPath,
-      metadataList: [],
-      resourceList: []
     };
 
     const appData: ApplicationData = {
       name,
       key,
       viewList: [viewData],
-      envData: {},
-      resourceList: []
     };
 
     return appData;

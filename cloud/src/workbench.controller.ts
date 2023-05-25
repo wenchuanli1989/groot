@@ -20,11 +20,12 @@ import { StandardResultInterceptor } from 'config/standard-result.interceptor';
 import { AssetService } from 'service/asset.service';
 import { ResourceService } from 'service/resource.service';
 import { EnvType } from '@grootio/common';
-import { Resource } from 'entities/Resource';
 import { SolutionService } from 'service/solution.service';
 import { Application } from 'entities/Application';
 import { Solution } from 'entities/Solution';
 import { ComponentService } from 'service/component.service';
+import { InstanceResource } from 'entities/InstanceResource';
+import { AppResource } from 'entities/AppResource';
 
 @UseInterceptors(StandardResultInterceptor)
 @Controller('/workbench')
@@ -205,19 +206,29 @@ export class WorkbenchController {
     return await this.componentInstanceService.remove(instanceId);
   }
 
-  @Post('/resource/add')
-  async resourceAdd(@Body() rawResource: Resource) {
-    return await this.resourceService.add(rawResource);
+  @Post('/resource/add-instance-resource')
+  async addInstanceResource(@Body() rawResource: InstanceResource) {
+    return await this.resourceService.addInstanceResource(rawResource);
+  }
+
+  @Post('/resource/add-app-resource')
+  async addAppResource(@Body() rawResource: AppResource) {
+    return await this.resourceService.addAppResource(rawResource);
   }
 
   @Get('/resource/remove/:resourceId')
-  async resourceRemove(@Param('resourceId') resourceId: number) {
-    return await this.resourceService.remove(resourceId);
+  async resourceRemove(@Param('resourceId') resourceId: number, @Query('type') type: string) {
+    return await this.resourceService.remove(resourceId, type as any);
   }
 
-  @Post('/resource/update')
-  async resourceUpdate(@Body() rawResource: Resource) {
-    return await this.resourceService.update(rawResource);
+  @Post('/resource/update-app-resource')
+  async updateAppResource(@Body() rawResource: AppResource) {
+    return await this.resourceService.updateAppResource(rawResource);
+  }
+
+  @Post('/resource/update-instance-resource')
+  async updateInstanceResource(@Body() rawResource: InstanceResource) {
+    return await this.resourceService.updateInstanceResource(rawResource);
   }
 
   @Get('/demo')

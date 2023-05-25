@@ -1,18 +1,27 @@
-import { Resource } from "./entities";
+import { Resource, ResourceConfig } from "./entities";
 
 export type ApplicationData = {
   name: string,
   key: string,
   viewList: ViewData[],
-  resourceList: Resource[],
-  envData: Record<string, any>
+  resourceList?: Resource[],
+  resourceConfigList?: ResourceConfig[],
+  resourceTaskList?: Task[],
+  envData?: { key: string, value: string }[],
 }
 
 export type ViewData = {
+  // 作为resource的context
   key: string;
-  metadataUrl?: string;
+  url?: string;
   metadataList?: Metadata[];
-  resourceList: Resource[]
+  // propTaskList的key和advancedProps的type对应
+  propTaskList?: Task[],
+
+  resourceList?: Resource[];
+  // resource的taskName和resourceTaskList的key对应
+  resourceTaskList?: Task[],
+  resourceConfigList?: ResourceConfig[],
 }
 
 export type Metadata = {
@@ -23,11 +32,7 @@ export type Metadata = {
   parentId?: number,
 
   advancedProps?: PropMetadata[],
-  propsObj: {
-    [key: string]: any
-  },
-  // postPropTasks的key和advancedProps的type关联对应
-  postPropTasks: Record<string, string>,
+  propsObj: Record<string, any>,
 
   $$runtime?: {
     propItemId: number,
@@ -68,7 +73,10 @@ export type PropMetadataComponentSetting = {
 }
 
 
-
+export type Task = {
+  key: string,
+  content: string
+}
 
 
 

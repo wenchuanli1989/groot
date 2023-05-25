@@ -68,11 +68,10 @@ export type ComponentInstance = {
   blockList: PropBlock[],
   itemList: PropItem[],
   valueList: PropValue[],
-  resourceList: Resource[],
 
   // ************************** 分割线已下是界面属性 **************************
   propTree: PropGroup[],
-} & Omit<import("../../cloud/src/entities/ComponentInstance").ComponentInstance, 'component' | 'componentVersion' | 'groupList' | 'blockList' | 'itemList' | 'valueList' | 'resourceList'>;
+} & Omit<import("../../cloud/src/entities/ComponentInstance").ComponentInstance, 'component' | 'componentVersion' | 'groupList' | 'blockList' | 'itemList' | 'valueList'>;
 
 export type Release = {
 
@@ -82,11 +81,34 @@ export type PropValue = {
 
 } & Omit<import("../../cloud/src/entities/PropValue").PropValue, ''>;
 
-export type Resource = {
+export type ProjectResource = {
 
   // ************************** 分割线已下是界面属性 **************************
-  isReadonly: boolean
-} & Omit<import("../../cloud/src/entities/Resource").Resource, 'componentInstance' | 'release'>;
+} & Omit<import("../../cloud/src/entities/ProjectResource").ProjectResource, 'project'>;
+
+export type AppResource = {
+
+  // ************************** 分割线已下是界面属性 **************************
+} & Omit<import("../../cloud/src/entities/AppResource").AppResource, 'app' | 'release'>;
+
+export type InstanceResource = {
+
+  // ************************** 分割线已下是界面属性 **************************
+} & Omit<import("../../cloud/src/entities/InstanceResource").InstanceResource, 'release' | 'componentInstance'>;
+
+export type Resource = {
+  resourceConfig: ResourceConfig,
+  // ************************** 分割线已下是界面属性 **************************
+  readonly?: boolean,
+  taskName?: string
+} & Omit<import("../../cloud/src/entities/Resource").Resource, 'resourceConfig'>;
+
+
+export type ResourceConfig = {
+
+  // ************************** 分割线已下是界面属性 **************************
+} & Omit<import("../../cloud/src/entities/ResourceConfig").ResourceConfig, ''>;
+
 
 export type Component = {
   componentVersion: ComponentVersion,
@@ -135,7 +157,8 @@ export type ExtensionInstance = {
 
   // ************************** 分割线已下是界面属性 **************************
   status: ExtensionStatus,
-  propItemPipeline: ExtScriptModule
+  propItemPipeline: ExtScriptModule,
+  resourcePipeline: ExtScriptModule
 } & Omit<import("../../cloud/src/entities/ExtensionInstance").ExtensionInstance, ''>;
 
 export type Solution = {

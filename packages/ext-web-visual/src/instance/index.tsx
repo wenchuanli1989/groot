@@ -71,7 +71,9 @@ export const instanceBootstrap = () => {
   registerState('gs.component', null, false)
   registerState('gs.allComponentInstance', [], true)
   registerState('gs.release', null, false)
-  registerState('gs.globalResourceList', params.application.resourceList as any as Resource[], true)
+  registerState('gs.globalResourceList', params.application.resourceList, true)
+  registerState('gs.globalResourceConfigList', params.application.resourceConfigList, true)
+  registerState('gs.localResourceList', [], true)
   registerState('gs.localResourceList', [], true)
 
   registerCommand('gc.fetch.instance', (_, rootInstanceId) => {

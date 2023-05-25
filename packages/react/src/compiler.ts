@@ -6,7 +6,7 @@ import { Metadata } from "@grootio/common";
 const refreshFnMap = new Map<number, Function>();
 
 
-export const createComponent = (metadata: Metadata, isRoot: boolean, viewEleMap, viewMetadataMap) => {
+export const createComponent = (metadata: Metadata, viewEleMap, viewMetadataMap) => {
   const module = globalConfig.modules[metadata.packageName][metadata.componentName];
   if (!module) {
     throw new Error(`模块未找到 ${metadata.packageName}/${metadata.componentName}`);
@@ -43,7 +43,7 @@ export const createComponent = (metadata: Metadata, isRoot: boolean, viewEleMap,
         ref: containerEleRef
       }
 
-      if (isRoot) {
+      if (!metadata.parentId) {
         eleProps['data-groot-root'] = 'true';
       }
       return React.createElement('div', eleProps, React.createElement(module, propsObj));

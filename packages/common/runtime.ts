@@ -43,7 +43,7 @@ export type UIManagerConfig = {
    */
   shared?: Record<string, any>;
 
-  createComponent?: (metadata: Metadata, isRoot: boolean, viewEleMap: Map<number, HTMLElement>, viewMetadataMap: Map<number, Metadata>) => any,
+  createComponent?: (metadata: Metadata, viewEleMap: Map<number, HTMLElement>, viewMetadataMap: Map<number, Metadata>) => any,
   refreshComponent?: (metadataId: number) => void;
 };
 

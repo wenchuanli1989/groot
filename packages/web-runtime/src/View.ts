@@ -1,42 +1,58 @@
-import type { Metadata, Resource, ViewData } from "@grootio/common";
+import type { Metadata, Resource, ResourceConfig, Task, ViewData } from "@grootio/common";
 import { PostMessageType } from "@grootio/common";
 
 import { buildComponent, reBuildComponent } from "./compiler";
 import { controlMode, globalConfig } from "./config";
-import { destoryResource, initResource } from "./resource";
+import { destoryResource, buildResource } from "./resource";
 
+type ParamsType = {
+  metadataList: Metadata[], resourceList?: Resource[], propTaskList?: Task[], resourceTaskList?: Task[], resourceConfigList?: ResourceConfig[]
+}
 export class View {
   readonly key: string;
-  readonly controlMode: boolean;
-  rootComponent?: any;
-  status: 'loading' | 'finish';
-  private metadataUrl: string;
+  private url: string;
   private metadataList: Metadata[];
   private resourceList: Resource[];
-  private resourceNamespaceKeyList: string[] = [];
-  private metadataPromise?: Promise<{ metadataList: Metadata[], resourceList: Resource[] }>;
-  private fetchMetadataResolve?: (data: { metadataList: Metadata[], resourceList: Resource[] }) => void;
+  private propTaskList: Task[]
+  private resourceTaskList: Task[]
+  private resourceConfigList: ResourceConfig[]
+
+  rootComponent?: any;
+  status: 'loading' | 'finish';
+  readonly controlMode: boolean;
   private rootMetadata: Metadata;
+  private metadataPromise?: Promise<ParamsType>;
+  private fetchMetadataResolve?: (data: ParamsType) => void;
 
   constructor(data: ViewData, controlMode: boolean) {
     this.key = data.key;
-    this.metadataUrl = data.metadataUrl;
+    this.url = data.url;
     this.metadataList = data.metadataList;
     this.resourceList = data.resourceList;
+    this.propTaskList = data.propTaskList;
+    this.resourceTaskList = data.resourceTaskList;
+    this.resourceConfigList = data.resourceConfigList
+
     this.controlMode = controlMode;
 
-    if (!controlMode && !this.metadataUrl && (!Array.isArray(this.metadataList) || this.metadataList.length === 0)) {
-      throw new Error('metadataUrl 和 metadataList 不能同时为空');
+    if (!controlMode && !this.url && !this.metadataList) {
+      throw new Error('数据异常');
     }
   }
 
   public init(): Promise<View> {
-    return this.loadMetadata().then(({ metadataList, resourceList }) => {
+    const result = this.metadataList ? Promise.resolve(null) : this.loadMetadata().then(({ metadataList, resourceList, propTaskList, resourceTaskList, resourceConfigList }) => {
       this.metadataList = metadataList;
-      this.resourceList = resourceList || [];
-      this.resourceNamespaceKeyList = initResource(this.resourceList)
+      this.propTaskList = propTaskList;
+      this.resourceList = resourceList;
+      this.resourceTaskList = resourceTaskList;
+      this.resourceConfigList = resourceConfigList
+    })
+
+    return result.then(() => {
+      buildResource(this.resourceList, this.resourceTaskList, this.resourceConfigList, this.key)
       this.rootMetadata = this.metadataList.find(m => !m.parentId);
-      this.rootComponent = buildComponent(this.rootMetadata, this.metadataList, true);
+      this.rootComponent = buildComponent(this.rootMetadata, this.metadataList, this.propTaskList, this.key);
       this.status = 'finish';
       return this;
     })
@@ -56,7 +72,7 @@ export class View {
   }
 
   public destory() {
-    destoryResource(this.resourceNamespaceKeyList)
+    destoryResource(this.key)
   }
 
   public refresh() {
@@ -66,7 +82,7 @@ export class View {
   /**
    * 加载页面配置信息
    */
-  private loadMetadata(): Promise<{ metadataList: Metadata[], resourceList: Resource[] }> {
+  private loadMetadata(): Promise<ParamsType> {
     if (this.status !== 'finish') {
       this.status = 'loading';
     }
@@ -82,16 +98,14 @@ export class View {
       }
 
       return this.metadataPromise;
-    } else if (this.metadataList) {
-      return Promise.resolve({ metadataList: this.metadataList, resourceList: this.resourceList });
-    } else if (this.metadataUrl) {// 从远程地址加载配置信息
+    } else if (this.url) {// 从远程地址加载配置信息
       if (!this.metadataPromise) {
-        this.metadataPromise = fetch(this.metadataUrl).then((res) => res.json())
+        this.metadataPromise = fetch(this.url).then((res) => res.json())
       }
 
       return this.metadataPromise;
     } else {
-      return Promise.reject('view数据异常');
+      return Promise.reject('数据异常');
     }
   }
 
@@ -99,7 +113,7 @@ export class View {
     const metadata = this.metadataList.find(m => m.id === data.id);
     metadata.propsObj = data.propsObj;
     metadata.advancedProps = data.advancedProps;
-    reBuildComponent(metadata, this.metadataList);
+    reBuildComponent(metadata, this.metadataList, this.key);// todo propTaskList
   }
 
   private fullUpdate(list: Metadata[]) {
@@ -113,6 +127,6 @@ export class View {
     list.splice(newRootIndex, 1, rootMetadata);
     this.metadataList = list;
 
-    reBuildComponent(rootMetadata, this.metadataList);
+    reBuildComponent(rootMetadata, this.metadataList, this.key);// todo propTaskList
   }
 }

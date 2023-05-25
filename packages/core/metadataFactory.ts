@@ -174,7 +174,10 @@ function buildPropObjectForLeafItem(propItem: PropItem, ctx: Object, propKeyChai
       defaultFn()
     } else {
       if (_pipeline) {
-        _pipeline({ ctx: newCTX, propKey: propEnd, value, propItem, metadata, propKeyChain, defaultFn, valueInterpolation })
+        _pipeline({
+          ctx: newCTX, propKey: propEnd, value, propItem, metadata, propKeyChain, defaultFn, valueInterpolation,
+          appendTask: () => { throw new Error('需要外部调用者实现该方法') }
+        })
         if (newCTX[propEnd] === undefined) {
           defaultFn()
         }

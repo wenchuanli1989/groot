@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import React from "react";
 import { APIStore } from "./api/API.store";
-import { Application, Component, ComponentInstance, ExtensionInstance, PropItem, Release, Solution, Resource } from "./entities";
+import { AppResource, Application, Component, ComponentInstance, ExtensionInstance, InstanceResource, PropItem, Release, Resource, ResourceConfig, Solution } from "./entities";
 import { GridLayout } from "./GridLayout";
 import { ApplicationData, Metadata } from "./internal";
 import { ExtensionLevel, ExtensionPipelineLevel, StudioMode } from "./enum";
@@ -172,8 +172,10 @@ export type GrootStateDict = {
   'gs.propSetting.breadcrumbList': [{ id: number, name: string }, true],
   'gs.stage.playgroundPath': [string, false],
   'gs.stage.debugBaseUrl': [string, false],
-  'gs.globalResourceList': [Resource, true],
-  'gs.localResourceList': [Resource, true],
+  'gs.globalResourceList': [AppResource, true],
+  'gs.localResourceList': [InstanceResource, true],
+  'gs.globalResourceConfigList': [ResourceConfig, true],
+  'gs.localResourceConfigList': [ResourceConfig, true],
   'gs.propItem.viewTypeList': [{ label: string, value: string }, true],
   'gs.propItem.formRenderList': [{ viewType: string, render: React.FC<FormItemRender> }, true],
   'gs.propItem.settingRenderList': [{ viewType: string, render: React.FC<FormItemRender> }, true],
@@ -363,5 +365,12 @@ export type PropItemPipelineParams = {
   metadata: Metadata,
   propKeyChain: string,
   defaultFn: () => void,
-  valueInterpolation: boolean
+  valueInterpolation: boolean,
+  appendTask: (taskName: string, taskCode: string) => void
+}
+
+export type ResourcePipelineParams = {
+  resource: Resource,
+  defaultFn: () => void,
+  appendTask: (taskName: string, taskCode: string) => void
 }

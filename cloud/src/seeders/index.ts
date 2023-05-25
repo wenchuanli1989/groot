@@ -114,7 +114,7 @@ export class DatabaseSeeder extends Seeder {
       extension: extWebVisual,
       extensionVersion: extWebVisualVersion,
       config: '',
-      relationType: ExtensionRelationType.SolutionVersion,
+      relationType: ExtensionRelationType.Solution,
       relationId: solutionVersion.id,
     });
     await em.persistAndFlush(extWebVisualSolutionInstance);
@@ -123,7 +123,7 @@ export class DatabaseSeeder extends Seeder {
       extension: extPropSetter,
       extensionVersion: extPropSetterVersion,
       config: '',
-      relationType: ExtensionRelationType.SolutionVersion,
+      relationType: ExtensionRelationType.Solution,
       relationId: solutionVersion.id,
     });
     await em.persistAndFlush(extPropSetterSolutionInstance);
@@ -132,7 +132,7 @@ export class DatabaseSeeder extends Seeder {
       extension: extWorkArea,
       extensionVersion: extWorkAreaVersion,
       config: '',
-      relationType: ExtensionRelationType.SolutionVersion,
+      relationType: ExtensionRelationType.Solution,
       relationId: solutionVersion.id,
     });
     await em.persistAndFlush(extWorkAreaSolutionInstance);
@@ -172,7 +172,7 @@ export class DatabaseSeeder extends Seeder {
       extension: extWebVisual,
       extensionVersion: extWebVisualVersion,
       config: '',
-      relationType: ExtensionRelationType.Release,
+      relationType: ExtensionRelationType.Application,
       relationId: release.id,
     });
     await em.persistAndFlush(extWebVisualReleaseInstance);
@@ -181,7 +181,7 @@ export class DatabaseSeeder extends Seeder {
       extension: extPropSetter,
       extensionVersion: extPropSetterVersion,
       config: '',
-      relationType: ExtensionRelationType.Release,
+      relationType: ExtensionRelationType.Application,
       relationId: release.id,
     });
     await em.persistAndFlush(extPropSetterReleaseInstance);
@@ -190,7 +190,7 @@ export class DatabaseSeeder extends Seeder {
       extension: extWorkArea,
       extensionVersion: extWorkAreaVersion,
       config: '',
-      relationType: ExtensionRelationType.Release,
+      relationType: ExtensionRelationType.Application,
       relationId: release.id,
     });
     await em.persistAndFlush(extWorkAreaReleaseInstance);
@@ -209,17 +209,12 @@ export class DatabaseSeeder extends Seeder {
 }
 
 const defaultPropItemPipeline = `
-const task = ({propItem,metadata,defaultFn,propKeyChain}) => {
+const exec = ({propItem,metadata,defaultFn,propKeyChain,appendTask}) => {
 
   defaultFn()
 
   if (propItem.viewType === 'datePicker' || propItem.viewType === 'timePicker') {
-    metadata.advancedProps.push({
-      keyChain: propKeyChain,
-      type: 'dateTime'
-    })
-
-    metadata.postPropTasks['dateTime'] = '_value = _shared.dayjs(_rawValue)'
+    appendTask('dateTime','_value = _shared.dayjs(_rawValue)')
   } 
 }
 
@@ -246,7 +241,7 @@ const check = ({propItem}) => {
 }
 
 module.exports = {
-  task,
+  exec,
   check
 }
 

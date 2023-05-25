@@ -1,11 +1,11 @@
 import { ExtensionRelationType } from '@grootio/common';
-import { RequestContext } from '@mikro-orm/core';
+import { RequestContext, wrap } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { LogicException } from 'config/logic.exception';
+import { AppResource } from 'entities/AppResource';
 import { Application } from 'entities/Application';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
 import { Release } from 'entities/Release';
-import { Resource } from 'entities/Resource';
 
 
 @Injectable()
@@ -24,10 +24,23 @@ export class ApplicationService {
 
     application.extensionInstanceList = await em.find(ExtensionInstance, {
       relationId: releaseId,
-      relationType: ExtensionRelationType.Release
+      relationType: ExtensionRelationType.Application
     }, { populate: ['extension', 'extensionVersion.propItemPipelineRaw', 'extensionVersion'] })
 
-    application.resourceList = await em.find(Resource, { componentInstance: null })
+    let resourceList = await em.find(AppResource, { app: application, release }, { populate: ['imageResource.resourceConfig', 'resourceConfig'] })
+
+    const resourceConfigMap = new Map()
+    application.resourceList = resourceList.map(resource => {
+      if (resource.imageResource) {
+        const resourceConfig = resource.imageResource.resourceConfig
+        resourceConfigMap.set(resourceConfig.id, resourceConfig)
+        return wrap(resource.imageResource).toObject() as any as AppResource
+      }
+      const resourceConfig = resource.resourceConfig;
+      resourceConfigMap.set(resourceConfig.id, resourceConfig)
+      return wrap(resource).toObject() as AppResource;
+    })
+    application.resourceConfigList = [...resourceConfigMap.values()]
 
     return application;
   }

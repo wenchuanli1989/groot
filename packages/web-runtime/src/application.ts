@@ -3,7 +3,7 @@ import { ApplicationData, IframeDebuggerConfig, PostMessageType, UIManagerConfig
 import { resetWatch, outerSelected, updateActiveRect, respondDragOver, respondDragEnter, respondDragLeave, respondDragDrop } from './monitor';
 import { controlMode, globalConfig, groot, setConfig } from './config';
 import { View } from './View';
-import { initResource, removeResource, updateResource } from './resource';
+import { buildResource, removeResource, updateResource } from './resource';
 
 export enum ApplicationStatus {
   Init = 'init',
@@ -149,7 +149,7 @@ function initApplication(data: ApplicationData) {
     const view = new View(viewData, controlMode && viewData.key === iframeDebuggerConfig.controlView);
     allViewMap.set(view.key, view);
   });
-  initResource(data.resourceList);
+  buildResource(data.resourceList, data.resourceTaskList, data.resourceConfigList, null);
   if (controlMode) {
     window.parent.postMessage({ type: PostMessageType.InnerApplicationReady }, '*');
   }

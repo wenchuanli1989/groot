@@ -12,7 +12,12 @@ export const createExtensionHandler = () => {
     }
   }
 
+  // 单个层级不允许出现相同的插件实例
+  // 全局出现重复插件ID，只有第一个插件状态是Active，其他同一个插件ID，但是不相同的实力状态为Conflict
   const install = (extensionInstance: ExtensionInstance, level: ExtensionLevel, solutionInstanceId?: number) => {
+    const extensionId = extensionInstance.extension.id;
+    // 不同插件共用同一个资源地址
+    const assetUrl = extensionInstance.extensionVersion.assetUrl
 
     if (level === ExtensionLevel.Application) {
       if (extensionMap.application.has(extensionInstance.id)) {
@@ -35,11 +40,7 @@ export const createExtensionHandler = () => {
       extensionMap.entry.set(extensionInstance.id, extensionInstance)
     }
 
-    const extensionId = extensionInstance.extension.id;
-    const assetUrl = extensionInstance.extensionVersion.assetUrl
-    if (!extensionId || !assetUrl) {
-      throw new Error('extensionId为空或assetUrl为空')
-    }
+
     if (extensionMap.runtime.byExtIdMap.has(extensionId)) {
       extensionInstance.status = ExtensionStatus.Conflict
     } else if (extensionMap.runtime.byAssetUrlMap.has(assetUrl)) {
