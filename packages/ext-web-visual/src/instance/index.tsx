@@ -1,5 +1,5 @@
 import { AppstoreOutlined } from "@ant-design/icons";
-import { APIPath, ExtensionLevel, ExtensionRuntime, Resource, ViewsContainer } from "@grootio/common";
+import { APIPath, ExtensionLevel, ExtensionRuntime, PostMessageType, Resource, ViewsContainer } from "@grootio/common";
 import { getContext, grootManager } from "context";
 import { Application } from "./Application";
 import { Material } from "./Material";
@@ -71,10 +71,10 @@ export const instanceBootstrap = () => {
   registerState('gs.component', null, false)
   registerState('gs.allComponentInstance', [], true)
   registerState('gs.release', null, false)
-  registerState('gs.globalResourceList', params.application.resourceList, true)
+  registerState('gs.globalResourceList', params.application.resourceList as Resource[], true)
   registerState('gs.globalResourceConfigList', params.application.resourceConfigList, true)
   registerState('gs.localResourceList', [], true)
-  registerState('gs.localResourceList', [], true)
+  registerState('gs.localResourceConfigList', [], true)
 
   registerCommand('gc.fetch.instance', (_, rootInstanceId) => {
     fetchRootInstance(rootInstanceId);
@@ -92,7 +92,7 @@ export const instanceBootstrap = () => {
 
 const fetchRootInstance = (rootInstanceId: number) => {
   const { request, groot: { loadExtension, launchExtension, extHandler }, params, layout } = getContext();
-  request(APIPath.componentInstance_rootDetail_instanceId, { instanceId: rootInstanceId }).then(({ data: { children, root, release, solutionInstanceList, entryExtensionInstanceList, resourceList } }) => {
+  request(APIPath.componentInstance_rootDetail_instanceId, { instanceId: rootInstanceId }).then(({ data: { children, root, release, solutionInstanceList, entryExtensionInstanceList, resourceList, resourceConfigList } }) => {
 
     // 卸载
     [...extHandler.entry.values()].forEach(ext => {
@@ -149,14 +149,20 @@ const fetchRootInstance = (rootInstanceId: number) => {
     // }
 
     const application = getContext().params.application
-    grootManager.state.setState('gs.stage.debugBaseUrl', release.debugBaseUrl || application.debugBaseUrl)
-    grootManager.state.setState('gs.stage.playgroundPath', release.playgroundPath || application.playgroundPath)
-    grootManager.state.setState('gs.release', release)
-    grootManager.state.setState('gs.allComponentInstance', list)
+    const { setState } = grootManager.state
+    const { executeCommand } = grootManager.command
+    const { callHook } = grootManager.hook
 
-    grootManager.state.setState('gs.localResourceList', resourceList)
+    setState('gs.stage.debugBaseUrl', release.debugBaseUrl || application.debugBaseUrl)
+    setState('gs.stage.playgroundPath', release.playgroundPath || application.playgroundPath)
+    setState('gs.release', release)
+    setState('gs.allComponentInstance', list)
+    setState('gs.localResourceList', resourceList as Resource[])
+    setState('gs.localResourceConfigList', resourceConfigList)
 
-    grootManager.command.executeCommand('gc.makeDataToStage', 'first');
+    const resourceData = executeCommand('gc.createResource', true)
+    const metadataData = executeCommand('gc.createMetadata')
+    callHook(PostMessageType.SwitchView, { ...resourceData, ...metadataData })
     switchComponentInstance(root.id);
   });
 }

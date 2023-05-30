@@ -22,7 +22,7 @@ export const getMetadataIds = (resourceId: number) => {
 }
 
 // 要考虑一个页面有多个全局组件情况
-export const buildResource = (resourceList: Resource[], taskList: { key: string, content: string }[], configList: ResourceConfig[], viewKey: string) => {
+export const buildResource = (resourceList: Resource[], viewKey: string, taskList: { key: string, content: string }[] = [], configList: ResourceConfig[] = [],) => {
   const resourceObj = {}
   const resourceConfigMap = new Map()
   const resourceTaskMap = new Map()
@@ -37,13 +37,13 @@ export const buildResource = (resourceList: Resource[], taskList: { key: string,
 
   resourceList.forEach(resource => {
     metadataIdsMap.set(resource.id, new Set())
-    let namespace = resourceObj[resource.type]
+    let namespace = resourceObj[resource.namespace]
     if (!namespace) {
-      namespace = createNamespace(resource.type, viewKey)
-      resourceObj[resource.type] = namespace
+      namespace = createNamespace(resource.namespace, viewKey)
+      resourceObj[resource.namespace] = namespace
     }
 
-    resourceManagerContainer.get(viewKey).get(resource.type).resourceMap.set(resource.name, resource)
+    resourceManagerContainer.get(viewKey).get(resource.namespace).resourceMap.set(resource.name, resource)
 
     if (resource.taskName) {
       let task = resourceTaskMap.get(resource.taskName)

@@ -1,7 +1,7 @@
 import {
   ApplicationData, DeployStatusType, EnvType,
   PropGroup as IPropGroup, PropBlock as IPropBlock, PropItem as IPropItem, PropValue as IPropValue, EnvTypeStr,
-  ExtScriptModule, ExtensionRelationType, createExtensionHandler, ExtensionLevel, ExtensionInstance as IExtensionInstance, PropItemPipelineParams, ResourcePipelineParams, ViewData, Resource
+  ExtScriptModule, ExtensionRelationType, createExtensionHandler, ExtensionLevel, ExtensionInstance as IExtensionInstance, PropItemPipelineParams, ResourcePipelineParams, ViewData, Resource, resourceAppendTask, propAppendTask
 } from '@grootio/common';
 import { EntityManager, RequestContext, wrap } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
@@ -26,6 +26,7 @@ import { SolutionInstance } from 'entities/SolutionInstance';
 import { LargeText } from 'entities/LargeText';
 import { AppResource } from 'entities/AppResource';
 import { InstanceResource } from 'entities/InstanceResource';
+import { parseResource } from 'util/common';
 
 
 const vm2 = new NodeVM()
@@ -88,7 +89,7 @@ export class AssetService {
     const appExtensionInstanceList = await em.find(ExtensionInstance, {
       relationId: releaseId,
       relationType: ExtensionRelationType.Application,
-    }, { populate: ['extensionVersion.propItemPipelineRaw', 'extension'] })
+    }, { populate: ['extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw', 'extension'] })
     this.installPipelineModule(appExtensionInstanceList, ExtensionLevel.Application, extHandler)
 
     // 处理全局资源
@@ -96,12 +97,10 @@ export class AssetService {
     const appResourceList = await em.find(AppResource, {
       app: application,
       release
-    }, { populate: ['imageResource'] })
+    }, { populate: ['imageResource.resourceConfig', 'resourceConfig'] })
+    const resourceConfigMap = new Map()
     appResourceList.map(resource => {
-      if (resource.imageResource) {
-        return wrap(resource.imageResource).toObject() as any as AppResource;
-      }
-      return wrap(resource).toObject() as AppResource;
+      return parseResource(resource, resourceConfigMap) as any as AppResource
     }).forEach(resource => {
       // delete resource.app;
       // delete resource.release
@@ -109,19 +108,12 @@ export class AssetService {
       pipelineExec<ResourcePipelineParams>([], [], appResourceExtScriptModuleList, {
         resource: resource as any,
         defaultFn: () => { },
-        appendTask: (taskName, taskCode) => {
-          (resource as any).taskName = taskName
-          appData.resourceTaskList.push({ key: taskName, content: taskCode })
-        }
+        appendTask: resourceAppendTask(resource as any, appData.resourceTaskList)
       })
 
-      if (resource.resourceConfig) {
-        appData.resourceConfigList.push(resource.resourceConfig)
-        // resource.resourceConfigId = resource.resourceConfig.id
-        // delete resource.resourceConfig
-      }
       appData.resourceList.push(resource as any)
     })
+    appData.resourceConfigList = [...resourceConfigMap.values()]
 
 
     const appPropItemExtScriptModuleList = [...extHandler.application.values()].filter(ext => !!ext.propItemPipeline).map(ext => ext.propItemPipeline)
@@ -134,9 +126,9 @@ export class AssetService {
         resourceList: [],
 
         // propTasks的key和advancedProps的type关联对应
-        propTaskMap: {},
-        resourceTaskMap: {},
-        resourceConfigMap: {}
+        propTaskList: [],
+        resourceTaskList: [],
+        resourceConfigList: []
       } as ViewData
 
       const solutionInstanceList = await em.find(SolutionInstance, {
@@ -148,20 +140,20 @@ export class AssetService {
         const solutionExtensionInstanceList = await em.find(ExtensionInstance, {
           relationId: solutionInstance.solutionVersion.id,
           relationType: ExtensionRelationType.Solution
-        }, { populate: ['extensionVersion.propItemPipelineRaw', 'extension'] })
+        }, { populate: ['extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw', 'extension'] })
 
         this.installPipelineModule(solutionExtensionInstanceList, ExtensionLevel.Solution, extHandler, solutionInstance.id)
       }
       const solutionResourceExtScriptModuleList = [...extHandler.solution.values()].reduce((pre, curr) => {
         pre.push([...curr.values()])
         return pre;
-      }, [])
+      }, []).filter(ext => !!ext.resourcePipeline?.id).map(ext => ext.resourcePipeline)
 
       // 加载实例级别插件
       const entryExtensionInstanceList = await em.find(ExtensionInstance, {
         relationId: rootInstance.id,
         relationType: ExtensionRelationType.Entry
-      }, { populate: ['extensionVersion.propItemPipelineRaw', 'extension'] })
+      }, { populate: ['extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw', 'extension'] })
       this.installPipelineModule(entryExtensionInstanceList, ExtensionLevel.Entry, extHandler)
       const entryPropItemExtScriptModuleList = [...extHandler.entry.values()].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
       const entryResourceExtScriptModuleList = [...extHandler.entry.values()].filter(item => !!item.resourcePipeline).map(item => item.resourcePipeline)
@@ -169,12 +161,10 @@ export class AssetService {
       // 处理实例资源
       const entryResourceList = await em.find(InstanceResource, {
         componentInstance: rootInstance
-      }, { populate: ['imageResource'] })
+      }, { populate: ['resourceConfig', 'imageResource.resourceConfig'] })
+      const resourceConfigMap = new Map()
       entryResourceList.map(resource => {
-        if (resource.imageResource) {
-          return wrap(resource.imageResource).toObject() as any as InstanceResource;
-        }
-        return wrap(resource).toObject() as any as InstanceResource;
+        return parseResource(resource, resourceConfigMap) as any as InstanceResource
       }).forEach(resource => {
         // delete resource.release
         // delete resource.componentInstance
@@ -182,19 +172,12 @@ export class AssetService {
         pipelineExec<ResourcePipelineParams>(entryResourceExtScriptModuleList, solutionResourceExtScriptModuleList, appResourceExtScriptModuleList, {
           resource: resource as any,
           defaultFn: () => { },
-          appendTask: (taskName, taskCode) => {
-            (resource as any).taskName = taskName
-            viewData.resourceTaskList.push({ key: taskName, content: taskCode })
-          }
+          appendTask: resourceAppendTask(resource as any, viewData.resourceTaskList)
         })
 
-        if (resource.resourceConfig) {
-          viewData.resourceConfigList.push(resource.resourceConfig);
-          // resource.resourceConfigId = resource.resourceConfig.id
-          // delete resource.resourceConfig
-        }
         viewData.resourceList.push(resource as any)
       })
+      viewData.resourceConfigList = [...resourceConfigMap.values()]
 
       // 生成根实例metadata
       const solutionPropItemExtScriptModuleList = [...(extHandler.solution.get(rootInstance.solutionInstance.id)?.values() || [])].filter(item => !!item.propItemPipeline).map(item => item.propItemPipeline)
@@ -408,13 +391,7 @@ export class AssetService {
     }, (params) => {
       pipelineExec<PropItemPipelineParams>(entryExtScriptModuleList, solutionExtScriptModuleList, appExtScriptModuleList, {
         ...params,
-        appendTask: (taskName, taskCode) => {
-          params.metadata.advancedProps.push({
-            keyChain: params.propKeyChain,
-            type: taskName
-          })
-          viewData.propTaskList.push({ key: taskName, content: taskCode })
-        }
+        appendTask: propAppendTask(params.metadata, viewData.propTaskList, params.propKeyChain)
       })
     });
 

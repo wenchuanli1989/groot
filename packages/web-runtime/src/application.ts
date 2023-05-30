@@ -3,7 +3,7 @@ import { ApplicationData, IframeDebuggerConfig, PostMessageType, UIManagerConfig
 import { resetWatch, outerSelected, updateActiveRect, respondDragOver, respondDragEnter, respondDragLeave, respondDragDrop } from './monitor';
 import { controlMode, globalConfig, groot, setConfig } from './config';
 import { View } from './View';
-import { buildResource, removeResource, updateResource } from './resource';
+import { buildResource } from './resource';
 
 export enum ApplicationStatus {
   Init = 'init',
@@ -66,17 +66,17 @@ function onMessage(event: any) {
     if (activeView.key !== event.data.data.key) {
       throw new Error('内外层界面标识不一致')
     }
-
-    activeView.update(event.data.data.metadataList, event.data.data.resourceList);
+    const { metadataList } = event.data.data;
+    activeView.update(metadataList);
     setTimeout(updateActiveRect);
   } else if (messageType === PostMessageType.OuterRefreshView) {
     window.location.reload();
   } else if (messageType === PostMessageType.OuterUpdateResource) {
-    updateResource(event.data.data.type, event.data.data.name, event.data.data.value)
+    const { resourceList, resourceTaskList, resourceConfigList, key } = event.data.data
+    buildResource(resourceList, key, resourceTaskList, resourceConfigList)
     activeView.refresh()
-  } else if (messageType === PostMessageType.OuterRemoveResource) {
-    removeResource(event.data.data.type, event.data.data.name)
-    activeView.refresh()
+  } else if (messageType === PostMessageType.OuterSetView) {
+    activeView.initCallback(event.data.data)
   }
 
 
@@ -149,7 +149,7 @@ function initApplication(data: ApplicationData) {
     const view = new View(viewData, controlMode && viewData.key === iframeDebuggerConfig.controlView);
     allViewMap.set(view.key, view);
   });
-  buildResource(data.resourceList, data.resourceTaskList, data.resourceConfigList, null);
+  buildResource(data.resourceList, null, data.resourceTaskList, data.resourceConfigList);
   if (controlMode) {
     window.parent.postMessage({ type: PostMessageType.InnerApplicationReady }, '*');
   }

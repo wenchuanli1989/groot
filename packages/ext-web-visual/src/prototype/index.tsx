@@ -65,6 +65,8 @@ const fetchComponent = (componentId: number, versionId) => {
     })
 
     grootManager.state.setState('gs.component', data)
-    grootManager.command.executeCommand('gc.makeDataToStage', 'first')
+
+    grootManager.command.executeCommand('gc.stageRefresh')
+    grootManager.command.executeCommand('gc.pushMetadata', 'all')
   })
 }

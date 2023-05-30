@@ -50,6 +50,10 @@ export const launchExtension = (remoteExtensionList: ExtensionRuntime[], params:
       extInstance.propItemPipeline = createExtScriptModule(extInstance.extensionVersion.propItemPipelineRaw)
       extInstance.propItemPipeline.id = extInstance.id;
     }
+    if (extInstance.extensionVersion.resourcePipelineRaw) {
+      extInstance.resourcePipeline = createExtScriptModule(extInstance.extensionVersion.resourcePipelineRaw)
+      extInstance.resourcePipeline.id = extInstance.id;
+    }
 
     __provider = `ext:${extInstance.id}`;
     const configSchema = extInstance.main({

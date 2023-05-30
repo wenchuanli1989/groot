@@ -65,4 +65,5 @@ export const viewRender = (view: ViewElement, props?: any) => {
   }
 }
 
-export const interpolationRegExp = /\{\{(\s*)([^\s]+[\s\S]*?)(\s*)\}\}/mg
+export const interpolationRegExp = /\{\{(\s*)([^}]+?)(\s*)\}\}/mg
+export const interpolationRegExpSingle = new RegExp(interpolationRegExp.source)

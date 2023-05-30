@@ -1,4 +1,4 @@
-import { Metadata, interpolationRegExp } from "@grootio/common";
+import { Metadata, interpolationRegExp, interpolationRegExpSingle } from "@grootio/common";
 import { getResourceList, getResourceManager, getMetadataIds } from "./resource";
 
 let _metadata: Metadata
@@ -31,7 +31,7 @@ export const wrapperProps = (props: Record<string, any>, metadata: Metadata, vie
       }
 
       return value.replace(interpolationRegExp, (matchStr) => {
-        return expression(interpolationRegExp.exec(matchStr)[2], nsKeyList, namespaceList)
+        return expression(interpolationRegExpSingle.exec(matchStr)[2], nsKeyList, namespaceList)
       })
 
     }

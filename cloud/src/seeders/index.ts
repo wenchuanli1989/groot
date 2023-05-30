@@ -18,6 +18,10 @@ import { create as profileCreate } from './profile';
 import { create as proTableCreate } from './pro-table';
 import { create as containerCreate } from './groot-container';
 import { create as pageContainerCreate } from './groot-page-container';
+import { ProjectResource } from '../entities/ProjectResource';
+import { ResourceConfig } from '../entities/ResourceConfig';
+import { InstanceResource } from '../entities/InstanceResource';
+import { AppResource } from '../entities/AppResource';
 
 export class DatabaseSeeder extends Seeder {
 
@@ -38,17 +42,30 @@ export class DatabaseSeeder extends Seeder {
     const extWorkArea = em.create(Extension, { name: '@groot/ext-work-area', org });
     await em.persistAndFlush(extWorkArea);
 
+    const extCore = em.create(Extension, { name: '@groot/ext-core', org });
+    await em.persistAndFlush(extCore);
 
-    const code = em.create(LargeText, {
+
+    const propPipelineCode = em.create(LargeText, {
       text: defaultPropItemPipeline
     })
 
-    const codeRaw = em.create(LargeText, {
+    const propPipelineCodeRaw = em.create(LargeText, {
       text: defaultPropItemPipeline
     })
 
-    await em.persistAndFlush(code);
-    await em.persistAndFlush(codeRaw);
+    const resourcePipelineCode = em.create(LargeText, {
+      text: resourcePipeline
+    })
+
+    const resourcePipelineCodeRaw = em.create(LargeText, {
+      text: resourcePipeline
+    })
+
+    await em.persistAndFlush(propPipelineCode);
+    await em.persistAndFlush(propPipelineCodeRaw);
+    await em.persistAndFlush(resourcePipelineCode);
+    await em.persistAndFlush(resourcePipelineCodeRaw);
 
     // 创建插件版本
     const extWebVisualVersion = em.create(ExtensionVersion, {
@@ -69,8 +86,10 @@ export class DatabaseSeeder extends Seeder {
       moduleName: 'Main',
       assetUrl: 'http://groot-local.com:21000/ext-prop-setter/index.js',
       extension: extPropSetter,
-      propItemPipeline: code,
-      propItemPipelineRaw: codeRaw
+      propItemPipeline: propPipelineCode,
+      propItemPipelineRaw: propPipelineCodeRaw,
+      resourcePipeline: resourcePipelineCode,
+      resourcePipelineRaw: resourcePipelineCodeRaw
     })
     await em.persistAndFlush(extPropSetterVersion);
 
@@ -89,6 +108,17 @@ export class DatabaseSeeder extends Seeder {
     extWorkArea.recentVersion = extWorkAreaVersion
     await em.persistAndFlush(extWorkArea);
 
+    const extCoreVersion = em.create(ExtensionVersion, {
+      name: '0.0.1',
+      packageName: '_ext_core',
+      moduleName: 'Main',
+      assetUrl: 'http://groot-local.com:12000/ext-core/index.js',
+      extension: extCore
+    })
+    await em.persistAndFlush(extCoreVersion);
+
+    extCore.recentVersion = extCoreVersion
+    await em.persistAndFlush(extCore);
 
     // 创建解决方案
     const solution = em.create(Solution, {
@@ -136,6 +166,15 @@ export class DatabaseSeeder extends Seeder {
       relationId: solutionVersion.id,
     });
     await em.persistAndFlush(extWorkAreaSolutionInstance);
+
+    const extCoreInstance = em.create(ExtensionInstance, {
+      extension: extCore,
+      extensionVersion: extCoreVersion,
+      config: '',
+      relationType: ExtensionRelationType.Solution,
+      relationId: solutionVersion.id,
+    });
+    await em.persistAndFlush(extCoreInstance);
 
     // 创建项目
     const project = em.create(Project, {
@@ -196,9 +235,48 @@ export class DatabaseSeeder extends Seeder {
     await em.persistAndFlush(extWorkAreaReleaseInstance);
 
 
+    const extCoreReleaseInstance = em.create(ExtensionInstance, {
+      extension: extCore,
+      extensionVersion: extCoreVersion,
+      config: '',
+      relationType: ExtensionRelationType.Application,
+      relationId: release.id,
+    });
+    await em.persistAndFlush(extCoreReleaseInstance);
+
+    const resourceConfig = em.create(ResourceConfig, {
+      name: 'aaa',
+      value: 'globalyyyy',
+      type: 'www'
+    })
+
+    await em.persistAndFlush(resourceConfig)
+
+    const projectResource = em.create(ProjectResource, {
+      project,
+      name: 'title',
+      value: '凄凄切切群',
+      namespace: 'state',
+      resourceConfig
+    })
+
+    await em.persistAndFlush(projectResource)
+
+    const appResource = em.create(AppResource, {
+      app: application,
+      release,
+      name: 'title',
+      value: 'bbbbbb',
+      namespace: 'state',
+      resourceConfig
+      // imageResource: projectResource
+    })
+    await em.persistAndFlush(appResource)
+
+
     await proTableCreate(em, solution, release);
 
-    await btnCreate(em, solution, release);
+    await btnCreate(em, solution, release, project);
 
     await profileCreate(em, solution, release);
 
@@ -213,31 +291,15 @@ const exec = ({propItem,metadata,defaultFn,propKeyChain,appendTask}) => {
 
   defaultFn()
 
-  if (propItem.viewType === 'datePicker' || propItem.viewType === 'timePicker') {
-    appendTask('dateTime','_value = _shared.dayjs(_rawValue)')
-  } 
+  appendTask('dateTime','_value = _shared.dayjs(_rawValue)')
 }
 
 const check = ({propItem}) => {
-  if (!([
-    'text',
-    'textarea',
-    'number',
-    'slider',
-    'buttonGroup',
-    'switch',
-    'select',
-    'radio',
-    'checkbox',
-    'datePicker',
-    'timePicker',
-    'json',
-    'function',
-  ]).includes(propItem.viewType)) {
-    return 'ignore'
+  if (propItem.viewType === 'datePicker' || propItem.viewType === 'timePicker') {
+    return 'low'
   }
 
-  return 'low'
+  return 'ignore'
 }
 
 module.exports = {
@@ -245,4 +307,25 @@ module.exports = {
   check
 }
 
+`
+
+const resourcePipeline = `
+const exec = ({resource,defaultFn,appendTask}) => {
+  // defaultFn()
+  resource.value = Math.random()
+  // appendTask('request',' _value = {get: () => _rawValue.toUpperCase() + _config.value}')
+}
+
+const check = ({resource}) => {
+  if (resource.namespace === 'state') {
+    return 'low'
+  }
+
+  return 'ignore'
+}
+
+module.exports = {
+  exec,
+  check
+}
 `

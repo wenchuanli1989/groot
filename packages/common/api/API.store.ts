@@ -1,4 +1,4 @@
-import { SolutionInstance, Resource, Application, Component, ComponentInstance, ComponentVersion, Deploy, Organization, PropBlock, PropGroup, PropItem, PropValue, Release, Solution, ExtensionInstance, AppResource, InstanceResource } from '../entities';
+import { SolutionInstance, Application, Component, ComponentInstance, ComponentVersion, Deploy, Organization, PropBlock, PropGroup, PropItem, PropValue, Release, Solution, ExtensionInstance, AppResource, InstanceResource, ResourceConfig } from '../entities';
 import { EnvType } from '../enum';
 import { API } from './API.common';
 import type { APIPath } from './API.path';
@@ -27,7 +27,8 @@ export type APIStore = {
     release: Release,
     entryExtensionInstanceList: ExtensionInstance[],
     solutionInstanceList: SolutionInstance[],
-    resourceList: InstanceResource[]
+    resourceList: InstanceResource[],
+    resourceConfigList: ResourceConfig[]
   }>];
   [APIPath.componentInstance_addRoot]: [ComponentInstance, API.Response<ComponentInstance>];
   [APIPath.release_add]: [Release, API.Response<Release>],

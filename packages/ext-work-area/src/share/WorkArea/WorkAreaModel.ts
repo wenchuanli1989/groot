@@ -1,6 +1,6 @@
-import { ApplicationData, BaseModel, IframeDebuggerConfig, iframeNamePrefix, Metadata, PostMessageType } from "@grootio/common";
+import { BaseModel, IframeDebuggerConfig, iframeNamePrefix, Metadata, PostMessageType, Resource, ResourceConfig, Task, ViewData } from "@grootio/common";
 
-import { commandBridge, getContext, grootManager, isPrototypeMode } from "context";
+import { commandBridge, getContext, grootManager } from "context";
 
 export default class WorkAreaModel extends BaseModel {
   static modelName = 'workArea';
@@ -11,7 +11,13 @@ export default class WorkAreaModel extends BaseModel {
     runtimeConfig: {}
   }
   private pageNavCallback: Function;
-  private viewData: Metadata | Metadata[]
+  private viewData: {
+    metadataList?: Metadata[];
+    propTaskList?: Task[],
+    resourceList?: Resource[];
+    resourceTaskList?: Task[],
+    resourceConfigList?: ResourceConfig[],
+  } = {}
 
   public initIframe(iframe: HTMLIFrameElement) {
     const { mode } = getContext().params
@@ -62,10 +68,10 @@ export default class WorkAreaModel extends BaseModel {
 
     const { registerHook, callHook } = grootManager.hook
     const { executeCommand } = grootManager.command
-    const { getState } = grootManager.state
 
     registerHook(PostMessageType.InnerReady, () => {
       this.iframeReady = true;
+      // 提供hook调用方式方便第三方监控或日志
       callHook(PostMessageType.OuterSetConfig)
     })
 
@@ -75,24 +81,20 @@ export default class WorkAreaModel extends BaseModel {
       this.iframeEle.contentWindow.postMessage({ type: PostMessageType.OuterSetConfig, data: messageData }, '*');
     })
 
-    registerHook(PostMessageType.InnerFetchApplication, () => {
+    registerHook(PostMessageType.OuterSetApplication, (data) => {
       guard();
-      callHook(PostMessageType.OuterSetApplication)
+      this.iframeEle.contentWindow.postMessage({ type: PostMessageType.OuterSetApplication, data }, '*');
     })
 
-    registerHook(PostMessageType.OuterSetApplication, (appData) => {
-      guard();
-      const messageData = appData || this.buildApplicationData(grootManager.state.getState('gs.stage.playgroundPath'));
-      this.iframeEle.contentWindow.postMessage({ type: PostMessageType.OuterSetApplication, data: messageData }, '*');
+    registerHook(PostMessageType.SwitchView, (data) => {
+      this.viewData = data
+      executeCommand('gc.stageRefresh')
     })
 
     registerHook(PostMessageType.InnerFetchView, () => {
       guard();
-      if (this.viewData) {
-        callHook(PostMessageType.OuterUpdateComponent, this.viewData, true);
-      } else {
-        throw new Error('流程异常:viewData不能为空')
-      }
+
+      callHook(PostMessageType.OuterSetView, this.viewData as any)
 
       if (this.pageNavCallback) {
         // 内部一般执行 组件刷新操作
@@ -101,24 +103,38 @@ export default class WorkAreaModel extends BaseModel {
       }
     })
 
-    registerHook(PostMessageType.OuterUpdateComponent, (data, first) => {
-      guard();
-      let resourceList = []
-      if (!isPrototypeMode() && first) {
-        resourceList = [
-          ...getState('gs.localResourceList').map(item => ({ ...item })),
-          ...getState('gs.globalResourceList').map(item => ({ ...item }))
-        ]
-      }
+    registerHook(PostMessageType.OuterUpdateResource, ({ resourceList, resourceTaskList, resourceConfigList }) => {
+      this.viewData.resourceList = resourceList
+      this.viewData.resourceTaskList = resourceTaskList
+      this.viewData.resourceConfigList = resourceConfigList
 
-      this.iframeEle.contentWindow.postMessage({
-        type: PostMessageType.OuterUpdateComponent,
-        data: {
-          key: this.iframeDebuggerConfig.controlView,
-          metadataList: data,
-          resourceList
-        }
-      }, '*');
+      if (this.iframeReady) {
+        this.iframeEle.contentWindow.postMessage({
+          type: PostMessageType.OuterUpdateResource,
+          data: {
+            key: this.iframeDebuggerConfig.controlView,
+            resourceList,
+            resourceTaskList,
+            resourceConfigList
+          }
+        }, '*');
+      }
+    })
+
+    registerHook(PostMessageType.OuterUpdateComponent, ({ metadataList, propTaskList }) => {
+      this.viewData.metadataList = metadataList
+      this.viewData.propTaskList = propTaskList
+
+      if (this.iframeReady) {
+        this.iframeEle.contentWindow.postMessage({
+          type: PostMessageType.OuterUpdateComponent,
+          data: {
+            key: this.iframeDebuggerConfig.controlView,
+            metadataList,
+            propTaskList
+          }
+        }, '*');
+      }
     })
 
     registerHook(PostMessageType.OuterRefreshView, (path) => {
@@ -167,28 +183,10 @@ export default class WorkAreaModel extends BaseModel {
       }, '*');
     })
 
-    registerHook('gh.component.propChange', (data, first = false) => {
-      console.info(data)
-      if (first) {
-        executeCommand('gc.stageRefresh')
-      } else {
-        callHook(PostMessageType.OuterUpdateComponent, data, false);
-      }
-      this.viewData = data;
-    }, true)
-
-    registerHook(PostMessageType.OuterUpdateResource, (data) => {
+    registerHook(PostMessageType.OuterSetView, (data) => {
       guard()
       this.iframeEle.contentWindow.postMessage({
-        type: PostMessageType.OuterUpdateResource,
-        data
-      }, '*');
-    })
-
-    registerHook(PostMessageType.OuterRemoveResource, (data) => {
-      guard()
-      this.iframeEle.contentWindow.postMessage({
-        type: PostMessageType.OuterRemoveResource,
+        type: PostMessageType.OuterSetView,
         data
       }, '*');
     })
@@ -216,20 +214,5 @@ export default class WorkAreaModel extends BaseModel {
     }
   }
 
-  private buildApplicationData(playgroundPath: string) {
-    const name = isPrototypeMode() ? '原型' : '实例';
-    const key = isPrototypeMode() ? 'prototype-demo' : 'instance-demo';
 
-    const viewData = {
-      key: playgroundPath,
-    };
-
-    const appData: ApplicationData = {
-      name,
-      key,
-      viewList: [viewData],
-    };
-
-    return appData;
-  }
 }

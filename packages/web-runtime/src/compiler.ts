@@ -22,7 +22,7 @@ export const buildComponent = (metadata: Metadata, metadataList: Metadata[], pro
     launchWatch(viewEleMap, viewMetadataMap);
   }
 
-  _buildComponent(metadata)
+  return _buildComponent(metadata)
 }
 
 export const reBuildComponent = (metadata: Metadata, metadataList: Metadata[], viewKey: string, propTaskList?: Record<string, any>) => {

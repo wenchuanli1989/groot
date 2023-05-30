@@ -50,7 +50,7 @@ export class View {
     })
 
     return result.then(() => {
-      buildResource(this.resourceList, this.resourceTaskList, this.resourceConfigList, this.key)
+      buildResource(this.resourceList, this.key, this.resourceTaskList, this.resourceConfigList,)
       this.rootMetadata = this.metadataList.find(m => !m.parentId);
       this.rootComponent = buildComponent(this.rootMetadata, this.metadataList, this.propTaskList, this.key);
       this.status = 'finish';
@@ -58,16 +58,16 @@ export class View {
     })
   }
 
-  public update(metadataList: Metadata | Metadata[], resourceList?: Resource[]) {
+  public initCallback(data) {
+    this.fetchMetadataResolve(data);
+  }
+
+  public update(metadataList: Metadata | Metadata[]) {
     const multi = Array.isArray(metadataList);
-    if (this.status === 'finish') {
-      if (multi) {
-        this.fullUpdate(metadataList);
-      } else {
-        this.incrementUpdate(metadataList)
-      }
+    if (multi) {
+      this.fullUpdate(metadataList);
     } else {
-      this.fetchMetadataResolve({ metadataList: multi ? metadataList : [metadataList], resourceList });
+      this.incrementUpdate(metadataList)
     }
   }
 

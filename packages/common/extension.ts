@@ -1,9 +1,9 @@
 import { ReactElement } from "react";
 import React from "react";
 import { APIStore } from "./api/API.store";
-import { AppResource, Application, Component, ComponentInstance, ExtensionInstance, InstanceResource, PropItem, Release, Resource, ResourceConfig, Solution } from "./entities";
+import { Application, Component, ComponentInstance, ExtensionInstance, PropItem, Release, Resource, ResourceConfig, Solution } from "./entities";
 import { GridLayout } from "./GridLayout";
-import { ApplicationData, Metadata } from "./internal";
+import { ApplicationData, Metadata, Task } from "./internal";
 import { ExtensionLevel, ExtensionPipelineLevel, StudioMode } from "./enum";
 import { RequestFnType } from "./request-factory";
 import { UIManagerConfig } from "./runtime";
@@ -132,10 +132,14 @@ export type GrootCommandDict = {
   'gc.ui.render.panel': [[], ReactElement | null],
   'gc.ui.render.statusBar': [[], ReactElement | null],
 
+  'gc.createMetadata': [[], { metadataList: Metadata[], propTaskList: Task[] }],
+  'gc.createResource': [[boolean], { resourceList: Resource[], resourceTaskList: Task[], resourceConfigList: ResourceConfig[] }],
+  'gc.pushMetadata': [['all' | 'current'], void],
+  'gc.pushResource': [['all' | Resource], void],
+
   'gc.fetch.instance': [[number], void],
   'gc.fetch.prototype': [[number, number | null], void],
   'gc.switchIstance': [[number], void],
-  'gc.makeDataToStage': [[number | 'all' | 'current' | 'first'], void],
   'gc.stageRefresh': [[Function] | [], void],
 
   'gc.pushPropItemToStack': [[PropItem], void]
@@ -172,8 +176,8 @@ export type GrootStateDict = {
   'gs.propSetting.breadcrumbList': [{ id: number, name: string }, true],
   'gs.stage.playgroundPath': [string, false],
   'gs.stage.debugBaseUrl': [string, false],
-  'gs.globalResourceList': [AppResource, true],
-  'gs.localResourceList': [InstanceResource, true],
+  'gs.globalResourceList': [Resource, true],
+  'gs.localResourceList': [Resource, true],
   'gs.globalResourceConfigList': [ResourceConfig, true],
   'gs.localResourceConfigList': [ResourceConfig, true],
   'gs.propItem.viewTypeList': [{ label: string, value: string }, true],
@@ -184,7 +188,6 @@ export type GrootStateDict = {
 export type GrootHookDict = {
   'gh.sidebar.dragStart': [[], void],
   'gh.sidebar.dragEnd': [[], void],
-  'gh.component.propChange': [[Metadata | Metadata[], boolean] | [Metadata | Metadata[]], void],
   'gh.component.dragStart': [[], void],
   'gh.component.dragEnd': [[], void],
   'gh.component.removeChild': [[number, number, string | null], void],
@@ -194,10 +197,11 @@ export type GrootHookDict = {
   [PostMessageType.InnerFetchApplication]: [[], void],
   [PostMessageType.OuterSetApplication]: [[ApplicationData] | [], void],
   [PostMessageType.InnerApplicationReady]: [[], void],
+  [PostMessageType.SwitchView]: [[{ resourceList: Resource[], resourceTaskList: Task[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: Task[] }], void],
   [PostMessageType.InnerFetchView]: [[], void],
-  [PostMessageType.OuterUpdateComponent]: [[Metadata | Metadata[], boolean], void],
-  [PostMessageType.OuterUpdateResource]: [[Resource], void],
-  [PostMessageType.OuterRemoveResource]: [[Resource], void],
+  [PostMessageType.OuterSetView]: [[{ resourceList: Resource[], resourceTaskList: Task[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: Task[] }], void],
+  [PostMessageType.OuterUpdateResource]: [[{ resourceList: Resource[], resourceTaskList: Task[], resourceConfigList: ResourceConfig[] }], void],
+  [PostMessageType.OuterUpdateComponent]: [[{ metadataList: Metadata[], propTaskList: Task[] }], void],
 
   [PostMessageType.OuterDragComponentEnter]: [[], void],
   [PostMessageType.OuterDragComponentOver]: [[{ positionX: number, positionY: number }], void],
@@ -260,12 +264,12 @@ export enum PostMessageType {
   InnerFetchApplication = 'inner_fetch_application',
   OuterSetApplication = 'outer_set_application',
   InnerApplicationReady = 'inner_application_ready',
+  SwitchView = 'switch_view',
   InnerFetchView = 'inner_fetch_view',
-  OuterUpdateState = 'outer_update_state',
+  OuterSetView = 'outer_set_view',
+  OuterUpdateResource = 'outer_update_resource',
   OuterUpdateComponent = 'outer_update_component',
   OuterRefreshView = 'outer_refresh_view',
-  OuterUpdateResource = 'outer_update_resource',
-  OuterRemoveResource = 'outer_remove_resource',
 
   OuterDragComponentOver = 'outer_drag_component_over',
   OuterDragComponentEnter = 'outer_drag_component_enter',
@@ -373,4 +377,22 @@ export type ResourcePipelineParams = {
   resource: Resource,
   defaultFn: () => void,
   appendTask: (taskName: string, taskCode: string) => void
+}
+
+
+export const resourceAppendTask = (resource: Resource, taskList: Task[]) => {
+  return (taskName: string, taskCode) => {
+    resource.taskName = taskName
+    taskList.push({ key: taskName, content: taskCode })
+  }
+}
+
+export const propAppendTask = (metadata: Metadata, taskList: Task[], propKeyChain: string) => {
+  return (taskName: string, taskCode: string) => {
+    metadata.advancedProps.push({
+      keyChain: propKeyChain,
+      type: taskName
+    })
+    taskList.push({ key: taskName, content: taskCode })
+  }
 }

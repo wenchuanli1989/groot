@@ -152,7 +152,7 @@ const PropBlockListStructPane: React.FC<PropsType> = ({ block: propBlock }) => {
     });
 
     propPersistModel.updateValue({ propItem, value: changedValues[updateKey], abstractValueId: +abstractValueId }).then(() => {
-      grootManager.command.executeCommand('gc.makeDataToStage', 'current');
+      grootManager.command.executeCommand('gc.pushMetadata', 'current');
     })
   }
 

@@ -10,8 +10,12 @@ import { PropGroup } from "../entities/PropGroup";
 import { PropItem } from "../entities/PropItem";
 import { Release } from "../entities/Release";
 import { Solution } from "../entities/Solution";
+import { ResourceConfig } from "../entities/ResourceConfig";
+import { ProjectResource } from "../entities/ProjectResource";
+import { InstanceResource } from "../entities/InstanceResource";
+import { Project } from "../entities/Project";
 
-export const create = async (em: EntityManager, solution: Solution, release: Release) => {
+export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project) => {
   // 创建组件
   const btnComponent = em.create(Component, {
     name: '按钮',
@@ -106,6 +110,37 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
 
   btnComponentInstance.trackId = btnComponentInstance.id;
   await em.persistAndFlush(btnComponentInstance);
+
+
+
+  const resourceConfig = em.create(ResourceConfig, {
+    name: 'aaa',
+    value: 'buttonxxxx',
+    type: 'www'
+  })
+
+  await em.persistAndFlush(resourceConfig)
+
+  const projectResource = em.create(ProjectResource, {
+    project,
+    name: 'remark',
+    value: '凄凄切切群',
+    namespace: 'state',
+    resourceConfig
+  })
+
+  await em.persistAndFlush(projectResource)
+
+  const instanceResource = em.create(InstanceResource, {
+    componentInstance: btnComponentInstance,
+    release,
+    name: 'remark',
+    value: 'mmmmmmm',
+    namespace: 'state',
+    resourceConfig
+    // imageResource: projectResource
+  })
+  await em.persistAndFlush(instanceResource)
 
 
   // 创建入口解决方案实例

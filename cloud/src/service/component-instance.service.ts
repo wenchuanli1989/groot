@@ -14,6 +14,7 @@ import { PropValue } from 'entities/PropValue';
 import { Release } from 'entities/Release';
 import { SolutionInstance } from 'entities/SolutionInstance';
 import { InstanceResource } from 'entities/InstanceResource';
+import { parseResource } from 'util/common';
 
 @Injectable()
 export class ComponentInstanceService {
@@ -184,7 +185,7 @@ export class ComponentInstanceService {
     const entryExtensionInstanceList = await em.find(ExtensionInstance, {
       relationId: rootInstance.id,
       relationType: ExtensionRelationType.Entry
-    }, { populate: ['extension', 'extensionVersion.propItemPipelineRaw'] })
+    }, { populate: ['extension', 'extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw',] })
 
     const solutionInstanceList = await em.find(SolutionInstance, {
       entry: rootInstance
@@ -194,7 +195,7 @@ export class ComponentInstanceService {
       solutionInstance.extensionInstanceList = await em.find(ExtensionInstance, {
         relationId: solutionInstance.solutionVersion.id,
         relationType: ExtensionRelationType.Solution
-      }, { populate: ['extension', 'extensionVersion.propItemPipelineRaw'] })
+      }, { populate: ['extension', 'extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw',] })
     }
 
     rootInstance.groupList = await em.find(PropGroup, { component: rootInstance.component, componentVersion: rootInstance.componentVersion });
@@ -217,16 +218,15 @@ export class ComponentInstanceService {
 
     const release = await em.findOne(Release, rootInstance.release.id)
 
-    let resourceList = await em.find(InstanceResource, { componentInstance: rootInstance }, { populate: ['imageResource'] })
+    let resourceList = await em.find(InstanceResource, { componentInstance: rootInstance }, { populate: ['imageResource.resourceConfig', 'resourceConfig'] })
 
+    const resourceConfigMap = new Map()
     resourceList = resourceList.map(resource => {
-      if (resource.imageResource) {
-        return wrap(resource.imageResource).toObject() as any as InstanceResource;
-      }
-      return wrap(resource).toObject() as any as InstanceResource;
+      return parseResource(resource, resourceConfigMap) as any as InstanceResource
     })
+    const resourceConfigList = [...resourceConfigMap.values()]
 
-    return { root: rootInstance, children: instanceList, release, resourceList, entryExtensionInstanceList, solutionInstanceList };
+    return { root: rootInstance, children: instanceList, release, resourceList, resourceConfigList, entryExtensionInstanceList, solutionInstanceList };
   }
 
   async reverseDetectId(trackId: number, releaseId: number) {

@@ -9,6 +9,7 @@ import PrimarySidebar from "./PrimarySidebar";
 import SecondarySidebar from "./SecondarySidebar";
 import Stage from "./Stage";
 import StatusBar from "./StatusBar";
+import { ApplicationData, PostMessageType } from "@grootio/common";
 
 export const startup = () => {
   const { registerCommand } = grootManager.command
@@ -35,6 +36,12 @@ export const startup = () => {
     return <StatusBar />
   });
 
+  grootManager.hook.registerHook(PostMessageType.InnerFetchApplication, () => {
+    const appData = buildApplicationData()
+    // 提供hook调用方式方便第三方监控或日志
+    grootManager.hook.callHook(PostMessageType.OuterSetApplication, appData)
+  })
+
   shareBootstrap();
 
   if (isPrototypeMode()) {
@@ -43,3 +50,33 @@ export const startup = () => {
     instanceBootstrap();
   }
 }
+
+
+const buildApplicationData = () => {
+  const playgroundPath = grootManager.state.getState('gs.stage.playgroundPath')
+
+  if (isPrototypeMode()) {
+    return {
+      name: '原型',
+      key: 'prototype-demo',
+      viewList: [{ key: playgroundPath }],
+      resourceList: [],
+      resourceTaskList: [],
+      resourceConfigList: []
+    } as ApplicationData
+  } else {
+    const { resourceList, resourceTaskList, resourceConfigList } = grootManager.command.executeCommand('gc.createResource', false)
+
+    const appData: ApplicationData = {
+      name: '实例',
+      key: 'instance-demo',
+      viewList: [{ key: playgroundPath }],
+      resourceTaskList,
+      resourceList,
+      resourceConfigList
+    }
+
+    return appData
+  }
+}
+

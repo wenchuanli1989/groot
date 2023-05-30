@@ -127,9 +127,9 @@ function PropBlockPane({ block, freezeSetting, noWrapMode }: PropType) {
       valueStruct
     }).then(() => {
       if (!isPrototypeMode() && valueStruct === ValueStruct.ChildComponentList) {
-        grootManager.command.executeCommand('gc.makeDataToStage', 'all');
+        grootManager.command.executeCommand('gc.pushMetadata', 'all');
       } else {
-        grootManager.command.executeCommand('gc.makeDataToStage', 'current');
+        grootManager.command.executeCommand('gc.pushMetadata', 'current');
       }
     })
   }
