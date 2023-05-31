@@ -20,7 +20,7 @@ const ResourceForm: React.FC = () => {
       form.resetFields();
     }
 
-    if (!resourceModel.isGlobalResource) {
+    if (!resourceModel.isLocalResource) {
       form.setFieldValue('instanceId', grootManager.state.getState('gs.componentInstance').id);
     }
   }, [resourceModel.formVisible]);
@@ -37,7 +37,7 @@ const ResourceForm: React.FC = () => {
 
   return <>
 
-    <Form layout="vertical" form={form} colon={false} disabled={resourceModel.currResource?.isReadonly}>
+    <Form layout="vertical" form={form} colon={false} disabled={resourceModel.currResource?.readonly}>
       <Form.Item label="名称" name="name" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
@@ -46,18 +46,18 @@ const ResourceForm: React.FC = () => {
         <Input />
       </Form.Item>
 
-      <Form.Item label="类型" name="subType" initialValue="String">
-        <Select options={ResourceTypeMap} />
+      <Form.Item label="命名空间" name="namespace" >
+        <Input />
       </Form.Item>
     </Form>
 
     <div style={{ display: 'flex' }}>
       <div style={{ flexGrow: 1 }}>
-        <Button danger disabled={resourceModel.currResource?.isReadonly} onClick={() => resourceModel.removeResource()}>删除</Button>
+        <Button danger disabled={resourceModel.currResource?.readonly} onClick={() => resourceModel.removeResource()}>删除</Button>
       </div>
       <Space>
         <Button onClick={() => resourceModel.hideForm()}>取消</Button>
-        <Button type="primary" disabled={resourceModel.currResource?.isReadonly} onClick={() => onSubmit()}>提交</Button>
+        <Button type="primary" disabled={resourceModel.currResource?.readonly} onClick={() => onSubmit()}>提交</Button>
       </Space>
     </div>
   </>

@@ -16,17 +16,20 @@ export const instanceBootstrap = () => {
   registerCommand('gc.pushMetadata', (_, type) => {
     if (type === 'all') {
       const data = executeCommand('gc.createMetadata')
-      callHook(PostMessageType.OuterUpdateComponent, data)
+      callHook(PostMessageType.OuterUpdateComponent, {
+        ...data,
+        viewKey: '/groot/playground'
+      })
     } else {
     }
   })
 
-  registerCommand('gc.pushResource', (_, type) => {
-    if (type === 'all') {
-      const data = executeCommand('gc.createResource', true)
-
-      callHook(PostMessageType.OuterUpdateResource, data)
-    }
+  registerCommand('gc.pushResource', (_, isLocalResource) => {
+    const data = executeCommand('gc.createResource', isLocalResource)
+    callHook(PostMessageType.OuterUpdateResource, {
+      ...data,
+      viewKey: isLocalResource ? '/groot/playground' : null
+    })
   })
 
   groot.onReady(() => {

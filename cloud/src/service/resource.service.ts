@@ -22,7 +22,6 @@ export class ResourceService {
     LogicException.assertParamEmpty(rawResource.namespace, 'namespace');
     LogicException.assertParamEmpty(rawResource.name, 'name');
     LogicException.assertParamEmpty(rawResource.value, 'value');
-    LogicException.assertParamEmpty(rawResource.type, 'type');
 
     const release = await em.findOne(ComponentInstance, rawResource.releaseId);
     LogicException.assertNotFound(release, 'Release', rawResource.releaseId);
@@ -69,7 +68,6 @@ export class ResourceService {
     LogicException.assertParamEmpty(rawResource.namespace, 'namespace');
     LogicException.assertParamEmpty(rawResource.name, 'name');
     LogicException.assertParamEmpty(rawResource.value, 'value');
-    LogicException.assertParamEmpty(rawResource.type, 'type');
 
     const app = await em.findOne(Application, rawResource.appId);
     LogicException.assertNotFound(app, 'Application', rawResource.appId);
@@ -124,7 +122,6 @@ export class ResourceService {
 
     LogicException.assertParamEmpty(rawResource.name, 'name');
     LogicException.assertParamEmpty(rawResource.value, 'value');
-    LogicException.assertParamEmpty(rawResource.type, 'type');
 
     LogicException.assertParamEmpty(rawResource.id, 'id');
     const resource = await em.findOne(InstanceResource, rawResource.id);
@@ -155,7 +152,6 @@ export class ResourceService {
 
     LogicException.assertParamEmpty(rawResource.name, 'name');
     LogicException.assertParamEmpty(rawResource.value, 'value');
-    LogicException.assertParamEmpty(rawResource.type, 'type');
 
     LogicException.assertParamEmpty(rawResource.id, 'id');
     const resource = await em.findOne(AppResource, rawResource.id);

@@ -103,7 +103,7 @@ export default class WorkAreaModel extends BaseModel {
       }
     })
 
-    registerHook(PostMessageType.OuterUpdateResource, ({ resourceList, resourceTaskList, resourceConfigList }) => {
+    registerHook(PostMessageType.OuterUpdateResource, ({ resourceList, resourceTaskList, resourceConfigList, viewKey }) => {
       this.viewData.resourceList = resourceList
       this.viewData.resourceTaskList = resourceTaskList
       this.viewData.resourceConfigList = resourceConfigList
@@ -112,7 +112,7 @@ export default class WorkAreaModel extends BaseModel {
         this.iframeEle.contentWindow.postMessage({
           type: PostMessageType.OuterUpdateResource,
           data: {
-            key: this.iframeDebuggerConfig.controlView,
+            viewKey,
             resourceList,
             resourceTaskList,
             resourceConfigList
@@ -121,7 +121,7 @@ export default class WorkAreaModel extends BaseModel {
       }
     })
 
-    registerHook(PostMessageType.OuterUpdateComponent, ({ metadataList, propTaskList }) => {
+    registerHook(PostMessageType.OuterUpdateComponent, ({ metadataList, propTaskList, viewKey }) => {
       this.viewData.metadataList = metadataList
       this.viewData.propTaskList = propTaskList
 
@@ -129,7 +129,7 @@ export default class WorkAreaModel extends BaseModel {
         this.iframeEle.contentWindow.postMessage({
           type: PostMessageType.OuterUpdateComponent,
           data: {
-            key: this.iframeDebuggerConfig.controlView,
+            viewKey,
             metadataList,
             propTaskList
           }

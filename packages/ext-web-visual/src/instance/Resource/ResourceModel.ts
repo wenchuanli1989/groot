@@ -1,4 +1,4 @@
-import { APIPath, BaseModel, pick, PostMessageType, Resource } from "@grootio/common";
+import { APIPath, AppResource, BaseModel, InstanceResource, pick, PostMessageType, Resource } from "@grootio/common";
 import { getContext, grootManager } from "context";
 
 export default class ResourceModel extends BaseModel {
@@ -6,12 +6,12 @@ export default class ResourceModel extends BaseModel {
 
   formVisible = false;
   currResource: Resource;
-  isGlobalResource = false;
+  isLocalResource = false;
 
 
-  showForm(isGlobal: boolean, data?: Resource) {
+  showForm(isLocal: boolean, data?: Resource) {
     this.formVisible = true;
-    this.isGlobalResource = isGlobal;
+    this.isLocalResource = isLocal;
     this.currResource = data;
   }
 
@@ -21,46 +21,54 @@ export default class ResourceModel extends BaseModel {
   }
 
   addResource(rawResource: Resource) {
-    rawResource.releaseId = grootManager.state.getState('gs.release').id
+    const releaseId = grootManager.state.getState('gs.release').id
 
-    if (!this.isGlobalResource) {
-      rawResource.instanceId = grootManager.state.getState('gs.componentInstance').id
+    if (this.isLocalResource) {
+      const componentInstanceId = grootManager.state.getState('gs.componentInstance').id
+      const data = rawResource as InstanceResource
+      data.releaseId = releaseId
+      data.componentInstanceId = componentInstanceId
+      getContext().request(APIPath.resource_add_instance_resource, data).then((res) => {
+        const localSttateList = grootManager.state.getState('gs.localResourceList');
+        localSttateList.push(res.data as Resource);
+        grootManager.command.executeCommand('gc.pushResource', this.isLocalResource)
+        this.hideForm();
+      })
+    } else {
+      const appId = getContext().params.application.id
+      const data = rawResource as AppResource
+      data.releaseId = releaseId
+      data.appId = appId
+      getContext().request(APIPath.resource_add_app_resource, data).then((res) => {
+        const globalResourceList = grootManager.state.getState('gs.globalResourceList');
+        globalResourceList.push(res.data as Resource);
+        grootManager.command.executeCommand('gc.pushResource', this.isLocalResource)
+        this.hideForm();
+      })
     }
 
-    rawResource.type = this.isGlobalResource ? '$globalState' : '$state'
-    getContext().request(APIPath.resource_add, rawResource).then((res) => {
-      if (this.isGlobalResource) {
-        const globalResourceList = grootManager.state.getState('gs.globalResourceList');
-        globalResourceList.push(res.data);
-      } else {
-        const localSttateList = grootManager.state.getState('gs.localResourceList');
-        localSttateList.push(res.data);
-      }
-      grootManager.hook.callHook(PostMessageType.OuterUpdateResource, rawResource)
-      this.hideForm();
-    });
   }
 
   updateResource(rawResource: Resource) {
-    getContext().request(APIPath.resource_update, { id: this.currResource.id, ...rawResource }).then((res) => {
-      const list = this.isGlobalResource ? grootManager.state.getState('gs.globalResourceList') : grootManager.state.getState('gs.localResourceList');
+    getContext().request(this.isLocalResource ? APIPath.resource_update_instance_resource : APIPath.resource_update_app_resource, { id: this.currResource.id, ...rawResource } as any).then((res) => {
+      const list = this.isLocalResource ? grootManager.state.getState('gs.localResourceList') : grootManager.state.getState('gs.globalResourceList') as any[];
       const originResource = list.find(item => item.id === this.currResource.id);
       Object.assign(originResource, pick(res.data, ['type', 'name', 'value']));
-      grootManager.hook.callHook(PostMessageType.OuterUpdateResource, JSON.parse(JSON.stringify(originResource)))
+      grootManager.command.executeCommand('gc.pushResource', this.isLocalResource)
       this.hideForm();
     });
   }
 
   removeResource() {
-    getContext().request(APIPath.resource_remove_resourceId, { resourceId: this.currResource.id }).then(() => {
-      const list = this.isGlobalResource ? grootManager.state.getState('gs.globalResourceList') : grootManager.state.getState('gs.localResourceList');
+    const type = this.isLocalResource ? 'instance' : 'app'
+    getContext().request(APIPath.resource_remove_resourceId, { resourceId: this.currResource.id, type }).then(() => {
+      const list = this.isLocalResource ? grootManager.state.getState('gs.localResourceList') : grootManager.state.getState('gs.globalResourceList')
 
       const index = list.findIndex((item) => item.id === this.currResource.id);
-      const resource = list[index]
-      grootManager.hook.callHook(PostMessageType.OuterRemoveResource, JSON.parse(JSON.stringify(resource)))
       if (index !== -1) {
         list.splice(index, 1);
       }
+      grootManager.command.executeCommand('gc.pushResource', this.isLocalResource)
       this.hideForm();
     });
   }

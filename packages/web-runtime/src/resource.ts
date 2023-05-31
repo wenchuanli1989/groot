@@ -95,22 +95,32 @@ const createNamespace = (nsKey: string, viewKey: string) => {
 // 读取属性时搜集依赖，防护属性写入，禁止非法操作
 const createSecureNamespace = (namespace: Record<string, any>, nsKey: string, viewKey: string) => {
   return new Proxy(namespace, {
-    get: (target, key, receiver) => {
+    get: (target, key: string, receiver) => {
       // 每次都取最新resource引用
       const resource = namespaceManagerContainer.get(viewKey).get(nsKey).resourceMap.get(key as string)
-      const metadata = getMetadata()
-      metadataIdsMap.get(resource.id).add(metadata.id)
-      return Reflect.get(target, key, receiver)
+      if (resource) {
+        const metadata = getMetadata()
+        metadataIdsMap.get(resource.id).add(metadata.id)
+        return Reflect.get(target, key, receiver)
+      } else {
+        console.warn(`未知resource: ${viewKey} - ${nsKey} - ${key}`)
+        return null
+      }
     },
-    set: (target, key, value, receiver) => {
+    set: (target, key: string, value, receiver) => {
       if (target.hasOwnProperty(key)) {
         // 每次都取最新resource引用
         const resource = namespaceManagerContainer.get(viewKey).get(nsKey).resourceMap.get(key as string)
-        const result = Reflect.set(target, key, value, receiver)
-        if (result) {
-          _refresh(resource)
+        if (resource) {
+          const result = Reflect.set(target, key, value, receiver)
+          if (result) {
+            _refresh(resource)
+          }
+          return result
+        } else {
+          console.warn(`未知resource: ${viewKey} - ${nsKey} - ${key}`)
+          return null
         }
-        return result
       } else {
         throw new Error('禁止对Resource添加自定义属性')
       }

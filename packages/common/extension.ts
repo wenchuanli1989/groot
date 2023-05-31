@@ -135,7 +135,7 @@ export type GrootCommandDict = {
   'gc.createMetadata': [[], { metadataList: Metadata[], propTaskList: PropTask[] }],
   'gc.createResource': [[boolean], { resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[] }],
   'gc.pushMetadata': [['all' | 'current'], void],
-  'gc.pushResource': [['all' | Resource], void],
+  'gc.pushResource': [[boolean], void],
 
   'gc.fetch.instance': [[number], void],
   'gc.fetch.prototype': [[number, number | null], void],
@@ -200,8 +200,8 @@ export type GrootHookDict = {
   [PostMessageType.SwitchView]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: PropTask[] }], void],
   [PostMessageType.InnerFetchView]: [[], void],
   [PostMessageType.OuterSetView]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: PropTask[] }], void],
-  [PostMessageType.OuterUpdateResource]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[] }], void],
-  [PostMessageType.OuterUpdateComponent]: [[{ metadataList: Metadata[], propTaskList: PropTask[] }], void],
+  [PostMessageType.OuterUpdateResource]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], viewKey: string }], void],
+  [PostMessageType.OuterUpdateComponent]: [[{ metadataList: Metadata[], propTaskList: PropTask[], viewKey: string }], void],
 
   [PostMessageType.OuterDragComponentEnter]: [[], void],
   [PostMessageType.OuterDragComponentOver]: [[{ positionX: number, positionY: number }], void],

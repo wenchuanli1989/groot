@@ -30,9 +30,9 @@ const ResourceList = () => {
             <div className={styles.groupTitle}>{data.title}</div>
 
             <Popover overlayClassName={styles.popoverOverlay} content={<ResourceForm />} trigger={['click']} placement="rightTop"
-              open={resourceModel.formVisible && !resourceModel.currResource && (data.key === 'global' ? resourceModel.isGlobalResource : !resourceModel.isGlobalResource)} >
+              open={resourceModel.formVisible && !resourceModel.currResource && (data.key === 'global' ? resourceModel.isLocalResource : !resourceModel.isLocalResource)} >
               <Typography.Link className={styles.groupAction} disabled={resourceModel.formVisible} onClick={() => {
-                resourceModel.showForm(data.key === 'global');
+                resourceModel.showForm(data.key === 'page');
               }} >
                 <PlusOutlined />
               </Typography.Link>
@@ -46,7 +46,7 @@ const ResourceList = () => {
 
                 <Popover overlayClassName={styles.popoverOverlay} content={<ResourceForm />} trigger={['click']} open={resourceModel.formVisible && resourceModel.currResource?.id === item.id} placement="rightTop">
                   <Typography.Link className={styles.itemAction} hidden={item.readonly} disabled={resourceModel.formVisible} onClick={() => {
-                    resourceModel.showForm(!!(item as any).appId, item)
+                    resourceModel.showForm(!(item as any).appId, item)
                   }} >
                     <EditOutlined />
                   </Typography.Link>

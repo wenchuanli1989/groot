@@ -72,8 +72,8 @@ function onMessage(event: any) {
   } else if (messageType === PostMessageType.OuterRefreshView) {
     window.location.reload();
   } else if (messageType === PostMessageType.OuterUpdateResource) {
-    const { resourceList, resourceTaskList, resourceConfigList, key } = event.data.data
-    buildResource(resourceList, key, resourceTaskList, resourceConfigList)
+    const { resourceList, resourceTaskList, resourceConfigList, viewKey } = event.data.data
+    buildResource(resourceList, viewKey, resourceTaskList, resourceConfigList)
     activeView.refresh()
   } else if (messageType === PostMessageType.OuterSetView) {
     activeView.initCallback(event.data.data)

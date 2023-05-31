@@ -11,7 +11,10 @@ export const prototypeBootstrap = () => {
   registerCommand('gc.pushMetadata', (_, type) => {
     if (type === 'all') {
       const data = executeCommand('gc.createMetadata')
-      callHook(PostMessageType.OuterUpdateComponent, data)
+      callHook(PostMessageType.OuterUpdateComponent, {
+        ...data,
+        viewKey: '/groot/playground'
+      })
     } else {
     }
   })

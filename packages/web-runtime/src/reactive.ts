@@ -50,6 +50,7 @@ function expression(code: string, nsKeyList: string[], namespaceList: any[]) {
       result = newFunction(...namespaceList);
     } catch (e) {
       console.error('表达式结果异常')
+      console.error(e)
     }
   } catch (e) {
     console.error('表达式编译异常')

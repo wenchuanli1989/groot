@@ -243,11 +243,17 @@ export class WorkbenchController {
 
   @Get('/resource-demo/demo1')
   async resourceDemo1() {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2000)
+    })
     return 'demo1-text1'
   }
 
   @Get('/resource-demo/demo2')
   async resourceDemo2() {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2000)
+    })
     return 'demo2-text2'
   }
 
