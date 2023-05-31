@@ -1,20 +1,24 @@
-import type { Metadata, Resource, ResourceConfig, Task, ViewData } from "@grootio/common";
+import type { Metadata, PropTask, Resource, ResourceConfig, ResourceTask, ViewData } from "@grootio/common";
 import { PostMessageType } from "@grootio/common";
 
-import { buildComponent, reBuildComponent } from "./compiler";
+import { buildComponent, destoryMetadata, reBuildComponent } from "./compiler";
 import { controlMode, globalConfig } from "./config";
 import { destoryResource, buildResource } from "./resource";
 
 type ParamsType = {
-  metadataList: Metadata[], resourceList?: Resource[], propTaskList?: Task[], resourceTaskList?: Task[], resourceConfigList?: ResourceConfig[]
+  metadataList: Metadata[],
+  resourceList?: Resource[],
+  propTaskList?: PropTask[],
+  resourceTaskList?: ResourceTask[],
+  resourceConfigList?: ResourceConfig[]
 }
 export class View {
   readonly key: string;
   private url: string;
   private metadataList: Metadata[];
   private resourceList: Resource[];
-  private propTaskList: Task[]
-  private resourceTaskList: Task[]
+  private propTaskList: PropTask[]
+  private resourceTaskList: ResourceTask[]
   private resourceConfigList: ResourceConfig[]
 
   rootComponent?: any;
@@ -73,6 +77,7 @@ export class View {
 
   public destory() {
     destoryResource(this.key)
+    destoryMetadata(this.key)
   }
 
   public refresh() {
@@ -113,7 +118,7 @@ export class View {
     const metadata = this.metadataList.find(m => m.id === data.id);
     metadata.propsObj = data.propsObj;
     metadata.advancedProps = data.advancedProps;
-    reBuildComponent(metadata, this.metadataList, this.key);// todo propTaskList
+    reBuildComponent(metadata, this.metadataList, [], this.key);// todo propTaskList
   }
 
   private fullUpdate(list: Metadata[]) {
@@ -127,6 +132,6 @@ export class View {
     list.splice(newRootIndex, 1, rootMetadata);
     this.metadataList = list;
 
-    reBuildComponent(rootMetadata, this.metadataList, this.key);// todo propTaskList
+    reBuildComponent(rootMetadata, this.metadataList, [], this.key);// todo propTaskList
   }
 }

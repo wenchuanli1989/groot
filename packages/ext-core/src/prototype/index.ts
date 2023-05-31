@@ -1,4 +1,4 @@
-import { Component, PropGroup, PropItemPipelineParams } from "@grootio/common"
+import { Component, PropGroup, PropItemPipelineParams, propAppendTask } from "@grootio/common"
 import { metadataFactory, pipelineExec, propTreeFactory } from "@grootio/core";
 import { getContext, grootManager } from "context"
 
@@ -33,10 +33,10 @@ const createFullMetadata = (component: Component) => {
     solutionInstanceId: null,
     componentVersionId: null
   }, (params) => {
-    params.appendTask = (taskName, taskCode) => {
-      propTaskList.push({ key: taskName, content: taskCode })
-    }
-    pipelineExec<PropItemPipelineParams>([], [], propItemPipelineModuleList, params)
+    pipelineExec<PropItemPipelineParams>([], [], propItemPipelineModuleList, {
+      ...params,
+      appendTask: propAppendTask(metadata, propTaskList, params.propKeyChain)
+    })
   }, true);
 
   return {

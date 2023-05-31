@@ -241,6 +241,16 @@ export class WorkbenchController {
     ]
   }
 
+  @Get('/resource-demo/demo1')
+  async resourceDemo1() {
+    return 'demo1-text1'
+  }
+
+  @Get('/resource-demo/demo2')
+  async resourceDemo2() {
+    return 'demo2-text2'
+  }
+
   @Get('/account')
   async account() {
     const org = await this.orgService.getDetail(1)

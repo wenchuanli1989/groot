@@ -1,4 +1,5 @@
 import { Resource, ResourceConfig } from "./entities";
+import { PropTask, ResourceTask } from "./extension";
 
 export type ApplicationData = {
   name: string,
@@ -6,7 +7,7 @@ export type ApplicationData = {
   viewList: ViewData[],
   resourceList?: Resource[],
   resourceConfigList?: ResourceConfig[],
-  resourceTaskList?: Task[],
+  resourceTaskList?: ResourceTask[],
   envData?: { key: string, value: string }[],
 }
 
@@ -16,11 +17,11 @@ export type ViewData = {
   url?: string;
   metadataList?: Metadata[];
   // propTaskList的key和advancedProps的type对应
-  propTaskList?: Task[],
+  propTaskList?: PropTask[],
 
   resourceList?: Resource[];
   // resource的taskName和resourceTaskList的key对应
-  resourceTaskList?: Task[],
+  resourceTaskList?: ResourceTask[],
   resourceConfigList?: ResourceConfig[],
 }
 
@@ -73,10 +74,7 @@ export type PropMetadataComponentSetting = {
 }
 
 
-export type Task = {
-  key: string,
-  content: string
-}
+
 
 
 

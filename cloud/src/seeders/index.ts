@@ -246,7 +246,7 @@ export class DatabaseSeeder extends Seeder {
 
     const resourceConfig = em.create(ResourceConfig, {
       name: 'aaa',
-      value: 'globalyyyy',
+      value: 'http://groot-local.com:10000/workbench/resource-demo',
       type: 'www'
     })
 
@@ -265,9 +265,9 @@ export class DatabaseSeeder extends Seeder {
     const appResource = em.create(AppResource, {
       app: application,
       release,
-      name: 'title',
-      value: 'bbbbbb',
-      namespace: 'state',
+      name: 'demo1',
+      value: '/demo1',
+      namespace: 'dataSource',
       resourceConfig
       // imageResource: projectResource
     })
@@ -312,12 +312,36 @@ module.exports = {
 const resourcePipeline = `
 const exec = ({resource,defaultFn,appendTask}) => {
   // defaultFn()
-  resource.value = Math.random()
-  // appendTask('request',' _value = {get: () => _rawValue.toUpperCase() + _config.value}')
+  // resource.value = Math.random()
+  appendTask('request',' _value = ' + taskMain.toString() + '(_storage,_rawValue,_refresh,_config)','_storage = ' + taskInit.toString() + '(_groot,_shared)')
+}
+
+const taskInit = function(_groot,_shared) {
+  return {cache: new Map(),loading: new Map()}
+}
+
+const taskMain = function(_storage,_rawValue,_refresh,_config) {
+  return {
+    get: () => {
+      if(_storage.cache.has(_rawValue)){
+        return _storage.cache.get(_rawValue)
+      }else if(_storage.loading.has(_rawValue)){
+        return null
+      } else{
+        _storage.loading.set(_rawValue,true)
+        fetch(_config.value + _rawValue).then(res => res.json()).then(res => {
+          _storage.loading.delete(_rawValue)
+          _storage.cache.set(_rawValue,res.data)
+          _refresh()
+        })
+        return null
+      }
+    }
+  }
 }
 
 const check = ({resource}) => {
-  if (resource.namespace === 'state') {
+  if (resource.namespace === 'dataSource') {
     return 'low'
   }
 

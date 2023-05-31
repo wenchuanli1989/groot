@@ -34,8 +34,8 @@ export const UIManager: IUIManager<{ viewKey: string }> = ({ viewKey }) => {
     return <>应用加载失败</>;
   } else {
     if (viewKeyRef.current !== viewKey) {
-      if (app.hasView(viewKey)) {
-        app.getView(viewKey).destory()
+      if (app.hasView(viewKeyRef.current)) {
+        app.getView(viewKeyRef.current).destory()
       }
       viewKeyRef.current = viewKey
     }

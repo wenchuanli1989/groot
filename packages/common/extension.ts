@@ -3,10 +3,10 @@ import React from "react";
 import { APIStore } from "./api/API.store";
 import { Application, Component, ComponentInstance, ExtensionInstance, PropItem, Release, Resource, ResourceConfig, Solution } from "./entities";
 import { GridLayout } from "./GridLayout";
-import { ApplicationData, Metadata, Task } from "./internal";
+import { ApplicationData, Metadata } from "./internal";
 import { ExtensionLevel, ExtensionPipelineLevel, StudioMode } from "./enum";
 import { RequestFnType } from "./request-factory";
-import { UIManagerConfig } from "./runtime";
+import { GrootType, UIManagerConfig } from "./runtime";
 
 
 
@@ -132,8 +132,8 @@ export type GrootCommandDict = {
   'gc.ui.render.panel': [[], ReactElement | null],
   'gc.ui.render.statusBar': [[], ReactElement | null],
 
-  'gc.createMetadata': [[], { metadataList: Metadata[], propTaskList: Task[] }],
-  'gc.createResource': [[boolean], { resourceList: Resource[], resourceTaskList: Task[], resourceConfigList: ResourceConfig[] }],
+  'gc.createMetadata': [[], { metadataList: Metadata[], propTaskList: PropTask[] }],
+  'gc.createResource': [[boolean], { resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[] }],
   'gc.pushMetadata': [['all' | 'current'], void],
   'gc.pushResource': [['all' | Resource], void],
 
@@ -197,11 +197,11 @@ export type GrootHookDict = {
   [PostMessageType.InnerFetchApplication]: [[], void],
   [PostMessageType.OuterSetApplication]: [[ApplicationData] | [], void],
   [PostMessageType.InnerApplicationReady]: [[], void],
-  [PostMessageType.SwitchView]: [[{ resourceList: Resource[], resourceTaskList: Task[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: Task[] }], void],
+  [PostMessageType.SwitchView]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: PropTask[] }], void],
   [PostMessageType.InnerFetchView]: [[], void],
-  [PostMessageType.OuterSetView]: [[{ resourceList: Resource[], resourceTaskList: Task[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: Task[] }], void],
-  [PostMessageType.OuterUpdateResource]: [[{ resourceList: Resource[], resourceTaskList: Task[], resourceConfigList: ResourceConfig[] }], void],
-  [PostMessageType.OuterUpdateComponent]: [[{ metadataList: Metadata[], propTaskList: Task[] }], void],
+  [PostMessageType.OuterSetView]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: PropTask[] }], void],
+  [PostMessageType.OuterUpdateResource]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[] }], void],
+  [PostMessageType.OuterUpdateComponent]: [[{ metadataList: Metadata[], propTaskList: PropTask[] }], void],
 
   [PostMessageType.OuterDragComponentEnter]: [[], void],
   [PostMessageType.OuterDragComponentOver]: [[{ positionX: number, positionY: number }], void],
@@ -370,29 +370,50 @@ export type PropItemPipelineParams = {
   propKeyChain: string,
   defaultFn: () => void,
   valueInterpolation: boolean,
-  appendTask: (taskName: string, taskCode: string) => void
+  appendTask: (taskName: string, taskCode: string, initCode: string, destoryCode: string) => void
 }
 
 export type ResourcePipelineParams = {
   resource: Resource,
   defaultFn: () => void,
-  appendTask: (taskName: string, taskCode: string) => void
+  appendTask: (taskName: string, taskCode: string, initCode: string, destoryCode: string) => void
 }
 
+export type ResourceTask = {
+  key: string,
+  main: string,
+  init: string,
+  destory: string,
+  storage?: any,
+  mainFn?: (_rawValue: string, _resource: Resource, _config: ResourceConfig, _refresh: () => void, _groot: GrootType, _shared: Record<string, any>, _storage: any) => { get?(): any; set?(v: any): void },
+  initFn?: (_groot: GrootType, _shared: Record<string, any>) => any,
+  destoryFn?: (_groot: GrootType, _shared: Record<string, any>, _storage: any) => void
+}
 
-export const resourceAppendTask = (resource: Resource, taskList: Task[]) => {
-  return (taskName: string, taskCode) => {
+export type PropTask = {
+  key: string,
+  main: string,
+  init: string,
+  destory: string,
+  storage?: any,
+  mainFn?: (_rawValue: string, _props: Record<string, any>, _groot: GrootType, _shared: Record<string, any>, _storage: any) => any,
+  initFn?: (_groot: GrootType, _shared: Record<string, any>) => any,
+  destoryFn?: (_groot: GrootType, _shared: Record<string, any>, _storage: any) => void
+}
+
+export const resourceAppendTask = (resource: Resource, taskList: ResourceTask[]) => {
+  return (taskName: string, taskCode, initCode: string, destoryCode: string) => {
     resource.taskName = taskName
-    taskList.push({ key: taskName, content: taskCode })
+    taskList.push({ key: taskName, main: taskCode, init: initCode, destory: destoryCode })
   }
 }
 
-export const propAppendTask = (metadata: Metadata, taskList: Task[], propKeyChain: string) => {
-  return (taskName: string, taskCode: string) => {
+export const propAppendTask = (metadata: Metadata, taskList: PropTask[], propKeyChain: string) => {
+  return (taskName: string, taskCode: string, initCode: string, destoryCode: string) => {
     metadata.advancedProps.push({
       keyChain: propKeyChain,
       type: taskName
     })
-    taskList.push({ key: taskName, content: taskCode })
+    taskList.push({ key: taskName, main: taskCode, init: initCode, destory: destoryCode })
   }
 }

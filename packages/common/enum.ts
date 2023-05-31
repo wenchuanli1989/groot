@@ -99,7 +99,6 @@ export enum PropMetadataType {
   Json = 'json',
   Function = 'function',
   DateTime = 'dateTime',
-  Interpolation = 'interpolation'
 }
 
 

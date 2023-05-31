@@ -115,7 +115,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
 
   const resourceConfig = em.create(ResourceConfig, {
     name: 'aaa',
-    value: 'buttonxxxx',
+    value: 'http://groot-local.com:10000/workbench/resource-demo',
     type: 'www'
   })
 
@@ -134,9 +134,9 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   const instanceResource = em.create(InstanceResource, {
     componentInstance: btnComponentInstance,
     release,
-    name: 'remark',
-    value: 'mmmmmmm',
-    namespace: 'state',
+    name: 'demo2',
+    value: '/demo2',
+    namespace: 'dataSource',
     resourceConfig
     // imageResource: projectResource
   })

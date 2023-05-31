@@ -1,4 +1,4 @@
-import { BaseModel, IframeDebuggerConfig, iframeNamePrefix, Metadata, PostMessageType, Resource, ResourceConfig, Task, ViewData } from "@grootio/common";
+import { BaseModel, IframeDebuggerConfig, iframeNamePrefix, Metadata, PostMessageType, PropTask, Resource, ResourceConfig, ResourceTask } from "@grootio/common";
 
 import { commandBridge, getContext, grootManager } from "context";
 
@@ -13,9 +13,9 @@ export default class WorkAreaModel extends BaseModel {
   private pageNavCallback: Function;
   private viewData: {
     metadataList?: Metadata[];
-    propTaskList?: Task[],
+    propTaskList?: PropTask[],
     resourceList?: Resource[];
-    resourceTaskList?: Task[],
+    resourceTaskList?: ResourceTask[],
     resourceConfigList?: ResourceConfig[],
   } = {}
 

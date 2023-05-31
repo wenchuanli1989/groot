@@ -186,12 +186,6 @@ function buildPropObjectForLeafItem(propItem: PropItem, ctx: Object, propKeyChai
       }
     }
 
-    if (interpolationRegExp.test(newCTX[propEnd])) {
-      metadata.advancedProps.push({
-        keyChain: propKeyChain,
-        type: PropMetadataType.Interpolation
-      })
-    }
   } else if (propItem.struct === PropItemStruct.Component) {
     const data = (!value ? { list: [] } : JSON.parse(value)) as PropMetadataComponent
 
