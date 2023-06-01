@@ -21,7 +21,8 @@ const instance = {
   getView,
   viewLoading,
   loadView,
-  beforeLoadAppPromise: Promise.resolve('执行异常'),
+  beforeLoadAppPromise: Promise.resolve(),
+  loadAppPromise: Promise.resolve(),
 
   groot
 };
@@ -103,11 +104,11 @@ function loadApplication(success = () => { }, fail = (e) => { throw e }) {
       instance.status = ApplicationStatus.BeforeLoading;
       instance.beforeLoadAppPromise = result;
       result.then(() => {
-        loadApplicationData().then(success, fail);
+        instance.loadAppPromise = loadApplicationData().then(success, fail);
       });
     }
   } else {
-    loadApplicationData().then(success, fail);
+    instance.loadAppPromise = loadApplicationData().then(success, fail);
   }
 }
 

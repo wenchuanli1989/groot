@@ -22,7 +22,7 @@ export class View {
   private resourceConfigList: ResourceConfig[]
 
   rootComponent?: any;
-  status: 'loading' | 'finish';
+  status: 'loading' | 'finish' | 'offline';
   readonly controlMode: boolean;
   private rootMetadata: Metadata;
   private metadataPromise?: Promise<ParamsType>;
@@ -76,6 +76,7 @@ export class View {
   }
 
   public destory() {
+    this.status = 'offline'
     destoryResource(this.key)
     destoryMetadata(this.key)
   }

@@ -20,7 +20,7 @@ export const UIManager: IUIManager<{ viewKey: string }> = ({ viewKey }) => {
     })
 
     // todo 设计统一加载动画
-    return <>应用加载中...</>;
+    return <>应用开始加载...</>;
   } else if (app.status === ApplicationStatus.BeforeLoading) {
     app.beforeLoadAppPromise.then(() => {
       refresh()
@@ -28,6 +28,9 @@ export const UIManager: IUIManager<{ viewKey: string }> = ({ viewKey }) => {
     return <>应用准备加载</>
   } else if (app.status === ApplicationStatus.Loading) {
     // todo 设计统一加载动画
+    app.loadAppPromise.then(() => {
+      refresh();
+    })
     return <>应用加载中...</>;
   } else if (app.status === ApplicationStatus.Fail) {
     // todo 设计统一加载动画

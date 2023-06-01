@@ -1,6 +1,9 @@
-import { Link, Outlet } from "react-router-dom";
+import { UIManager } from "@grootio/react";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 function Layout() {
+  const location = useLocation();
+
   return (
     <>
       <nav>
@@ -8,14 +11,14 @@ function Layout() {
           <li>
             <Link to="/">Home</Link>
           </li>
+          {/* <li>
+            <Link to="/layout/groot/button">button</Link>
+          </li> */}
           <li>
-            <Link to="/admin/groot/page1">page1</Link>
+            <Link to="/layout/groot/table">table</Link>
           </li>
           <li>
-            <Link to="/admin/groot/page2">page2</Link>
-          </li>
-          <li>
-            <Link to="/admin/groot/page3">page3</Link>
+            <Link to="/layout/groot/profile">profile</Link>
           </li>
         </ul>
       </nav>
@@ -23,6 +26,8 @@ function Layout() {
       <hr />
 
       <Outlet />
+
+      {location.pathname === '/layout/groot/table' || location.pathname === '/layout/groot/profile' ? <UIManager viewKey="/layout/groot/button" /> : null}
     </>
   )
 }
