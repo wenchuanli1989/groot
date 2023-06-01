@@ -31,7 +31,7 @@ export const shareBootstrap = () => {
   registerState('gs.stage.debugBaseUrl', '', false)
   registerState('gs.stage.playgroundPath', '', false)
 
-  grootManager.command.registerCommand('gc.stageRefresh', (_, callback) => {
-    commandBridge.stageRefresh(callback)
+  grootManager.command.registerCommand('gc.stageRefresh', (_, data, callback) => {
+    commandBridge.stageRefresh(data, callback)
   })
 }

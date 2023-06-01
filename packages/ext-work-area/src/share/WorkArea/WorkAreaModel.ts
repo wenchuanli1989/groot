@@ -28,6 +28,8 @@ export default class WorkAreaModel extends BaseModel {
     // 传递基本信息
     window.self.addEventListener('message', this.onMessage);
     this.initListener()
+
+    commandBridge.stageRefresh = this.refresh;
   }
 
 
@@ -84,11 +86,6 @@ export default class WorkAreaModel extends BaseModel {
     registerHook(PostMessageType.OuterSetApplication, (data) => {
       guard();
       this.iframeEle.contentWindow.postMessage({ type: PostMessageType.OuterSetApplication, data }, '*');
-    })
-
-    registerHook(PostMessageType.SwitchView, (data) => {
-      this.viewData = data
-      executeCommand('gc.stageRefresh')
     })
 
     registerHook(PostMessageType.InnerFetchView, () => {
@@ -191,10 +188,10 @@ export default class WorkAreaModel extends BaseModel {
       }, '*');
     })
 
-    commandBridge.stageRefresh = this.refresh;
   }
 
-  private refresh = (callback?: Function) => {
+  private refresh = (data: any, callback?: Function) => {
+    this.viewData = data
     this.pageNavCallback = callback;
 
     const iframeBasePath = grootManager.state.getState('gs.stage.debugBaseUrl')

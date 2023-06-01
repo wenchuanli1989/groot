@@ -130,7 +130,7 @@ export class DatabaseSeeder extends Seeder {
     // 创建解决方案版本
     const solutionVersion = em.create(SolutionVersion, {
       name: '0.0.1',
-      playgroundPath: '/groot/playground',
+      playgroundPath: '/layout/groot/playground',
       debugBaseUrl: 'http://groot-local.com:11000',
       solution
     })
@@ -187,7 +187,7 @@ export class DatabaseSeeder extends Seeder {
     const application = em.create(Application, {
       key: 'demo',
       name: '管理端应用',
-      playgroundPath: '/groot/playground',
+      playgroundPath: '/layout/groot/playground',
       debugBaseUrl: 'http://groot-local.com:11000',
       project,
     });

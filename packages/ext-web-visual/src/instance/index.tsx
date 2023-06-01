@@ -151,7 +151,6 @@ const fetchRootInstance = (rootInstanceId: number) => {
     const application = getContext().params.application
     const { setState } = grootManager.state
     const { executeCommand } = grootManager.command
-    const { callHook } = grootManager.hook
 
     setState('gs.stage.debugBaseUrl', release.debugBaseUrl || application.debugBaseUrl)
     setState('gs.stage.playgroundPath', release.playgroundPath || application.playgroundPath)
@@ -162,7 +161,7 @@ const fetchRootInstance = (rootInstanceId: number) => {
 
     const resourceData = executeCommand('gc.createResource', true)
     const metadataData = executeCommand('gc.createMetadata')
-    callHook(PostMessageType.SwitchView, { ...resourceData, ...metadataData })
+    executeCommand('gc.stageRefresh', { ...resourceData, ...metadataData }, null)
     switchComponentInstance(root.id);
   });
 }

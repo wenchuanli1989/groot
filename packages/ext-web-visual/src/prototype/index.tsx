@@ -1,5 +1,5 @@
 import { AppstoreOutlined } from "@ant-design/icons";
-import { APIPath, PropBlockStructType, ViewsContainer } from "@grootio/common";
+import { APIPath, PostMessageType, PropBlockStructType, ViewsContainer } from "@grootio/common";
 import { getContext, grootManager } from "context";
 import { parseOptions } from "util/index";
 import { Solution } from "./Solution";
@@ -66,7 +66,7 @@ const fetchComponent = (componentId: number, versionId) => {
 
     grootManager.state.setState('gs.component', data)
 
-    grootManager.command.executeCommand('gc.stageRefresh')
-    grootManager.command.executeCommand('gc.pushMetadata', 'all')
+    const metadataData = grootManager.command.executeCommand('gc.createMetadata')
+    grootManager.command.executeCommand('gc.stageRefresh', { ...metadataData, resourceList: [], resourceConfigList: [], resourceTaskList: [] }, null)
   })
 }

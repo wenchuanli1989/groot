@@ -140,7 +140,7 @@ export type GrootCommandDict = {
   'gc.fetch.instance': [[number], void],
   'gc.fetch.prototype': [[number, number | null], void],
   'gc.switchIstance': [[number], void],
-  'gc.stageRefresh': [[Function] | [], void],
+  'gc.stageRefresh': [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: PropTask[] }, Function | null], void],
 
   'gc.pushPropItemToStack': [[PropItem], void]
 }
@@ -172,17 +172,17 @@ export type GrootStateDict = {
   'gs.allComponentInstance': [ComponentInstance, true],
   'gs.component': [Component, false],
   'gs.release': [Release, false],
-
-  'gs.propSetting.breadcrumbList': [{ id: number, name: string }, true],
-  'gs.stage.playgroundPath': [string, false],
-  'gs.stage.debugBaseUrl': [string, false],
   'gs.globalResourceList': [Resource, true],
   'gs.localResourceList': [Resource, true],
   'gs.globalResourceConfigList': [ResourceConfig, true],
   'gs.localResourceConfigList': [ResourceConfig, true],
+
   'gs.propItem.viewTypeList': [{ label: string, value: string }, true],
   'gs.propItem.formRenderList': [{ viewType: string, render: React.FC<FormItemRender> }, true],
   'gs.propItem.settingRenderList': [{ viewType: string, render: React.FC<FormItemRender> }, true],
+  'gs.propSetting.breadcrumbList': [{ id: number, name: string }, true],
+  'gs.stage.playgroundPath': [string, false],
+  'gs.stage.debugBaseUrl': [string, false],
 }
 
 export type GrootHookDict = {
@@ -197,7 +197,6 @@ export type GrootHookDict = {
   [PostMessageType.InnerFetchApplication]: [[], void],
   [PostMessageType.OuterSetApplication]: [[ApplicationData] | [], void],
   [PostMessageType.InnerApplicationReady]: [[], void],
-  [PostMessageType.SwitchView]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: PropTask[] }], void],
   [PostMessageType.InnerFetchView]: [[], void],
   [PostMessageType.OuterSetView]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: PropTask[] }], void],
   [PostMessageType.OuterUpdateResource]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], viewKey: string }], void],
