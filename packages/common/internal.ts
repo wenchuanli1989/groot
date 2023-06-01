@@ -12,8 +12,9 @@ export type ApplicationData = {
 }
 
 export type ViewData = {
-  // 作为resource的context
+  // 仅供ApplicationData.viewList使用
   key: string;
+  // 加载view的地址，仅供ApplicationData.viewList使用
   url?: string;
   metadataList?: Metadata[];
   // propTaskList的key和advancedProps的type对应
