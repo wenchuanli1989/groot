@@ -30,7 +30,7 @@ const ResourceList = () => {
             <div className={styles.groupTitle}>{data.title}</div>
 
             <Popover overlayClassName={styles.popoverOverlay} content={<ResourceForm />} trigger={['click']} placement="rightTop"
-              open={resourceModel.formVisible && !resourceModel.currResource && (data.key === 'global' ? resourceModel.isLocalResource : !resourceModel.isLocalResource)} >
+              open={resourceModel.formVisible && !resourceModel.currResource && (data.key === 'global' ? !resourceModel.isLocalResource : resourceModel.isLocalResource)} >
               <Typography.Link className={styles.groupAction} disabled={resourceModel.formVisible} onClick={() => {
                 resourceModel.showForm(data.key === 'page');
               }} >
@@ -44,7 +44,8 @@ const ResourceList = () => {
               return <div className={styles.item} key={item.id}>
                 <div className={styles.itemTitle}>{item.name}</div>
 
-                <Popover overlayClassName={styles.popoverOverlay} content={<ResourceForm />} trigger={['click']} open={resourceModel.formVisible && resourceModel.currResource?.id === item.id} placement="rightTop">
+                <Popover overlayClassName={styles.popoverOverlay} content={<ResourceForm />} trigger={['click']}
+                  open={resourceModel.formVisible && resourceModel.isLocalResource === (data.key === 'page') && resourceModel.currResource?.id === item.id} placement="rightTop">
                   <Typography.Link className={styles.itemAction} hidden={item.readonly} disabled={resourceModel.formVisible} onClick={() => {
                     resourceModel.showForm(!(item as any).appId, item)
                   }} >
