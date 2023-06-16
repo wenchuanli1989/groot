@@ -197,7 +197,7 @@ const getState: GrootContextGetState<Record<string, [any, boolean]>> = (name) =>
   }
 
   const stateData = stateMap.get(name);
-  return stateData.value;
+  return stateData?.value;
 }
 
 const watchState: GrootContextWatchState<Record<string, [any, boolean]>> = (name, callback) => {
