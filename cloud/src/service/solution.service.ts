@@ -13,7 +13,7 @@ export class SolutionService {
   async getDetailBySolutionVersionId(solutionVersionId: number) {
     const em = RequestContext.getEntityManager();
 
-    LogicException.assertParamEmpty(solutionVersionId, '参数solutionVersionId为空')
+    LogicException.assertParamEmpty(solutionVersionId, 'solutionVersionId')
 
     const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId, { populate: ['componentVersionList.component'] })
     LogicException.assertNotFound(solutionVersion, 'SolutionVersion', solutionVersionId);

@@ -6,6 +6,8 @@ import { parseOptions } from "../util";
 
 export const prototypeBootstrap = () => {
   const { registerCommand } = grootManager.command
+  const { registerState } = grootManager.state
+  registerState('gs.solution', null, false)
 
   registerCommand('gc.createMetadata', () => {
     const component = grootManager.state.getState('gs.component');
@@ -90,6 +92,9 @@ const loadComponent = (versionId: number) => {
     itemList.forEach(item => {
       parseOptions(item);
     })
+
+    const { setState } = grootManager.state
+    setState('gs.component', component)
 
     const { executeCommand } = grootManager.command
     const data = executeCommand('gc.createMetadata')

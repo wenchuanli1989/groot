@@ -263,7 +263,7 @@ export class WorkbenchController {
   }
 
   @Get('/solution/detail-by-solutionVersionId/:solutionVersionId')
-  async detailBySolutionVersionId(@Query('solutionVersionId') solutionVersionId: number) {
+  async detailBySolutionVersionId(@Param('solutionVersionId') solutionVersionId: number) {
     return await this.solutionService.getDetailBySolutionVersionId(solutionVersionId)
   }
 
@@ -281,8 +281,7 @@ export class WorkbenchController {
 
   @Get('/secret-core')
   async getSecretCore(@Query('mode') mode: StudioMode, @Query('releaseId') releaseId: string, @Query('solutionVersionId') solutionVersionId: string) {
-    const type = mode === StudioMode.Prototype ? ExtensionRelationType.Solution : ExtensionRelationType.Application;
-    const relationId = mode === StudioMode.Prototype ? solutionVersionId : releaseId;
-    return await this.extensionInstanceService.getSecret(type, +relationId)
+
+    return await this.extensionInstanceService.getSecret({ mode, releaseId: +releaseId, solutionVersionId: +solutionVersionId })
   }
 }
