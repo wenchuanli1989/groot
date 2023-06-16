@@ -1,5 +1,5 @@
 import { SolutionInstance, Application, Component, ComponentInstance, ComponentVersion, Deploy, Organization, PropBlock, PropGroup, PropItem, PropValue, Release, Solution, ExtensionInstance, AppResource, InstanceResource, ResourceConfig, Resource } from '../entities';
-import { EnvType } from '../enum';
+import { EnvType, StudioMode } from '../enum';
 import { ExtensionRuntime } from '../extension';
 import { API } from './API.common';
 import type { APIPath } from './API.path';
@@ -85,6 +85,7 @@ export type APIStore = {
 
   [APIPath.application_releaseList_appId]: [{ appId: number }, API.Response<Release[]>]
 
+  [APIPath.secretCore]: [{ mode: StudioMode, releaseId: string, solutionVersionId: string }, API.Response<ExtensionInstance>]
 };
 
 

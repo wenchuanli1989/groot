@@ -48,6 +48,7 @@ export enum APIPath {
 
   solution_componentList_solutionVersionId = 'solution/component-list/:solutionVersionId',
 
-  application_releaseList_appId = 'application/release-list/:appId'
+  application_releaseList_appId = 'application/release-list/:appId',
 
+  secretCore = 'secret-core'
 }

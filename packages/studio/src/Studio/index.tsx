@@ -1,4 +1,4 @@
-import { ExtensionContext, GridLayout, GrootContextParams, loadRemoteModule } from '@grootio/common';
+import { APIPath, ExtensionContext, GridLayout, GrootContextParams, StudioMode, loadRemoteModule } from '@grootio/common';
 import { useEffect, useState } from 'react';
 import request from 'util/request';
 import { commandManager, createExtScriptModule, extHandler, hookManager, launchExtension, loadExtension, setGrootContext, stateManager } from './groot';
@@ -9,7 +9,18 @@ const Studio: React.FC<{ params: Record<string, string> } & { account: any }> & 
   const [layout, setLayout] = useState<GridLayout>();
 
   useEffect(() => {
-    loadRemoteModule('packageName', 'moduleName', 'assetUrl').then((extModule) => {
+    request(APIPath.secretCore, {
+      mode: props.params.mode as StudioMode,
+      releaseId: props.params.releaseId,
+      solutionVersionId: props.params.solutionVersionId
+    }).then(({ data: extInstance }) => {
+      const { packageName, moduleName, assetUrl } = extInstance.extensionVersion
+      loadCoreExt(packageName, moduleName, assetUrl)
+    })
+  }, [])
+
+  const loadCoreExt = (packageName: string, moduleName: string, assetUrl: string) => {
+    loadRemoteModule(packageName, moduleName, assetUrl).then((extModule) => {
       const layout = new GridLayout();
       setLayout(layout);
 
@@ -55,7 +66,7 @@ const Studio: React.FC<{ params: Record<string, string> } & { account: any }> & 
       } as ExtensionContext)
       readyCallback()
     })
-  }, [])
+  }
 
   return layout ? <Workbench layout={layout} /> : null
 

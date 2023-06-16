@@ -24,5 +24,8 @@ export class ExtensionInstance extends BaseEntity {
   @Property()
   relationId: number;
 
+  @Property()
+  secret = false;
+
   //************************已下是接口入参或者查询返回需要定义的属性************************
 }

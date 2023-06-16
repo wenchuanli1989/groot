@@ -19,13 +19,12 @@ import { Release } from 'entities/Release';
 import { StandardResultInterceptor } from 'config/standard-result.interceptor';
 import { AssetService } from 'service/asset.service';
 import { ResourceService } from 'service/resource.service';
-import { EnvType } from '@grootio/common';
+import { EnvType, ExtensionRelationType, StudioMode } from '@grootio/common';
 import { SolutionService } from 'service/solution.service';
-import { Application } from 'entities/Application';
-import { Solution } from 'entities/Solution';
 import { ComponentService } from 'service/component.service';
 import { InstanceResource } from 'entities/InstanceResource';
 import { AppResource } from 'entities/AppResource';
+import { ExtensionInstanceService } from 'service/extension-instance.service';
 
 @UseInterceptors(StandardResultInterceptor)
 @Controller('/workbench')
@@ -44,6 +43,7 @@ export class WorkbenchController {
     private readonly assetService: AssetService,
     private readonly resourceService: ResourceService,
     private readonly solutionService: SolutionService,
+    private readonly extensionInstanceService: ExtensionInstanceService,
   ) { }
 
   @Post('/component/add')
@@ -277,5 +277,12 @@ export class WorkbenchController {
   @Get('/application/release-list/:appId')
   async componentList(@Param('appId') appId: number) {
     return await this.releaseService.list(appId)
+  }
+
+  @Get('/secret-core')
+  async getSecretCore(@Query('mode') mode: StudioMode, @Query('releaseId') releaseId: string, @Query('solutionVersionId') solutionVersionId: string) {
+    const type = mode === StudioMode.Prototype ? ExtensionRelationType.Solution : ExtensionRelationType.Application;
+    const relationId = mode === StudioMode.Prototype ? solutionVersionId : releaseId;
+    return await this.extensionInstanceService.getSecret(type, +relationId)
   }
 }

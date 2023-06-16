@@ -173,6 +173,7 @@ export class DatabaseSeeder extends Seeder {
       config: '',
       relationType: ExtensionRelationType.Solution,
       relationId: solutionVersion.id,
+      secret: true
     });
     await em.persistAndFlush(extCoreInstance);
 
@@ -241,6 +242,7 @@ export class DatabaseSeeder extends Seeder {
       config: '',
       relationType: ExtensionRelationType.Application,
       relationId: release.id,
+      secret: true
     });
     await em.persistAndFlush(extCoreReleaseInstance);
 
