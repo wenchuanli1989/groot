@@ -143,7 +143,7 @@ export type GrootCommandDict = {
 
   'gc.createMetadata': [[number] | [], { metadataList: Metadata[], propTaskList: PropTask[] }],
   'gc.createResource': [[number] | [], { resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[] }],
-  'gc.pushMetadata': [['all' | 'current', number] | ['all' | 'current'], void],
+  'gc.pushMetadata': [[] | [number] | [], void],
   'gc.pushResource': [[number] | [], void],
 
   'gc.switchIstance': [[number, number] | [number], void],

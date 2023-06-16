@@ -10,16 +10,14 @@ export const instanceBootstrap = () => {
 
   registerState('gs.propSetting.breadcrumbList', [], true)
 
-  registerCommand('gc.pushMetadata', (_, type, entryId) => {
-    if (type === 'all') {
-      const data = executeCommand('gc.createMetadata', entryId)
-      const entry = getState('gs.entryList').find(item => item.id === entryId)
-      callHook(PostMessageType.OuterUpdateComponent, {
-        ...data,
-        viewKey: entry.key
-      })
-    } else {
-    }
+  registerCommand('gc.pushMetadata', (_, instanceId) => {
+    const entryId = grootManager.state.getState('gs.entry').id
+    const data = executeCommand('gc.createMetadata', entryId)
+    const entry = getState('gs.entryList').find(item => item.id === entryId)
+    callHook(PostMessageType.OuterUpdateComponent, {
+      ...data,
+      viewKey: entry.key,
+    })
   })
 
   registerCommand('gc.pushResource', (_, entryId) => {

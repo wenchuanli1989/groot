@@ -132,7 +132,8 @@ export default class PropPersistModel extends BaseModel {
         assignBaseType(this.propHandle.propTree[groupIndex], groupData);
 
         this.currSettingPropGroup = undefined;
-        grootManager.command.executeCommand('gc.pushMetadata', 'current');
+        const instanceId = grootManager.state.getState('gs.componentInstance')?.id
+        grootManager.command.executeCommand('gc.pushMetadata', instanceId);
       }).finally(() => {
         this.settingModalSubmitting = false;
       })
@@ -151,7 +152,7 @@ export default class PropPersistModel extends BaseModel {
         }
 
         this.currSettingPropGroup = undefined;
-        grootManager.command.executeCommand('gc.pushMetadata', 'current');
+        grootManager.command.executeCommand('gc.pushMetadata');
       }).finally(() => {
         this.settingModalSubmitting = false;
       })
@@ -168,7 +169,8 @@ export default class PropPersistModel extends BaseModel {
         let blockIndex = group.propBlockList.findIndex(b => b.id === blockData.id);
         assignBaseType(group.propBlockList[blockIndex], blockData);
         this.currSettingPropBlock = undefined;
-        grootManager.command.executeCommand('gc.pushMetadata', 'current');
+        const instanceId = grootManager.state.getState('gs.componentInstance')?.id
+        grootManager.command.executeCommand('gc.pushMetadata', instanceId);
       }).finally(() => {
         this.settingModalSubmitting = false;
       })
@@ -192,7 +194,7 @@ export default class PropPersistModel extends BaseModel {
         }
 
         this.currSettingPropBlock = undefined;
-        grootManager.command.executeCommand('gc.pushMetadata', 'current');
+        grootManager.command.executeCommand('gc.pushMetadata');
       }).finally(() => {
         this.settingModalSubmitting = false;
       })
@@ -216,7 +218,8 @@ export default class PropPersistModel extends BaseModel {
         originItem.optionList = itemData.optionList;
 
         this.currSettingPropItem = undefined;
-        grootManager.command.executeCommand('gc.pushMetadata', 'current');
+        const instanceId = grootManager.state.getState('gs.componentInstance')?.id
+        grootManager.command.executeCommand('gc.pushMetadata', instanceId);
       }).finally(() => {
         this.settingModalSubmitting = false;
       })
@@ -244,7 +247,7 @@ export default class PropPersistModel extends BaseModel {
         }
 
         this.currSettingPropItem = undefined;
-        grootManager.command.executeCommand('gc.pushMetadata', 'current');
+        grootManager.command.executeCommand('gc.pushMetadata');
       }).finally(() => {
         this.settingModalSubmitting = false;
       })
@@ -259,7 +262,7 @@ export default class PropPersistModel extends BaseModel {
       if (this.propHandle.activeGroupId === groupId) {
         this.propHandle.activeGroupId = this.propHandle.propTree[0]?.id
       }
-      grootManager.command.executeCommand('gc.pushMetadata', 'current');
+      grootManager.command.executeCommand('gc.pushMetadata');
     })
   }
 
@@ -267,7 +270,7 @@ export default class PropPersistModel extends BaseModel {
     this.request(APIPath.block_remove_blockId, { blockId }).then(() => {
       let blockIndex = group.propBlockList.findIndex(b => b.id === blockId);
       group.propBlockList.splice(blockIndex, 1);
-      grootManager.command.executeCommand('gc.pushMetadata', 'current');
+      grootManager.command.executeCommand('gc.pushMetadata');
     })
   }
 
@@ -275,7 +278,7 @@ export default class PropPersistModel extends BaseModel {
     this.request(APIPath.item_remove_itemId, { itemId }).then(() => {
       let itemIndex = block.propItemList.findIndex(item => item.id === itemId);
       block.propItemList.splice(itemIndex, 1);
-      grootManager.command.executeCommand('gc.pushMetadata', 'current');
+      grootManager.command.executeCommand('gc.pushMetadata');
     })
   }
 
@@ -334,14 +337,16 @@ export default class PropPersistModel extends BaseModel {
 
     this.request(APIPath.value_abstractType_add, paramsData).then(({ data }) => {
       propItem.valueList.push(data);
-      grootManager.command.executeCommand('gc.pushMetadata', 'current');
+      const instanceId = grootManager.state.getState('gs.componentInstance')?.id
+      grootManager.command.executeCommand('gc.pushMetadata', instanceId);
     })
   }
 
   public removeBlockListStructChildItem(propValueId: number, propItem: PropItem) {
     this.request(APIPath.value_abstractType_remove_propValueId, { propValueId }).then(() => {
       propItem.valueList = propItem.valueList.filter(v => v.id !== propValueId);
-      grootManager.command.executeCommand('gc.pushMetadata', 'current');
+      const instanceId = grootManager.state.getState('gs.componentInstance')?.id
+      grootManager.command.executeCommand('gc.pushMetadata', instanceId);
     })
   }
 
