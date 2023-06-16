@@ -195,6 +195,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     name: '查询页',
     key: '/layout/groot/table',
     entry: true,
+    mainEntry: true,
     component: tableComponent,
     componentVersion: tableComponentVersion,
     release,

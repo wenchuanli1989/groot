@@ -1,38 +1,41 @@
-.clearfix() {
-  zoom: 1;
+html.studio {
 
-  &::before,
-  &::after {
-    display: table;
-    content: ' ';
+  .clearfix() {
+    zoom: 1;
+
+    &::before,
+    &::after {
+      display: table;
+      content: ' ';
+    }
+
+    &::after {
+      clear: both;
+      height: 0;
+      font-size: 0;
+      visibility: hidden;
+    }
   }
 
-  &::after {
-    clear: both;
-    height: 0;
-    font-size: 0;
-    visibility: hidden;
+  .box-shadow {
+    box-shadow: 0 3px 6px -4px rgb(0 0 0 / 12%), 0 6px 16px 0 rgb(0 0 0 / 8%), 0 9px 28px 8px rgb(0 0 0 / 5%);
   }
-}
 
-.box-shadow {
-  box-shadow: 0 3px 6px -4px rgb(0 0 0 / 12%), 0 6px 16px 0 rgb(0 0 0 / 8%), 0 9px 28px 8px rgb(0 0 0 / 5%);
-}
-
-.highlight {
-  &::after {
-    content: '!';
-    color: red;
-    font-weight: 900;
+  .highlight {
+    &::after {
+      content: '!';
+      color: red;
+      font-weight: 900;
+    }
   }
-}
 
-// 常用类样式
-// ------------------------
-.pull-left {
-  float: left;
-}
+  // 常用类样式
+  // ------------------------
+  .pull-left {
+    float: left;
+  }
 
-.pull-right {
-  float: right;
+  .pull-right {
+    float: right;
+  }
 }

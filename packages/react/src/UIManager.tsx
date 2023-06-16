@@ -38,7 +38,7 @@ export const UIManager: IUIManager<{ viewKey: string }> = ({ viewKey }) => {
   } else {
     if (viewKeyRef.current !== viewKey) {
       if (app.hasView(viewKeyRef.current)) {
-        app.getView(viewKeyRef.current).destory()
+        app.unloadView(viewKeyRef.current)
       }
       viewKeyRef.current = viewKey
     }

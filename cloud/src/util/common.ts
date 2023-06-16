@@ -1,7 +1,11 @@
+import { ExtScriptModule, ExtensionHandler, ExtensionLevel, ExtensionInstance as IExtensionInstance } from "@grootio/common";
 import { wrap } from "@mikro-orm/core";
 import { AppResource } from "entities/AppResource";
+import { ExtensionInstance } from "entities/ExtensionInstance";
 import { InstanceResource } from "entities/InstanceResource";
 import { ResourceConfig } from "entities/ResourceConfig";
+import { NodeVM } from "vm2";
+
 
 export function isDevMode() {
   return process.env.NODE_ENV !== 'production'
@@ -29,3 +33,44 @@ export function parseResource(resource: AppResource | InstanceResource, resource
   return wrap(_resource).toObject();
 }
 
+const vm2 = new NodeVM()
+
+// 创建ExtScriptModule模块赋值给插件
+export function installPipelineModule(
+  { list, level, extHandler, entryId, solutionId }: {
+    list: ExtensionInstance[],
+    level: ExtensionLevel,
+    extHandler: ExtensionHandler,
+    entryId?: number,
+    solutionId?: number
+  }
+) {
+  for (const item of list) {
+    const extInstance = wrap(item).toObject() as IExtensionInstance
+    // 一定要先加载安装在初始化 module
+    const success = extHandler.install({
+      extInstance, level, solutionId, entryId,
+      extId: extInstance.extension.id,
+      extAssetUrl: extInstance.extensionVersion.assetUrl
+    })
+
+    const { extensionVersion } = item
+
+    if (success && extensionVersion) {
+      const resourcePipelineModuleCode = extensionVersion.resourcePipelineRaw?.text
+      const propItemPipelineModuleCode = extensionVersion.propItemPipelineRaw?.text
+
+      if (resourcePipelineModuleCode) {
+        const resourceModule = vm2.run(resourcePipelineModuleCode) as ExtScriptModule
+        resourceModule.id = extInstance.id;
+        extInstance.resourcePipeline = resourceModule;
+      }
+
+      if (propItemPipelineModuleCode) {
+        const propItemModule = vm2.run(propItemPipelineModuleCode) as ExtScriptModule
+        propItemModule.id = extInstance.id;
+        extInstance.propItemPipeline = propItemModule;
+      }
+    }
+  }
+}

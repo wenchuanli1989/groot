@@ -17,7 +17,7 @@ const ComponentItem: React.FC<{ component: Component }> = ({ component }) => {
 
   const onSwitchVersion = (value) => {
     component.componentVersionId = value
-    grootManager.command.executeCommand('gc.fetch.prototype', component.id, value)
+    // todo-reload grootManager.command.executeCommand('gc.fetch.prototype', component.id, value)
   }
 
   return <div className={`${styles.componentItem} ${currComponent?.id === component.id ? styles.active : ''}`}>

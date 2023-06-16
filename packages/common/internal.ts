@@ -14,8 +14,12 @@ export type ApplicationData = {
 export type ViewData = {
   // 仅供ApplicationData.viewList使用
   key: string;
+  mainEntry?: boolean;
   // 加载view的地址，仅供ApplicationData.viewList使用
   url?: string;
+} & ViewDataCore
+
+export type ViewDataCore = {
   metadataList?: Metadata[];
   // propTaskList的key和advancedProps的type对应
   propTaskList?: PropTask[],

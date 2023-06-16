@@ -203,6 +203,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     name: '个人资料',
     key: '/layout/groot/profile',
     entry: true,
+    mainEntry: true,
     component: profileComponent,
     componentVersion: profileComponentVersion,
     release,

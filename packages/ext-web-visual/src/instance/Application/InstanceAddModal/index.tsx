@@ -21,7 +21,7 @@ const InstanceAddModal: React.FC = () => {
 
   const handleOk = async () => {
     const formData = await form.validateFields();
-    applicationModel.addRootInstance(formData as ComponentInstance)
+    applicationModel.addEntry(formData as ComponentInstance)
   }
 
   const handleCancel = () => {
@@ -53,6 +53,10 @@ const InstanceAddModal: React.FC = () => {
             </Select>
           </Form.Item>)
         }}
+      </Form.Item>
+
+      <Form.Item label="主入口" name="mainEntry">
+        <Switch />
       </Form.Item>
 
       <Form.Item label="空实例" name="empty" valuePropName="checked">

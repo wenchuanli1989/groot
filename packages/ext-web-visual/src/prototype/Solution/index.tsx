@@ -24,7 +24,7 @@ export const Solution = () => {
     if (currComponent.id === component.id) {
       return;
     }
-    grootManager.command.executeCommand('gc.fetch.prototype', component.id, component.recentVersionId)
+    grootManager.command.executeCommand('gc.loadComponent', component.id)
   }
 
   if (!currComponent) {

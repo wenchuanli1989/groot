@@ -29,7 +29,6 @@ export class ComponentInstance extends BaseEntity {
   @Property({ comment: '一般为组件实例第一次创建时的ID，多个版本迭代实例重新创建，但是trackI永远复制上一个版本的，保证多版本迭代之间还可以追溯组件实例的历史记录' })
   trackId: number;
 
-  // todo 替换为 entry
   @ManyToOne({ serializer: value => value?.id, serializedName: 'rootId' })
   root?: ComponentInstance;
 
@@ -42,7 +41,10 @@ export class ComponentInstance extends BaseEntity {
   @Enum()
   parserType: ComponentParserType = ComponentParserType.ReactComponent;
 
-  @Property({ comment: '是否是页面级组件根实例' })
+  @Property({ comment: '是否是页面级组件入口' })
+  mainEntry: boolean = false;
+
+  @Property({ comment: '是否是组件入口' })
   entry: boolean = false;
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'solutionInstanceId' })

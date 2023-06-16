@@ -13,11 +13,11 @@ export default class SolutionModel extends BaseModel {
     this.componentAddModalStatus = ModalStatus.Submit;
     getContext().request(APIPath.component_add, {
       ...rawComponent,
-      solutionId: getContext().params.solution.id,
+      solutionId: grootManager.state.getState('gs.solution').id
     }).then(({ data }) => {
       this.componentAddModalStatus = ModalStatus.None;
       this.componentList.push(data)
-      grootManager.command.executeCommand('gc.fetch.prototype', data.id, data.recentVersionId)
+      grootManager.command.executeCommand('gc.loadComponent', data.id)
     });
   }
 
@@ -34,7 +34,7 @@ export default class SolutionModel extends BaseModel {
       this.component.versionList.push(data);
       this.component.componentVersion = data;
 
-      grootManager.command.executeCommand('gc.fetch.prototype', this.component.id, data.id)
+      // todo-reload grootManager.command.executeCommand('gc.fetch.prototype', this.component.id, data.id)
     });
   }
 

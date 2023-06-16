@@ -7,31 +7,36 @@ const stateMap = new Map<string, StateObject>();
 const hookMap = new Map<string, { preArgs?: any[], list: HookObject[] }>();
 let registorReady = false;
 let __provider: string;
+let _grootParams: GrootContextParams, _grootLayout: GridLayout, _extProcess: Function
 
-const extHandler = createExtensionHandler()
+export const extHandler = createExtensionHandler()
+
+export const setGrootContext = (grootParams: GrootContextParams, grootLayout: GridLayout, extProcess: (ext: ExtensionRuntime) => void) => {
+  _grootParams = grootParams
+  _grootLayout = grootLayout
+  _extProcess = extProcess
+}
 
 
-export const loadExtension = (remoteExtensionList: ExtensionRuntime[], extLevel: ExtensionLevel, solutionInstanceId?: number) => {
+export const loadExtension = ({ remoteExtensionList, extLevel, entryId, solutionId }: { remoteExtensionList: ExtensionRuntime[], extLevel: ExtensionLevel, entryId?: number, solutionId?: number }) => {
   remoteExtensionList.forEach(extInstance => {
-    extHandler.install(extInstance, extLevel, solutionInstanceId)
+    extHandler.install({ extInstance, level: extLevel, solutionId, entryId, extId: extInstance.extension.id, extAssetUrl: extInstance.extensionVersion.assetUrl })
   })
   return Promise.all(remoteExtensionList.map(extInstance => {
-    if (extInstance.status === ExtensionStatus.Active) {
+    if (extInstance.status === ExtensionStatus.Active && extInstance.extensionVersion.assetUrl) {
       const { assetUrl, packageName, moduleName } = extInstance.extensionVersion
       return loadRemoteModule(packageName, moduleName, assetUrl)
     } else {
       return Promise.resolve()
     }
   })).then(extModuleList => {
-    remoteExtensionList.forEach((extInstance, index) => {
-      if (extInstance.status === ExtensionStatus.Active) {
-        remoteExtensionList[index].main = extModuleList[index].default
-      }
+    remoteExtensionList.forEach((_, index) => {
+      remoteExtensionList[index].main = extModuleList[index]?.default
     })
   })
 }
 
-export const launchExtension = (remoteExtensionList: ExtensionRuntime[], params: GrootContextParams, layout: GridLayout, level: ExtensionLevel) => {
+export const launchExtension = (remoteExtensionList: ExtensionRuntime[], level: ExtensionLevel) => {
   registorReady = false;
 
   const readyCallbackList: Function[] = []
@@ -39,43 +44,39 @@ export const launchExtension = (remoteExtensionList: ExtensionRuntime[], params:
   remoteExtensionList.filter(item => item.status === ExtensionStatus.Active).forEach((extInstance) => {
     extInstance.level = level;
 
-    const requestClone = request.clone((type) => {
-      if (type === 'request') {
-        const { name, packageName, moduleName } = extInstance.extensionVersion
-        console.log(`[ext: ${name} ${packageName}/${moduleName} request]`);
-      }
-    });
+    // 对插件的特殊处理
+    _extProcess(extInstance)
 
-    if (extInstance.extensionVersion.propItemPipelineRaw) {
-      extInstance.propItemPipeline = createExtScriptModule(extInstance.extensionVersion.propItemPipelineRaw)
-      extInstance.propItemPipeline.id = extInstance.id;
-    }
-    if (extInstance.extensionVersion.resourcePipelineRaw) {
-      extInstance.resourcePipeline = createExtScriptModule(extInstance.extensionVersion.resourcePipelineRaw)
-      extInstance.resourcePipeline.id = extInstance.id;
-    }
-
-    __provider = `ext:${extInstance.id}`;
-    const configSchema = extInstance.main({
-      extension: extInstance,
-      params,
-      layout,
-      request: requestClone,
-      groot: {
-        extHandler,
-        loadExtension,
-        launchExtension,
-        stateManager,
-        commandManager,
-        hookManager,
-        onReady: function (callback) {
-          readyCallbackList.push(callback)
+    if (extInstance.main) {
+      const requestClone = request.clone((type) => {
+        if (type === 'request') {
+          const { name, packageName, moduleName } = extInstance.extensionVersion
+          console.log(`[ext: ${name} ${packageName}/${moduleName} request]`);
         }
-      }
-    });
-    __provider = undefined;
+      });
 
-    extInstance.configSchema = configSchema;
+      __provider = `ext:${extInstance.id}`;
+      const configSchema = extInstance.main({
+        extension: extInstance,
+        params: _grootParams,
+        layout: _grootLayout,
+        request: requestClone,
+        groot: {
+          extHandler,
+          loadExtension,
+          launchExtension,
+          stateManager,
+          commandManager,
+          hookManager,
+          onReady: function (callback) {
+            readyCallbackList.push(callback)
+          }
+        }
+      });
+      __provider = undefined;
+
+      extInstance.configSchema = configSchema;
+    }
   });
 
   registorReady = true;

@@ -61,7 +61,7 @@ const ViewportOutlineMarker: React.FC = () => {
     updateEle(selectedRef.current, data, true);
     selectedCacheRef.current = data;
 
-    executeCommand('gc.switchIstance', data.instanceId)
+    executeCommand('gc.switchIstance', data.instanceId, data.rootInstanceId)
   }
 
   function onUpdate({ selected, hover }: { selected: ComponentAnchor, hover: ComponentAnchor }) {

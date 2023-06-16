@@ -31,18 +31,18 @@ export default class ResourceModel extends BaseModel {
       getContext().request(APIPath.resource_add_instance_resource, data).then((res) => {
         const localSttateList = grootManager.state.getState('gs.localResourceList');
         localSttateList.push(res.data as Resource);
-        grootManager.command.executeCommand('gc.pushResource', this.isLocalResource)
+        const entryId = grootManager.state.getState('gs.entry').id
+        grootManager.command.executeCommand('gc.pushResource', entryId)
         this.hideForm();
       })
     } else {
-      const appId = getContext().params.application.id
       const data = rawResource as AppResource
       data.releaseId = releaseId
-      data.appId = appId
+      data.appId = grootManager.state.getState('gs.app').id
       getContext().request(APIPath.resource_add_app_resource, data).then((res) => {
         const globalResourceList = grootManager.state.getState('gs.globalResourceList');
         globalResourceList.push(res.data as Resource);
-        grootManager.command.executeCommand('gc.pushResource', this.isLocalResource)
+        grootManager.command.executeCommand('gc.pushResource')
         this.hideForm();
       })
     }
@@ -54,7 +54,8 @@ export default class ResourceModel extends BaseModel {
       const list = this.isLocalResource ? grootManager.state.getState('gs.localResourceList') : grootManager.state.getState('gs.globalResourceList') as any[];
       const originResource = list.find(item => item.id === this.currResource.id);
       Object.assign(originResource, pick(res.data, ['type', 'name', 'value']));
-      grootManager.command.executeCommand('gc.pushResource', this.isLocalResource)
+      const entryId = this.isLocalResource ? grootManager.state.getState('gs.entry').id : undefined
+      grootManager.command.executeCommand('gc.pushResource', entryId)
       this.hideForm();
     });
   }
@@ -68,7 +69,8 @@ export default class ResourceModel extends BaseModel {
       if (index !== -1) {
         list.splice(index, 1);
       }
-      grootManager.command.executeCommand('gc.pushResource', this.isLocalResource)
+      const entryId = this.isLocalResource ? grootManager.state.getState('gs.entry').id : undefined
+      grootManager.command.executeCommand('gc.pushResource', entryId)
       this.hideForm();
     });
   }

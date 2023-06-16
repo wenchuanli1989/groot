@@ -19,13 +19,12 @@ export const Application = () => {
 
   useEffect(() => {
     if (currInstance) {
-      applicationModel.loadList(release.id);
-      applicationModel.loadReleaseList()
+      applicationModel.init()
     }
   }, [currInstance])
 
-  const switchInstance = (instance: ComponentInstance) => {
-    grootManager.command.executeCommand('gc.fetch.instance', instance.id)
+  const switchEntry = (instance: ComponentInstance) => {
+    grootManager.command.executeCommand('gc.switchEntry', instance.id)
   }
 
   if (!currInstance) {
@@ -65,20 +64,20 @@ export const Application = () => {
       </div>
       <div >
         {
-          applicationModel.noEntryInstanceList.map((instance) => {
+          applicationModel.entryInstanceList.map((instance) => {
             return (<div key={instance.id}
               className={`${styles.componentItem} ${(currInstance.rootId || currInstance.id) === instance.id ? styles.active : ''}`}
-              onClick={() => switchInstance(instance)}>
+              onClick={() => switchEntry(instance)}>
               <InstanceItem instance={instance} />
             </div>)
           })
         }
         <Divider style={{ margin: '0 0 5px 0' }} />
         {
-          applicationModel.entryInstanceList.map((instance) => {
+          applicationModel.mainEntryInstanceList.map((instance) => {
             return (<div key={instance.id}
               className={`${styles.componentItem} ${(currInstance.rootId || currInstance.id) === instance.id ? styles.active : ''}`}
-              onClick={() => switchInstance(instance)}>
+              onClick={() => switchEntry(instance)}>
               <InstanceItem instance={instance} />
             </div>)
           })

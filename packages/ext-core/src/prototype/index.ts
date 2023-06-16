@@ -1,16 +1,46 @@
-import { Component, PropGroup, PropItemPipelineParams, propAppendTask } from "@grootio/common"
+import { APIPath, Component, ExtensionLevel, PropBlockStructType, PropGroup, PropItemPipelineParams, propAppendTask } from "@grootio/common"
 import { metadataFactory, pipelineExec, propTreeFactory } from "@grootio/core";
 import { getContext, grootManager } from "context"
+import { parseOptions } from "../util";
+
 
 export const prototypeBootstrap = () => {
-  grootManager.command.registerCommand('gc.createMetadata', () => {
+  const { registerCommand } = grootManager.command
+
+  registerCommand('gc.createMetadata', () => {
     const component = grootManager.state.getState('gs.component');
     return createFullMetadata(component)
+  })
+
+  registerCommand('gc.loadComponent', (_, componentVersionId) => {
+    return loadComponent(componentVersionId);
+  })
+
+  getContext().groot.onReady(onReady)
+}
+
+const onReady = () => {
+  const { setState } = grootManager.state
+  const { groot: { loadExtension, launchExtension } } = getContext()
+
+  const solutionVersionId = +getContext().params.solutionVersionId || null
+  getContext().request(APIPath.solution_detailBySolutionVersionId, { solutionVersionId }).then(({ data: { extensionInstanceList, ...solution } }) => {
+    setState('gs.solution', solution as any)
+    setState('gs.stage.debugBaseUrl', solution.solutionVersion.debugBaseUrl)
+    setState('gs.stage.playgroundPath', solution.solutionVersion.playgroundPath)
+
+    // 以应用级别方式加载解决方案扩展插件
+    loadExtension({ remoteExtensionList: extensionInstanceList, extLevel: ExtensionLevel.Application }).then(() => {
+
+      launchExtension(extensionInstanceList, ExtensionLevel.Application)
+
+      getContext().layout.refresh()
+    })
   })
 }
 
 const createFullMetadata = (component: Component) => {
-  const { groot: { extHandler }, params: { solution } } = getContext()
+  const { groot: { extHandler } } = getContext()
 
   if (!component.propTree) {
     const { groupList, blockList, itemList, valueList } = component;
@@ -24,8 +54,7 @@ const createFullMetadata = (component: Component) => {
   }
 
   const propTaskList = []
-  const propItemPipelineModuleList = [...(extHandler.solution.get(solution.id)?.values() || [])].filter(ext => !!ext.propItemPipeline?.id).map(ext => ext.propItemPipeline)
-
+  const propItemPipelineModuleList = extHandler.getPipeline('propItem', ExtensionLevel.Application)
   const metadata = metadataFactory(component.propTree, {
     packageName: component.packageName,
     componentName: component.componentName,
@@ -33,9 +62,14 @@ const createFullMetadata = (component: Component) => {
     solutionInstanceId: null,
     componentVersionId: null
   }, (params) => {
-    pipelineExec<PropItemPipelineParams>([], [], propItemPipelineModuleList, {
-      ...params,
-      appendTask: propAppendTask(params.metadata, propTaskList, params.propKeyChain)
+    pipelineExec<PropItemPipelineParams>({
+      appExtList: propItemPipelineModuleList,
+      solutionExtList: [],
+      entryExtList: [],
+      params: {
+        ...params,
+        appendTask: propAppendTask(params.metadata, propTaskList, params.propKeyChain)
+      }
     })
   }, true);
 
@@ -43,4 +77,25 @@ const createFullMetadata = (component: Component) => {
     metadataList: [metadata],
     propTaskList
   }
+}
+
+const loadComponent = (versionId: number) => {
+  return getContext().request(APIPath.componentPrototype_detailByVersionId, { versionId }).then(({ data: component }) => {
+    const { blockList, itemList } = component;
+    blockList.filter(block => block.struct === PropBlockStructType.List).forEach((block) => {
+      block.listStructData = JSON.parse(block.listStructData as any || '[]');
+    })
+
+    itemList.forEach(item => {
+      parseOptions(item);
+    })
+
+    const { executeCommand } = grootManager.command
+    const data = executeCommand('gc.createMetadata')
+
+    return {
+      component,
+      ...data
+    }
+  })
 }

@@ -1,4 +1,4 @@
-import { ExtensionContext, PropItem, StudioMode } from "@grootio/common"
+import { ExtensionContext, PropItem, StudioMode, ViewDataCore } from "@grootio/common"
 
 let _context: ExtensionContext;
 
@@ -28,7 +28,7 @@ export const isPrototypeMode = () => {
 }
 
 export const commandBridge = {
-  stageRefresh: (data: any, callback: Function): void => {
+  stageRefresh: (viewKey: string, data: ViewDataCore, callback: Function): void => {
     throw new Error('方法未实现')
   },
   pushPropItemToStack: (propItem: PropItem): void => {

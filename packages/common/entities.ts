@@ -1,5 +1,5 @@
 import { ExtensionStatus } from "./enum";
-import { ExtScriptModule } from "./extension";
+import { ExtScriptModule, ExtensionRuntime } from "./extension";
 
 /**
  * 属性配置组
@@ -71,6 +71,8 @@ export type ComponentInstance = {
 
   // ************************** 分割线已下是界面属性 **************************
   propTree: PropGroup[],
+  extId: number,
+  solutionId: number
 } & Omit<import("../../cloud/src/entities/ComponentInstance").ComponentInstance, 'component' | 'componentVersion' | 'groupList' | 'blockList' | 'itemList' | 'valueList'>;
 
 export type Release = {
@@ -125,9 +127,15 @@ export type Component = {
 } & Omit<import("../../cloud/src/entities/Component").Component, 'componentVersion' | 'groupList' | 'blockList' | 'itemList' | 'valueList' | 'versionList'>;
 
 export type Application = {
-  extensionInstanceList: ExtensionInstance[]
+  extensionInstanceList: ExtensionRuntime[],
+  release: Release,
+  entryList: ComponentInstance[],
+  resourceList: Resource[],
+  resourceConfigList: ResourceConfig[],
 
   // ************************** 分割线已下是界面属性 **************************
+
+
 } & Omit<import("../../cloud/src/entities/Application").Application, ''>;
 
 export type Organization = {
@@ -157,13 +165,15 @@ export type ExtensionInstance = {
   // ************************** 分割线已下是界面属性 **************************
   status: ExtensionStatus,
   propItemPipeline: ExtScriptModule,
-  resourcePipeline: ExtScriptModule
+  resourcePipeline: ExtScriptModule,
+  destory?: () => void
 } & Omit<import("../../cloud/src/entities/ExtensionInstance").ExtensionInstance, ''>;
 
 export type Solution = {
-  extensionInstanceList: ExtensionInstance[]
+  extensionInstanceList: ExtensionRuntime[];
 
   // ************************** 分割线已下是界面属性 **************************
+
 } & Omit<import("../../cloud/src/entities/Solution").Solution, ''>;
 
 export type SolutionVersion = {
@@ -172,7 +182,8 @@ export type SolutionVersion = {
 
 export type SolutionInstance = {
 
-  extensionInstanceList: ExtensionInstance[]
+  extensionInstanceList: ExtensionRuntime[]
+  // ************************** 分割线已下是界面属性 **************************
 } & Omit<import("../../cloud/src/entities/SolutionInstance").SolutionInstance, ''>;
 
 

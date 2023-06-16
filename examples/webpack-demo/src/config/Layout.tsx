@@ -27,7 +27,7 @@ function Layout() {
 
       <Outlet />
 
-      {location.pathname === '/layout/groot/table' || location.pathname === '/layout/groot/profile' ? <UIManager viewKey="/layout/groot/button" /> : null}
+      {/* {location.pathname === '/layout/groot/table' || location.pathname === '/layout/groot/profile' ? <UIManager viewKey="/layout/groot/button" /> : null} */}
     </>
   )
 }

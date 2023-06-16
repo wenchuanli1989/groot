@@ -101,6 +101,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     name: '按钮',
     key: '/layout/groot/button',
     entry: true,
+    mainEntry: false,
     component: btnComponent,
     componentVersion: btnComponentVersion,
     release,

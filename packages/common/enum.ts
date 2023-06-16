@@ -123,8 +123,8 @@ export enum ExtensionRelationType {
 
 export enum ExtensionStatus {
   Active = 'active',
-  Conflict = 'conflict',
-  ConflictUrl = 'conflictUrl',
+  Conflict = 'conflict', // 被同一个Extension.ID抢占
+  ConflictUrl = 'conflictUrl',// 被同一个URL资源地址插件抢占
+  Padding = 'padding',// 同一ExtensionInstance.ID重复加载
   Destroy = 'destroy',
-  Uninstall = 'uninstall'
 }

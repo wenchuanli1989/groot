@@ -23,6 +23,7 @@ const instance = {
   loadView,
   beforeLoadAppPromise: Promise.resolve(),
   loadAppPromise: Promise.resolve(),
+  unloadView,
 
   groot
 };
@@ -32,7 +33,8 @@ export type ApplicationInstance = typeof instance;
 let iframeApplicationLoadResolve: (info: ApplicationData) => void;
 let iframeDebuggerConfig: IframeDebuggerConfig;
 // 当前激活的界面视图
-let activeView: View;
+let activeViewMap: Map<string, View> = new Map()
+let activeMainEntryView: View;
 // 包含所有界面视图
 const allViewMap = new Map<string, View>();
 const loadingViewMap = new Map<string, Promise<any>>()
@@ -64,10 +66,8 @@ function onMessage(event: any) {
   } else if (messageType === PostMessageType.OuterSetApplication) {
     iframeApplicationLoadResolve(event.data.data);
   } else if (messageType === PostMessageType.OuterUpdateComponent) {
-    if (activeView.key !== event.data.data.key) {
-      throw new Error('内外层界面标识不一致')
-    }
-    const { metadataList } = event.data.data;
+    const { metadataList, viewKey } = event.data.data;
+    const activeView = activeViewMap.get(viewKey)
     activeView.update(metadataList);
     setTimeout(updateActiveRect);
   } else if (messageType === PostMessageType.OuterRefreshView) {
@@ -75,8 +75,11 @@ function onMessage(event: any) {
   } else if (messageType === PostMessageType.OuterUpdateResource) {
     const { resourceList, resourceTaskList, resourceConfigList, viewKey } = event.data.data
     buildResource(resourceList, viewKey, resourceTaskList, resourceConfigList)
+    const activeView = activeViewMap.get(viewKey)
     activeView.refresh()
   } else if (messageType === PostMessageType.OuterSetView) {
+    const { viewKey } = event.data.data
+    const activeView = activeViewMap.get(viewKey)
     activeView.initCallback(event.data.data)
   }
 
@@ -176,11 +179,14 @@ function viewLoading(key: string) {
 
 function loadView(key: string): Promise<View> | View {
   const view = allViewMap.get(key);
-  activeView = view;
 
   if (!view) {
     return Promise.reject(new Error('界面未找到'));
   } else if (view.status === 'finish') {
+    activeViewMap.set(key, view)
+    if (view.mainEntry) {
+      activeMainEntryView = view
+    }
     return view;
   }
 
@@ -188,8 +194,21 @@ function loadView(key: string): Promise<View> | View {
   loadingViewMap.set(key, result)
   result.finally(() => {
     loadingViewMap.delete(key)
+    activeViewMap.set(key, view)
+    if (view.mainEntry) {
+      activeMainEntryView = view
+    }
   })
   return result;
+}
+
+function unloadView(key: string) {
+  const view = activeViewMap.get(key)
+  view.destory()
+  activeViewMap.delete(key)
+  if (view.mainEntry) {
+    activeMainEntryView = null
+  }
 }
 
 

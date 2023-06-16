@@ -23,6 +23,7 @@ export class View {
 
   rootComponent?: any;
   status: 'loading' | 'finish' | 'offline';
+  mainEntry: boolean;
   readonly controlMode: boolean;
   private rootMetadata: Metadata;
   private metadataPromise?: Promise<ParamsType>;
@@ -31,6 +32,7 @@ export class View {
   constructor(data: ViewData, controlMode: boolean) {
     this.key = data.key;
     this.url = data.url;
+    this.mainEntry = data.mainEntry;
     this.metadataList = data.metadataList;
     this.resourceList = data.resourceList;
     this.propTaskList = data.propTaskList;
@@ -39,9 +41,6 @@ export class View {
 
     this.controlMode = controlMode;
 
-    if (!controlMode && !this.url && !this.metadataList) {
-      throw new Error('数据异常');
-    }
   }
 
   public init(): Promise<View> {
@@ -94,7 +93,7 @@ export class View {
     }
 
     if (controlMode && this.controlMode) {
-      window.parent.postMessage({ type: PostMessageType.InnerFetchView }, '*');
+      window.parent.postMessage({ type: PostMessageType.InnerFetchView, data: this.key }, '*');
       if (!this.metadataPromise) {
         this.metadataPromise = new Promise((resolve) => {
           this.fetchMetadataResolve = (data) => {

@@ -65,12 +65,18 @@ const buildApplicationData = () => {
       resourceConfigList: []
     } as ApplicationData
   } else {
-    const { resourceList, resourceTaskList, resourceConfigList } = grootManager.command.executeCommand('gc.createResource', false)
+    const viewList = grootManager.state.getState('gs.entryList').map(item => {
+      return {
+        key: item.key,
+        mainEntry: item.mainEntry
+      }
+    })
+    const { resourceList, resourceTaskList, resourceConfigList } = grootManager.command.executeCommand('gc.createResource')
 
     const appData: ApplicationData = {
       name: '实例',
       key: 'instance-demo',
-      viewList: [{ key: playgroundPath }],
+      viewList,
       resourceTaskList,
       resourceList,
       resourceConfigList

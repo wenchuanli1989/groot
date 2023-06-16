@@ -1,17 +1,18 @@
 @import './styles/patch.less';
 @import './styles/util.less';
 
-body.studio {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  height: 100%;
-  margin: 0;
-}
 
 html.studio {
   height: 100%;
-}
 
-body.studio #pangu {
-  height: 100%;
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    height: 100%;
+    margin: 0;
+
+    #pangu {
+      height: 100%;
+    }
+  }
 }

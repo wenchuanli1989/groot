@@ -1,6 +1,6 @@
-import { BaseModel, IframeDebuggerConfig, iframeNamePrefix, Metadata, PostMessageType, PropTask, Resource, ResourceConfig, ResourceTask } from "@grootio/common";
+import { BaseModel, IframeDebuggerConfig, iframeNamePrefix, Metadata, PostMessageType, PropTask, Resource, ResourceConfig, ResourceTask, ViewData, ViewDataCore } from "@grootio/common";
 
-import { commandBridge, getContext, grootManager } from "context";
+import { commandBridge, getContext, grootManager, isPrototypeMode } from "context";
 
 export default class WorkAreaModel extends BaseModel {
   static modelName = 'workArea';
@@ -11,13 +11,7 @@ export default class WorkAreaModel extends BaseModel {
     runtimeConfig: {}
   }
   private pageNavCallback: Function;
-  private viewData: {
-    metadataList?: Metadata[];
-    propTaskList?: PropTask[],
-    resourceList?: Resource[];
-    resourceTaskList?: ResourceTask[],
-    resourceConfigList?: ResourceConfig[],
-  } = {}
+  private viewDataMap = new Map<string, ViewDataCore>()
 
   public initIframe(iframe: HTMLIFrameElement) {
     const { mode } = getContext().params
@@ -88,10 +82,11 @@ export default class WorkAreaModel extends BaseModel {
       this.iframeEle.contentWindow.postMessage({ type: PostMessageType.OuterSetApplication, data }, '*');
     })
 
-    registerHook(PostMessageType.InnerFetchView, () => {
+    registerHook(PostMessageType.InnerFetchView, (viewKey: string) => {
       guard();
 
-      callHook(PostMessageType.OuterSetView, this.viewData as any)
+      const viewData = this.viewDataMap.get(viewKey)
+      callHook(PostMessageType.OuterSetView, viewData as any)
 
       if (this.pageNavCallback) {
         // 内部一般执行 组件刷新操作
@@ -101,9 +96,10 @@ export default class WorkAreaModel extends BaseModel {
     })
 
     registerHook(PostMessageType.OuterUpdateResource, ({ resourceList, resourceTaskList, resourceConfigList, viewKey }) => {
-      this.viewData.resourceList = resourceList
-      this.viewData.resourceTaskList = resourceTaskList
-      this.viewData.resourceConfigList = resourceConfigList
+      const viewData = this.viewDataMap.get(viewKey)
+      viewData.resourceList = resourceList
+      viewData.resourceTaskList = resourceTaskList
+      viewData.resourceConfigList = resourceConfigList
 
       if (this.iframeReady) {
         this.iframeEle.contentWindow.postMessage({
@@ -119,8 +115,9 @@ export default class WorkAreaModel extends BaseModel {
     })
 
     registerHook(PostMessageType.OuterUpdateComponent, ({ metadataList, propTaskList, viewKey }) => {
-      this.viewData.metadataList = metadataList
-      this.viewData.propTaskList = propTaskList
+      const viewData = this.viewDataMap.get(viewKey)
+      viewData.metadataList = metadataList
+      viewData.propTaskList = propTaskList
 
       if (this.iframeReady) {
         this.iframeEle.contentWindow.postMessage({
@@ -190,23 +187,22 @@ export default class WorkAreaModel extends BaseModel {
 
   }
 
-  private refresh = (data: any, callback?: Function) => {
-    this.viewData = data
+  private refresh = (viewKey: string, data: ViewDataCore, callback?: Function) => {
+    this.viewDataMap.set(viewKey, data)
     this.pageNavCallback = callback;
 
     const iframeBasePath = grootManager.state.getState('gs.stage.debugBaseUrl')
-    const playgroundPath = grootManager.state.getState('gs.stage.playgroundPath')
-    const path = `${iframeBasePath}${playgroundPath}`;
+
+    const path = `${iframeBasePath}${viewKey}`;
     if (this.iframeEle.src) {
       if (this.iframeEle.src === path) {
         grootManager.hook.callHook(PostMessageType.OuterRefreshView, path)
       } else {
-        this.viewData = null;
-        this.iframeDebuggerConfig.controlView = playgroundPath;
+        this.iframeDebuggerConfig.controlView = viewKey;
         this.iframeEle.src = path;
       }
     } else {
-      this.iframeDebuggerConfig.controlView = playgroundPath;
+      this.iframeDebuggerConfig.controlView = viewKey;
       this.iframeEle.src = path;
     }
   }

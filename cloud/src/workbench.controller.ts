@@ -128,9 +128,9 @@ export class WorkbenchController {
     return await this.propValueService.update(rawPropValue);
   }
 
-  @Post('/component-instance/add-root')
-  async componentInstanceAdd(@Body() componentInstance: ComponentInstance) {
-    return await this.componentInstanceService.addRoot(componentInstance);
+  @Post('/component-instance/add-entry')
+  async componentInstanceAddEntry(@Body() componentInstance: ComponentInstance) {
+    return await this.componentInstanceService.addEntry(componentInstance);
   }
 
 
@@ -139,22 +139,19 @@ export class WorkbenchController {
     return this.orgService.getDetail(orgId);
   }
 
-  @Get('/component-prototype/detail/:componentId')
-  async componentPrototypeDetail(@Param('componentId') componentId: number, @Query('versionId') versionId: number) {
-    return this.componentService.getComponentPrototype(componentId, versionId);
+  @Get('/component-prototype/detail-by-versionId/:versionId')
+  async componentDetailByVersionId(@Param('versionId') versionId: number) {
+    return this.componentService.getComponentDetailByVersionId(versionId);
   }
 
-  @Get('/application/detail/:applicationId')
-  async applicationDetail(@Param('applicationId') applicationId: number, @Query('releaseId') releaseId: number) {
-    return this.applicationService.getDetail({
-      id: applicationId,
-      releaseId
-    } as Application);
+  @Get('/application/detail-by-releaseId/:releaseId')
+  async getDetailByReleaseId(@Param('releaseId') releaseId: number) {
+    return this.applicationService.getDetailByReleaseId(releaseId);
   }
 
-  @Get('/component-instance/root-detail/:instanceId')
-  async rootComponentInstanceDetail(@Param('instanceId') instanceId: number) {
-    return this.componentInstanceService.getRootDetail(instanceId);
+  @Get('/component-instance/entry-detail/:entryId')
+  async componentInstanceEntryDetail(@Param('entryId') entryId: number) {
+    return this.componentInstanceService.getEntryDetail(entryId);
   }
 
   @Post('/component-version/add')
@@ -265,28 +262,20 @@ export class WorkbenchController {
     }
   }
 
-  @Get('/solution/detail/:solutionId')
-  async solutionDetail(@Param('solutionId') solutionId: number, @Query('solutionVersionId') solutionVersionId: number) {
-    return await this.solutionService.getDetail({
-      id: solutionId,
-      solutionVersionId
-    } as Solution)
+  @Get('/solution/detail-by-solutionVersionId/:solutionVersionId')
+  async detailBySolutionVersionId(@Query('solutionVersionId') solutionVersionId: number) {
+    return await this.solutionService.getDetailBySolutionVersionId(solutionVersionId)
   }
 
   // todo 添加解决方案实现
   @Get('/solution/component-list/:solutionVersionId')
   async solutionCompoentList(@Param('solutionVersionId') solutionVersionId: number, @Query('all') all: string) {
-    return await this.solutionService.componentListByVersionId(solutionVersionId, all === 'true');
+    return await this.solutionService.componentListBySolutionVersionId(solutionVersionId, all === 'true');
   }
 
 
-  @Get('/release/instance-list/:releaseId')
-  async releaseComponentList(@Param('releaseId') releaseId: number) {
-    return await this.componentInstanceService.list(releaseId)
-  }
-
-  @Get('/application/release-list/:applicationId')
-  async componentList(@Param('applicationId') applicationId: number) {
-    return await this.releaseService.list(applicationId)
+  @Get('/application/release-list/:appId')
+  async componentList(@Param('appId') appId: number) {
+    return await this.releaseService.list(appId)
   }
 }

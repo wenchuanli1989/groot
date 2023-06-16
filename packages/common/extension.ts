@@ -3,8 +3,8 @@ import React from "react";
 import { APIStore } from "./api/API.store";
 import { Application, Component, ComponentInstance, ExtensionInstance, PropItem, Release, Resource, ResourceConfig, Solution } from "./entities";
 import { GridLayout } from "./GridLayout";
-import { ApplicationData, Metadata } from "./internal";
-import { ExtensionLevel, ExtensionPipelineLevel, StudioMode } from "./enum";
+import { ApplicationData, Metadata, ViewDataCore } from "./internal";
+import { ExtensionLevel, ExtensionPipelineLevel } from "./enum";
 import { RequestFnType } from "./request-factory";
 import { GrootType, UIManagerConfig } from "./runtime";
 
@@ -15,19 +15,18 @@ export type GrootContext = {
   stateManager: StateManager,
   hookManager: HookManager,
   extHandler: ExtensionHandler,
-  loadExtension: (remoteExtensionList: ExtensionRuntime[], extLevel: ExtensionLevel, solutionInstanceId?: number) => void,
-  launchExtension: (remoteExtensionList: ExtensionRuntime[], params: GrootContextParams, layout: GridLayout, level: ExtensionLevel) => void,
+  loadExtension: (params: { remoteExtensionList: ExtensionRuntime[], extLevel: ExtensionLevel, solutionId?: number, entryId?: number }) => Promise<void>,
+  launchExtension: (remoteExtensionList: ExtensionRuntime[], level: ExtensionLevel) => void,
   onReady: (callback: Function) => void;
 }
 
 export type GrootContextParams = {
-  mode: StudioMode,
   account: any,
-  application: Application,
-  solution: Solution,
-  instanceId?: number,
-  componentId?: number,
-  versionId?: number
+  mode: string,
+  releaseId: string,
+  solutionVersionId: string,
+  instanceId?: string,
+  componentVersionId?: string,
 }
 
 export type MainFunction<C> = (context: ExtensionContext, config?: C) => ExtensionConfigSchema;
@@ -132,15 +131,23 @@ export type GrootCommandDict = {
   'gc.ui.render.panel': [[], ReactElement | null],
   'gc.ui.render.statusBar': [[], ReactElement | null],
 
-  'gc.createMetadata': [[], { metadataList: Metadata[], propTaskList: PropTask[] }],
-  'gc.createResource': [[boolean], { resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[] }],
-  'gc.pushMetadata': [['all' | 'current'], void],
-  'gc.pushResource': [[boolean], void],
+  'gc.loadEntry': [[number], Promise<ViewDataCore>],
+  'gc.switchEntry': [[number, boolean] | [number], void],
+  'gc.unloadEntry': [[number], void],
+  'gc.loadComponent': [[number], Promise<{
+    component: Component,
+    metadataList: Metadata[],
+    propTaskList: PropTask[]
+  }>]
 
-  'gc.fetch.instance': [[number], void],
-  'gc.fetch.prototype': [[number, number | null], void],
-  'gc.switchIstance': [[number], void],
-  'gc.stageRefresh': [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: PropTask[] }, Function | null], void],
+
+  'gc.createMetadata': [[number] | [], { metadataList: Metadata[], propTaskList: PropTask[] }],
+  'gc.createResource': [[number] | [], { resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[] }],
+  'gc.pushMetadata': [['all' | 'current', number] | ['all' | 'current'], void],
+  'gc.pushResource': [[number] | [], void],
+
+  'gc.switchIstance': [[number, number] | [number], void],
+  'gc.stageRefresh': [[string, ViewDataCore, Function] | [string, ViewDataCore], void],
 
   'gc.pushPropItemToStack': [[PropItem], void]
 }
@@ -168,14 +175,19 @@ export type GrootStateDict = {
   'gs.ui.banner.views': [{ id: string, placement: 'left' | 'center' | 'right' }, true],
   // 'gs.ui.propSettingViews': [{ name: string, remotePackage: string, remoteUrl: string, remoteModule: string }, true],
 
+  'gs.app': [Application, false],
+  'gs.release': [Release, false],
+  'gs.entryList': [ComponentInstance, true],
+  'gs.globalResourceList': [Resource, true],
+  'gs.globalResourceConfigList': [ResourceConfig, true],
+  'gs.entry': [ComponentInstance, false],
+  'gs.localResourceList': [Resource, true],
+  'gs.localResourceConfigList': [ResourceConfig, true],
   'gs.componentInstance': [ComponentInstance, false],
   'gs.allComponentInstance': [ComponentInstance, true],
+
+  'gs.solution': [Solution, false],
   'gs.component': [Component, false],
-  'gs.release': [Release, false],
-  'gs.globalResourceList': [Resource, true],
-  'gs.localResourceList': [Resource, true],
-  'gs.globalResourceConfigList': [ResourceConfig, true],
-  'gs.localResourceConfigList': [ResourceConfig, true],
 
   'gs.propItem.viewTypeList': [{ label: string, value: string }, true],
   'gs.propItem.formRenderList': [{ viewType: string, render: React.FC<FormItemRender> }, true],
@@ -197,8 +209,8 @@ export type GrootHookDict = {
   [PostMessageType.InnerFetchApplication]: [[], void],
   [PostMessageType.OuterSetApplication]: [[ApplicationData] | [], void],
   [PostMessageType.InnerApplicationReady]: [[], void],
-  [PostMessageType.InnerFetchView]: [[], void],
-  [PostMessageType.OuterSetView]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: PropTask[] }], void],
+  [PostMessageType.InnerFetchView]: [[string], void],
+  [PostMessageType.OuterSetView]: [[{ viewKey: string, resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: PropTask[] }], void],
   [PostMessageType.OuterUpdateResource]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], viewKey: string }], void],
   [PostMessageType.OuterUpdateComponent]: [[{ metadataList: Metadata[], propTaskList: PropTask[], viewKey: string }], void],
 
@@ -342,17 +354,39 @@ export type ExtScriptModule<P = any> = {
 
 
 export type ExtensionHandler = {
-  application: Map<number, ExtensionInstance>,
-  solution: Map<number, Map<number, ExtensionInstance>>,
-  entry: Map<number, ExtensionInstance>,
+  /**
+   * extInstanceId: extInstance
+   */
+  appExt: Map<number, { instance: ExtensionInstance, extId: number, extAssetUrl: string }>,
+  /**
+   * entryId: {solutionId: {extInstanceId: extInstance}}
+   */
+  solutionExt: Map<number, Map<number, Map<number, { instance: ExtensionInstance, extId: number, extAssetUrl: string }>>>,
+  /**
+   * entryId: {extInstanceId: extInstance}
+   */
+  entryExt: Map<number, Map<number, { instance: ExtensionInstance, extId: number, extAssetUrl: string }>>,
+
   runtime: {
-    byAssetUrlMap: Map<string, ExtensionInstance>,
-    byExtIdMap: Map<number, ExtensionInstance>
+    /**
+     * extId: ...
+     */
+    extByIdMap: Map<number, { referCount: number, extId: number, extInstance: ExtensionInstance }>,
+    /**
+     * extVersionUrl: extId
+     */
+    extByAssetUrlMap: Map<string, number>,
   },
-  install: (extensionInstance: ExtensionInstance, level: ExtensionLevel, solutionInstanceId?: number) => boolean,
-  uninstall: (extensionInstanceId: number, level: ExtensionLevel, solutionInstanceId?: number) => boolean
+  getPipeline: GetPipeline,
+  install: (params: { extInstance: ExtensionInstance, level: ExtensionLevel, extId: number, extAssetUrl: string, solutionId?: number, entryId?: number }) => boolean,
+  uninstall: (params: { extInstanceId: number, level: ExtensionLevel, solutionId?: number, entryId?: number }) => boolean
 }
 
+interface GetPipeline {
+  (type: 'propItem' | 'resource', level: ExtensionLevel.Application): ExtScriptModule[];
+  (type: 'propItem' | 'resource', level: ExtensionLevel.Entry, entryId: number): ExtScriptModule[];
+  (type: 'propItem' | 'resource', level: ExtensionLevel.Solution, entryId: number, solutionId?: number): ExtScriptModule[];
+}
 
 export type FormItemRender = {
   propItem: PropItem,
@@ -375,6 +409,7 @@ export type PropItemPipelineParams = {
 export type ResourcePipelineParams = {
   resource: Resource,
   defaultFn: () => void,
+  local: boolean,
   appendTask: (taskName: string, taskCode: string, initCode: string, destoryCode: string) => void
 }
 

@@ -20,7 +20,7 @@ import { parseResource } from 'util/common';
 export class ComponentInstanceService {
 
   // root key entry wrapper parserType
-  async addRoot(rawInstance: ComponentInstance) {
+  async addEntry(rawInstance: ComponentInstance) {
     let em = RequestContext.getEntityManager();
 
     LogicException.assertParamEmpty(rawInstance.key, 'key');
@@ -32,13 +32,14 @@ export class ComponentInstanceService {
     }
 
     let wrapperRawInstance;
+    rawInstance.entry = true
 
     if (rawInstance.wrapper) {
       const [packageName, componentName] = rawInstance.wrapper.split('/');
       const wrapperComponent = await em.findOne(Component, { packageName, componentName });
       LogicException.assertNotFound(wrapperComponent, 'Component');
 
-      wrapperRawInstance = pick(rawInstance, ['name', 'key', 'releaseId', 'entry']);
+      wrapperRawInstance = pick(rawInstance, ['name', 'key', 'releaseId', 'mainEntry', 'entry']);
       wrapperRawInstance.componentId = wrapperComponent.id;
     }
 
@@ -108,7 +109,7 @@ export class ComponentInstanceService {
     });
 
     const newInstance = em.create(ComponentInstance, {
-      ...pick(rawInstance, ['key', 'entry']),
+      ...pick(rawInstance, ['key', 'mainEntry', 'entry']),
       name: rawInstance.name || componentVersion.component.name,
       parent: rawInstance.parentId,
       root: rawInstance.rootId,
@@ -170,15 +171,15 @@ export class ComponentInstanceService {
   }
 
   // todo **id为componentInstanceId**
-  async getRootDetail(instanceId: number) {
+  async getEntryDetail(entryId: number) {
     const em = RequestContext.getEntityManager();
 
-    LogicException.assertParamEmpty(instanceId, 'instanceId');
-    const rootInstance = await em.findOne(ComponentInstance, instanceId, {
+    LogicException.assertParamEmpty(entryId, 'entryId');
+    const rootInstance = await em.findOne(ComponentInstance, entryId, {
       populate: ['componentVersion', 'component',]
     });
-    LogicException.assertNotFound(rootInstance, 'Instance', instanceId);
-    if (rootInstance.root) {
+    LogicException.assertNotFound(rootInstance, 'Instance', entryId);
+    if (rootInstance.root || !rootInstance.entry) {
       throw new LogicException(`当前组件不是入口组件`, LogicExceptionCode.UnExpect);
     }
 
@@ -203,7 +204,7 @@ export class ComponentInstanceService {
     rootInstance.itemList = await em.find(PropItem, { component: rootInstance.component, componentVersion: rootInstance.componentVersion });
     rootInstance.valueList = await em.find(PropValue, { componentInstance: rootInstance });
 
-    const instanceList = await em.find(ComponentInstance, { root: instanceId }, {
+    const instanceList = await em.find(ComponentInstance, { root: entryId }, {
       populate: ['component', 'componentVersion'],
     });
 
@@ -216,8 +217,6 @@ export class ComponentInstanceService {
       instance.valueList = await em.find(PropValue, { componentInstance: instance });
     }
 
-    const release = await em.findOne(Release, rootInstance.release.id)
-
     let resourceList = await em.find(InstanceResource, { componentInstance: rootInstance }, { populate: ['imageResource.resourceConfig', 'resourceConfig'] })
 
     const resourceConfigMap = new Map()
@@ -226,7 +225,7 @@ export class ComponentInstanceService {
     })
     const resourceConfigList = [...resourceConfigMap.values()]
 
-    return { root: rootInstance, children: instanceList, release, resourceList, resourceConfigList, entryExtensionInstanceList, solutionInstanceList };
+    return { root: rootInstance, children: instanceList, resourceList, resourceConfigList, entryExtensionInstanceList, solutionInstanceList };
   }
 
   async reverseDetectId(trackId: number, releaseId: number) {
@@ -325,18 +324,6 @@ export class ComponentInstanceService {
     }
 
     await em.nativeDelete(ComponentInstance, { id: { $in: removeIds } });
-  }
-
-  async list(releaseId: number) {
-    const em = RequestContext.getEntityManager();
-
-    LogicException.assertParamEmpty(releaseId, 'releaseId');
-    const release = await em.findOne(Release, releaseId);
-    LogicException.assertNotFound(release, 'release', releaseId);
-
-    const instanceList = await em.find(ComponentInstance, { release, root: null });
-
-    return instanceList
   }
 
   private async addRootForWrapper(rawInstance: ComponentInstance, wrapperRawInstance: ComponentInstance, em: EntityManager) {

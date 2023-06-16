@@ -4,31 +4,35 @@ import { getContext, grootManager } from "context";
 
 export const instanceBootstrap = () => {
   const { groot } = getContext();
-  const { registerState, watchState } = grootManager.state;
+  const { registerState, watchState, getState } = grootManager.state;
   const { registerCommand, executeCommand } = grootManager.command;
   const { callHook } = grootManager.hook;
 
-
-
   registerState('gs.propSetting.breadcrumbList', [], true)
 
-
-  registerCommand('gc.pushMetadata', (_, type) => {
+  registerCommand('gc.pushMetadata', (_, type, entryId) => {
     if (type === 'all') {
-      const data = executeCommand('gc.createMetadata')
+      const data = executeCommand('gc.createMetadata', entryId)
+      const entry = getState('gs.entryList').find(item => item.id === entryId)
       callHook(PostMessageType.OuterUpdateComponent, {
         ...data,
-        viewKey: '/groot/playground'
+        viewKey: entry.key
       })
     } else {
     }
   })
 
-  registerCommand('gc.pushResource', (_, isLocalResource) => {
-    const data = executeCommand('gc.createResource', isLocalResource)
+  registerCommand('gc.pushResource', (_, entryId) => {
+    const data = executeCommand('gc.createResource', entryId)
+    let viewKey;
+
+    if (entryId) {
+      const entry = getState('gs.entryList').find(item => item.id === entryId)
+      viewKey = entry.key
+    }
     callHook(PostMessageType.OuterUpdateResource, {
       ...data,
-      viewKey: isLocalResource ? '/groot/playground' : null
+      viewKey
     })
   })
 

@@ -10,16 +10,16 @@ import { SolutionVersion } from 'entities/SolutionVersion';
 @Injectable()
 export class SolutionService {
 
-  async getDetail(rawSolution: Solution) {
+  async getDetailBySolutionVersionId(solutionVersionId: number) {
     const em = RequestContext.getEntityManager();
 
-    LogicException.assertParamEmpty(rawSolution.id, 'solutionId');
-    const solution = await em.findOne(Solution, rawSolution.id);
-    LogicException.assertNotFound(solution, 'Solution', rawSolution.id);
+    LogicException.assertParamEmpty(solutionVersionId, '参数solutionVersionId为空')
 
-    const solutionVersionId = rawSolution.solutionVersionId || solution.recentVersion.id
-    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId)
+    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId, { populate: ['componentVersionList.component'] })
     LogicException.assertNotFound(solutionVersion, 'SolutionVersion', solutionVersionId);
+
+    const solution = await em.findOne(Solution, solutionVersion.solution.id);
+    LogicException.assertNotFound(solution, 'Solution', solutionVersion.solution.id);
 
     solution.solutionVersion = wrap(solutionVersion).toObject() as any
 
@@ -31,7 +31,7 @@ export class SolutionService {
     return solution;
   }
 
-  async componentListByVersionId(solutionVersionId: number, all = false) {
+  async componentListBySolutionVersionId(solutionVersionId: number, all = false) {
     const em = RequestContext.getEntityManager();
 
     const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId, { populate: ['componentVersionList.component'] });

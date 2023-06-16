@@ -1,34 +1,32 @@
-import { ResourcePipelineParams, resourceAppendTask } from "@grootio/common"
+import { ExtensionLevel, ExtensionStatus, Resource, ResourcePipelineParams, resourceAppendTask } from "@grootio/common"
 import { pipelineExec } from "@grootio/core"
-import { getContext, grootManager } from "context"
+import { getContext } from "context"
 
-export const createResourceTaskList = (isLocalResource = true) => {
+export const createResourceTaskList = (resourceList: Resource[], entryId?: number) => {
   const { extHandler } = getContext().groot
   let entryResourceExtScriptModuleList = []
   let solutionResourceExtScriptModuleList = []
-  let resourceList = [];
 
-  const appResourceExtScriptModuleList = [...(extHandler.application.values() || [])].filter(ext => !!ext.resourcePipeline?.id).map(ext => ext.resourcePipeline)
-  if (isLocalResource) {
-    entryResourceExtScriptModuleList = [...(extHandler.entry.values() || [])].filter(ext => !!ext.resourcePipeline?.id).map(ext => ext.resourcePipeline)
+  const appResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.Application)
 
-    solutionResourceExtScriptModuleList = [...extHandler.solution.values()].reduce((pre, curr) => {
-      const list = [...curr.values()]
-      pre.push(...list)
-      return pre;
-    }, []).filter(ext => !!ext.resourcePipeline?.id).map(ext => ext.resourcePipeline)
+  if (entryId) {
+    entryResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.Entry, entryId)
 
-    resourceList = grootManager.state.getState('gs.localResourceList')
-  } else {
-    resourceList = grootManager.state.getState('gs.globalResourceList')
+    solutionResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.Solution, entryId)
   }
 
   const resourceTaskList = []
   resourceList.forEach(resource => {
-    pipelineExec<ResourcePipelineParams>(entryResourceExtScriptModuleList, solutionResourceExtScriptModuleList, appResourceExtScriptModuleList, {
-      resource: resource as any,
-      defaultFn: () => { },
-      appendTask: resourceAppendTask(resource, resourceTaskList)
+    pipelineExec<ResourcePipelineParams>({
+      entryExtList: entryResourceExtScriptModuleList,
+      solutionExtList: solutionResourceExtScriptModuleList,
+      appExtList: appResourceExtScriptModuleList,
+      params: {
+        resource: resource as any,
+        defaultFn: () => { },
+        local: true,
+        appendTask: resourceAppendTask(resource, resourceTaskList)
+      }
     })
   })
 

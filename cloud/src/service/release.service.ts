@@ -57,7 +57,7 @@ export class ReleaseService {
       // 创建组件实例
       originInstanceList.forEach((originInstance) => {
         const instance = em.create(ComponentInstance, {
-          ...pick(originInstance, ['key', 'name', 'component', 'componentVersion', 'trackId', 'entry', 'solutionInstance']),
+          ...pick(originInstance, ['key', 'name', 'component', 'componentVersion', 'trackId', 'entry', 'mainEntry', 'solutionInstance']),
           release: newRelease,
         });
         instanceMap.set(originInstance.id, instance);
@@ -119,8 +119,6 @@ export class ReleaseService {
       throw e;
     }
 
-    newRelease.instanceList = await em.find(ComponentInstance, { release: newRelease, entry: true });
-
     return newRelease;
   }
 
@@ -133,6 +131,7 @@ export class ReleaseService {
 
     return list
   }
+
 }
 
 

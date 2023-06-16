@@ -7,17 +7,17 @@ export enum APIPath {
   auth_logout = 'auth/logout',
   system_dict = 'system/dict',
 
-  application_detail_applicationId = 'application/detail/:applicationId',
+  application_detailByReleaseId = 'application/detail-by-releaseId/:releaseId',
   org_detail_orgId = 'org/detail/:orgId',
-  solution_detail_solutionId = 'solution/detail/:solutionId',
+  solution_detailBySolutionVersionId = 'solution/detail-by-solutionVersionId/:solutionVersionId',
   componentInstance_addChild = 'POST component-instance/add-child',
   componentInstance_remove_instanceId = 'component-instance/remove/:instanceId',
-  componentPrototype_detail_componentId = 'component-prototype/detail/:componentId?versionId=:versionId',
+  componentPrototype_detailByVersionId = 'component-prototype/detail-by-versionId/:versionId',
   component_add = 'POST component/add',
   componentVersion_add = 'POST component-version/add',
   componentVersion_publish = 'POST component-version/publish',
-  componentInstance_rootDetail_instanceId = 'component-instance/root-detail/:instanceId',
-  componentInstance_addRoot = 'POST component-instance/add-root',
+  componentInstance_entryDetail_entryId = 'component-instance/entry-detail/:entryId',
+  componentInstance_addEntry = 'POST component-instance/add-entry',
   componentInstance_reverseDetectId = 'component-instance/reverse-detect-id',
   release_add = 'POST release/add',
   asset_build = 'POST asset/build',
@@ -48,8 +48,6 @@ export enum APIPath {
 
   solution_componentList_solutionVersionId = 'solution/component-list/:solutionVersionId',
 
-  release_instanceList_releaseId = 'release/instance-list/:releaseId',
-
-  application_releaseList_applicationId = 'application/release-list/:applicationId'
+  application_releaseList_appId = 'application/release-list/:appId'
 
 }

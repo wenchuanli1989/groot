@@ -28,4 +28,7 @@ export class SolutionInstance extends BaseEntity {
 
   @Property({ persist: false })
   solutionVersionId: number
+
+  @Property({ persist: false })
+  solutionId: number
 }

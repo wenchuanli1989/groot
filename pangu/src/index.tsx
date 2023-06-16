@@ -12,7 +12,9 @@ const appConfig = panguConfig.appConfig[appName];
 if (appConfig.bootstrap === false) {
   loadRemoteModule(appConfig.packageName, appConfig.moduleName, appConfig.assetUrl).then((module) => {
     module.default({
-      appEnv: process.env.APP_ENV
+      appEnv: process.env.APP_ENV,
+      appName,
+      rootId: panguConfig.rootId,
     });
   })
 } else {

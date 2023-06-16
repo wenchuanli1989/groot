@@ -16,28 +16,25 @@ import { SolutionVersion } from 'entities/SolutionVersion';
 @Injectable()
 export class ComponentService {
 
-  /**
-   * 获取组件某个版本的配置信息
-   * @param id 组件ID
-   * @param versionId 组件版本
-   * @returns 组件信息
-   */
-  async getComponentPrototype(id: number, versionId?: number) {
+  async getComponentDetailByVersionId(versionId: number) {
     const em = RequestContext.getEntityManager();
 
-    LogicException.assertParamEmpty(id, 'id');
-    const component = await em.findOne(Component, id);
-    LogicException.assertNotFound(component, 'Component', id);
+    LogicException.assertParamEmpty(versionId, 'versionId');
 
-    const version = await em.findOne(ComponentVersion, versionId || component.recentVersion.id);
+    const version = await em.findOne(ComponentVersion, versionId);
     LogicException.assertNotFound(version, 'ComponentVersion', versionId);
+    const componentId = version.component.id
+
+    const component = await em.findOne(Component, componentId);
+    LogicException.assertNotFound(component, 'Component', componentId);
+
     component.componentVersion = wrap(version).toObject() as any;
 
     // component.versionList = await em.find(ComponentVersion, { component });
-    component.groupList = await em.find(PropGroup, { component: id, componentVersion: version });
-    component.blockList = await em.find(PropBlock, { component: id, componentVersion: version });
-    component.itemList = await em.find(PropItem, { component: id, componentVersion: version });
-    component.valueList = await em.find(PropValue, { component: id, componentVersion: version, type: PropValueType.Prototype });
+    component.groupList = await em.find(PropGroup, { component: componentId, componentVersion: version });
+    component.blockList = await em.find(PropBlock, { component: componentId, componentVersion: version });
+    component.itemList = await em.find(PropItem, { component: componentId, componentVersion: version });
+    component.valueList = await em.find(PropValue, { component: componentId, componentVersion: version, type: PropValueType.Prototype });
 
     return component;
   }

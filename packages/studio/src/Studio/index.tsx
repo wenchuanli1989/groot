@@ -1,128 +1,79 @@
-import { APIPath, Application, ExtensionLevel, ExtensionRuntime, ExtensionStatus, GridLayout, Solution, StudioMode } from '@grootio/common';
-import { message } from 'antd';
-import { StudioParams } from 'index';
+import { ExtensionContext, GridLayout, GrootContextParams, loadRemoteModule } from '@grootio/common';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import request from 'util/request';
-import { launchExtension, loadExtension } from './groot';
+import { commandManager, createExtScriptModule, extHandler, hookManager, launchExtension, loadExtension, setGrootContext, stateManager } from './groot';
 import Workbench from './Workbench';
 
 
-/**
- * 1.加载解决方案或者应用信息 
- * 2.加载插件
- * 3.启动插件
- * 4.启动工作台
- **/
-const Studio: React.FC<StudioParams & { account: any }> & { Wrapper: React.FC<{ account: any }> } = (params) => {
-  const [loadStatus, setLoadStatus] = useState<'doing' | 'no-application' | 'no-solution' | 'no-instance' | 'fetch-extension' | 'notfound' | 'ok'>('doing');
+const Studio: React.FC<{ params: Record<string, string> } & { account: any }> & { Wrapper: React.FC<{ account: any }> } = (props) => {
   const [layout, setLayout] = useState<GridLayout>();
 
   useEffect(() => {
-    let fetchCoreDataPromise: Promise<Application | Solution>
-    let prototypeMode = params.mode === StudioMode.Prototype;
-    let extLevel = prototypeMode ? ExtensionLevel.Solution : ExtensionLevel.Application
+    loadRemoteModule('packageName', 'moduleName', 'assetUrl').then((extModule) => {
+      const layout = new GridLayout();
+      setLayout(layout);
 
-    if (prototypeMode) {
-      fetchCoreDataPromise = fetchSolution(params.solutionId)
-    } else {
-      fetchCoreDataPromise = fetchApplication(params.appId)
-    }
+      const grootParams = {
+        ...props.params,
+        account: props.account
+      } as GrootContextParams
 
-    fetchCoreDataPromise.then((data) => {
-      setLoadStatus('fetch-extension');
-
-      const solutionInstanceId = prototypeMode ? (data as Solution).id : 0
-      // todo 研究promise自动刷新视图
-      loadExtension(data.extensionInstanceList as ExtensionRuntime[], extLevel, solutionInstanceId).then(() => {
-        setLoadStatus('ok');
-        const layout = new GridLayout();
-        setLayout(layout);
-
-        launchExtension(data.extensionInstanceList as ExtensionRuntime[], {
-          mode: params.mode,
-          application: !prototypeMode ? data as Application : null,
-          solution: prototypeMode ? data as Solution : null,
-          account: params.account,
-          instanceId: params.instanceId,
-          componentId: params.componentId,
-          versionId: params.versionId
-        }, layout, extLevel)
-
-        layout.refresh()
+      setGrootContext(grootParams, layout, (extInstance) => {
+        if (extInstance.extensionVersion.propItemPipelineRaw) {
+          extInstance.propItemPipeline = createExtScriptModule(extInstance.extensionVersion.propItemPipelineRaw)
+          extInstance.propItemPipeline.id = extInstance.id;
+        }
+        if (extInstance.extensionVersion.resourcePipelineRaw) {
+          extInstance.resourcePipeline = createExtScriptModule(extInstance.extensionVersion.resourcePipelineRaw)
+          extInstance.resourcePipeline.id = extInstance.id;
+        }
       })
+
+      const requestClone = request.clone((type) => {
+        if (type === 'request') {
+          // ...
+        }
+      });
+
+      let readyCallback: Function
+      extModule.default({
+        params: grootParams,
+        layout,
+        extension: null,
+        request: requestClone,
+        groot: {
+          extHandler,
+          loadExtension,
+          launchExtension,
+          stateManager,
+          commandManager,
+          hookManager,
+          onReady: function (callback) {
+            readyCallback = callback
+          }
+        }
+      } as ExtensionContext)
+      readyCallback()
     })
-  }, []);
+  }, [])
 
-  const fetchSolution = (solutionId: number) => {
-    return request(APIPath.solution_detail_solutionId, { solutionId }).then(({ data }) => {
-      return data;
-    }).catch((e) => {
-      setLoadStatus('no-solution');
-      return Promise.reject(e);
-    })
-  }
+  return layout ? <Workbench layout={layout} /> : null
 
-  const fetchApplication = (applicationId: number) => {
-    return request(APIPath.application_detail_applicationId, { applicationId }).then(({ data }) => {
-      return data;
-    }).catch((e) => {
-      setLoadStatus('no-application');
-      return Promise.reject(e);
-    })
-  }
-
-
-  if (loadStatus === 'doing') {
-    return <>load data ...</>
-  } else if (loadStatus === 'notfound') {
-    return <>notfound component</>
-  } else if (loadStatus === 'fetch-extension') {
-    return <>load extension ...</>
-  } else {
-    return <Workbench layout={layout} />
-  }
 }
 
 Studio.Wrapper = (account) => {
-  const [searchParams] = useSearchParams();
+  // const [searchParams] = useSearchParams();
+  if (!account) {
+    return null
+  }
 
-  const [params] = useState(() => {
-    const mode = searchParams.get('mode') as StudioMode || StudioMode.Instance;
-    const solutionId = +searchParams.get('solutionId')
-    const appId = +searchParams.get('appId')
-    const componentId = +searchParams.get('componentId')
-    const instanceId = +searchParams.get('instanceId')
-    const releaseId = +searchParams.get('releaseId')
-    const versionId = +searchParams.get('versionId')
+  const searchParams = (location.search.substring(1) || '').split('&').reduce((searchMap, curr) => {
+    const [key, value] = curr.split('=')
+    searchMap[key] = value
+    return searchMap
+  }, {})
 
-    if (mode === StudioMode.Instance) {
-      if (!appId) {
-        setTimeout(() => {
-          message.warning('参数appId为空');
-        })
-        return null;
-      }
-    } else if (mode === StudioMode.Prototype) {
-      if (!solutionId) {
-        setTimeout(() => {
-          message.warning('参数solutionId为空');
-        })
-        return null;
-      }
-    }
-    return {
-      solutionId,
-      appId,
-      instanceId,
-      releaseId,
-      componentId,
-      mode,
-      versionId
-    }
-  })
-
-  return <Studio {...params} account={account} />
+  return <Studio params={searchParams as any} account={account} />
 }
 
 export default Studio;

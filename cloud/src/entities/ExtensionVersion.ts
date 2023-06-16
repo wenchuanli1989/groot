@@ -14,14 +14,14 @@ export class ExtensionVersion extends BaseEntity {
   defaultConfig?: LargeText;
 
   @Property({ length: 30, comment: 'webpack模块联邦包名' })
-  packageName: string;
+  packageName = '';
 
   @Property({ length: 30, comment: 'webpack模块联邦模块名' })
-  moduleName: string;
+  moduleName = '';
 
   // todo 保证扩展根据assetUrl全局唯一
   @Property({ length: 100, comment: 'webpack模块联邦暴露出来可访问js地址' })
-  assetUrl: string;
+  assetUrl = '';
 
   @OneToOne({ serializer: value => value?.text })
   propItemPipeline?: LargeText;
