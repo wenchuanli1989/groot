@@ -1,6 +1,6 @@
 import { BaseModel, IframeDebuggerConfig, iframeNamePrefix, Metadata, PostMessageType, PropTask, Resource, ResourceConfig, ResourceTask, ViewData, ViewDataCore } from "@grootio/common";
 
-import { commandBridge, getContext, grootManager, isPrototypeMode } from "context";
+import { commandBridge, getContext, grootManager } from "context";
 
 export default class WorkAreaModel extends BaseModel {
   static modelName = 'workArea';
@@ -86,7 +86,11 @@ export default class WorkAreaModel extends BaseModel {
       guard();
 
       const viewData = this.viewDataMap.get(viewKey)
-      callHook(PostMessageType.OuterSetView, viewData as any)
+      const data = {
+        viewKey,
+        ...viewData
+      }
+      callHook(PostMessageType.OuterSetView, data)
 
       if (this.pageNavCallback) {
         // 内部一般执行 组件刷新操作

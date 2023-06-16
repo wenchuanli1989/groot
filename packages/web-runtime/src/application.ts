@@ -79,7 +79,7 @@ function onMessage(event: any) {
     activeView.refresh()
   } else if (messageType === PostMessageType.OuterSetView) {
     const { viewKey } = event.data.data
-    const activeView = activeViewMap.get(viewKey)
+    const activeView = allViewMap.get(viewKey)
     activeView.initCallback(event.data.data)
   }
 

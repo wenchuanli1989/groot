@@ -198,6 +198,7 @@ export type GrootStateDict = {
 }
 
 export type GrootHookDict = {
+  'gh.startWork': [[], void],
   'gh.sidebar.dragStart': [[], void],
   'gh.sidebar.dragEnd': [[], void],
   'gh.component.dragStart': [[], void],
@@ -210,7 +211,7 @@ export type GrootHookDict = {
   [PostMessageType.OuterSetApplication]: [[ApplicationData] | [], void],
   [PostMessageType.InnerApplicationReady]: [[], void],
   [PostMessageType.InnerFetchView]: [[string], void],
-  [PostMessageType.OuterSetView]: [[{ viewKey: string, resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], metadataList: Metadata[], propTaskList: PropTask[] }], void],
+  [PostMessageType.OuterSetView]: [[{ viewKey: string } & ViewDataCore], void],
   [PostMessageType.OuterUpdateResource]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], viewKey: string }], void],
   [PostMessageType.OuterUpdateComponent]: [[{ metadataList: Metadata[], propTaskList: PropTask[], viewKey: string }], void],
 

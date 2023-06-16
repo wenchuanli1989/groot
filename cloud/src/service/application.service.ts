@@ -26,7 +26,8 @@ export class ApplicationService {
     app.release = wrap(release).toObject()
     app.extensionInstanceList = await em.find(ExtensionInstance, {
       relationId: releaseId,
-      relationType: ExtensionRelationType.Application
+      relationType: ExtensionRelationType.Application,
+      secret: false
     }, { populate: ['extension', 'extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw'] })
 
     let resourceList = await em.find(AppResource, { app, release }, { populate: ['imageResource.resourceConfig', 'resourceConfig'] })

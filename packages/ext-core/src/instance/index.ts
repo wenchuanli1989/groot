@@ -12,12 +12,25 @@ const entryCache = new Map<number, {
   resourceList: Resource[],
   resourceConfigList: ResourceConfig[]
 }>()
-let activeEntryIdSet: Set<number>
+const activeEntryIdSet = new Set<number>()
 let selectEntryId: number
 
 export const instanceBootstrap = () => {
 
   const { registerCommand } = grootManager.command
+  const { registerState } = grootManager.state
+
+  registerState('gs.release', null, false)
+  registerState('gs.app', null, false)
+  registerState('gs.entryList', null, true)
+  registerState('gs.globalResourceList', null, true)
+  registerState('gs.globalResourceConfigList', null, true)
+  registerState('gs.componentInstance', null, false)
+  registerState('gs.allComponentInstance', null, true)
+  registerState('gs.localResourceList', null, true)
+  registerState('gs.localResourceConfigList', null, true)
+  registerState('gs.entry', null, false)
+
 
   registerCommand('gc.createMetadata', (_, entryId) => {
     return createFullMetadata(entryId)
@@ -67,6 +80,7 @@ const onReady = () => {
 
       launchExtension(remoteExtensionList, ExtensionLevel.Application)
 
+      grootManager.hook.callHook('gh.startWork')
       getContext().layout.refresh()
     })
 
@@ -86,8 +100,8 @@ const createResource = (entryId: number) => {
       resourceTaskList
     }
   } else {
-    const resourceList = grootManager.state.getState('gs.globalResourceList')
-    const resourceConfigList = grootManager.state.getState('gs.globalResourceConfigList')
+    const resourceList = grootManager.state.getState('gs.globalResourceList')['__groot_origin']
+    const resourceConfigList = grootManager.state.getState('gs.globalResourceConfigList')['__groot_origin']
 
     const resourceTaskList = createResourceTaskList(resourceList)
     return {
@@ -182,8 +196,8 @@ const loadEntry = (entryId: number) => {
 
     // 顺序不能错
     const entryExtPromise = loadExtension({ remoteExtensionList: entryExtensionInstanceList, extLevel: ExtensionLevel.Entry, entryId })
-    const solutionExtPromiseList = solutionInstanceListSort.map(({ extensionInstanceList, solution }) => {
-      return loadExtension({ remoteExtensionList: extensionInstanceList, extLevel: ExtensionLevel.Solution, solutionId: solution.id, entryId })
+    const solutionExtPromiseList = solutionInstanceListSort.map(({ extensionInstanceList, solutionId }) => {
+      return loadExtension({ remoteExtensionList: extensionInstanceList, extLevel: ExtensionLevel.Solution, solutionId, entryId })
     })
 
     // 加载入口级扩展插件和解决方案级扩展插件

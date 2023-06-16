@@ -90,6 +90,7 @@ export class AssetService {
     const appExtensionInstanceList = await em.find(ExtensionInstance, {
       relationId: releaseId,
       relationType: ExtensionRelationType.Application,
+      secret: false
     }, { populate: ['extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw', 'extension'] })
     installPipelineModule({
       list: appExtensionInstanceList,
@@ -141,7 +142,8 @@ export class AssetService {
       // 加载实例级别插件
       const entryExtensionInstanceList = await em.find(ExtensionInstance, {
         relationId: entry.id,
-        relationType: ExtensionRelationType.Entry
+        relationType: ExtensionRelationType.Entry,
+        secret: false
       }, { populate: ['extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw', 'extension'] })
       installPipelineModule({ list: entryExtensionInstanceList, level: ExtensionLevel.Entry, extHandler })
       const entryResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.Entry, entry.id)
@@ -157,7 +159,8 @@ export class AssetService {
       for (const solutionInstance of [primarySolutionInstance, ...noPrimarySolutionInstanceList]) {
         const solutionExtensionInstanceList = await em.find(ExtensionInstance, {
           relationId: solutionInstance.solutionVersion.id,
-          relationType: ExtensionRelationType.Solution
+          relationType: ExtensionRelationType.Solution,
+          secret: false
         }, { populate: ['extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw', 'extension'] })
 
         const solutionId = solutionInstance.solution.id

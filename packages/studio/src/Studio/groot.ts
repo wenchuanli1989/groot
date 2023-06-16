@@ -1,4 +1,4 @@
-import { CommandManager, createExtensionHandler, ExtensionLevel, ExtensionRuntime, ExtensionStatus, ExtScriptModule, GridLayout, GrootContextCallHook, GrootContextExecuteCommand, GrootContextGetState, GrootContextParams, GrootContextRegisterCommand, GrootContextRegisterHook, GrootContextRegisterState, GrootContextSetState, GrootContextUseStateByName, GrootContextWatchState, HookManager, isBaseType, loadRemoteModule, MainFunction, StateManager, wrapperState } from "@grootio/common"
+import { CommandManager, createExtensionHandler, ExtensionLevel, ExtensionRuntime, ExtensionStatus, ExtScriptModule, GridLayout, GrootContextCallHook, GrootContextExecuteCommand, GrootContextGetState, GrootContextParams, GrootContextRegisterCommand, GrootContextRegisterHook, GrootContextRegisterState, GrootContextSetState, GrootContextUseStateByName, GrootContextWatchState, HookManager, isBaseType, loadRemoteModule, StateManager, wrapperState } from "@grootio/common"
 import { useEffect, useReducer } from "react";
 import request from "util/request";
 
@@ -17,6 +17,9 @@ export const setGrootContext = (grootParams: GrootContextParams, grootLayout: Gr
   _extProcess = extProcess
 }
 
+export const setRegistorReady = (ready: boolean) => {
+  registorReady = ready
+}
 
 export const loadExtension = ({ remoteExtensionList, extLevel, entryId, solutionId }: { remoteExtensionList: ExtensionRuntime[], extLevel: ExtensionLevel, entryId?: number, solutionId?: number }) => {
   remoteExtensionList.forEach(extInstance => {

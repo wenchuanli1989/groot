@@ -34,6 +34,7 @@ const onReady = () => {
 
       launchExtension(extensionInstanceList, ExtensionLevel.Application)
 
+      grootManager.hook.callHook('gh.startWork')
       getContext().layout.refresh()
     })
   })

@@ -1,14 +1,21 @@
 import { APIPath, ExtensionContext, GridLayout, GrootContextParams, StudioMode, loadRemoteModule } from '@grootio/common';
 import { useEffect, useState } from 'react';
 import request from 'util/request';
-import { commandManager, createExtScriptModule, extHandler, hookManager, launchExtension, loadExtension, setGrootContext, stateManager } from './groot';
+import { commandManager, createExtScriptModule, extHandler, hookManager, launchExtension, loadExtension, setGrootContext, setRegistorReady, stateManager } from './groot';
 import Workbench from './Workbench';
+
 
 
 const Studio: React.FC<{ params: Record<string, string> } & { account: any }> & { Wrapper: React.FC<{ account: any }> } = (props) => {
   const [layout, setLayout] = useState<GridLayout>();
+  const [startWork, setStartWork] = useState(false)
 
   useEffect(() => {
+
+    hookManager().registerHook('gh.startWork', () => {
+      setStartWork(true)
+    })
+
     request(APIPath.secretCore, {
       mode: props.params.mode as StudioMode,
       releaseId: props.params.releaseId,
@@ -46,6 +53,7 @@ const Studio: React.FC<{ params: Record<string, string> } & { account: any }> & 
         }
       });
 
+      setRegistorReady(false)
       let readyCallback: Function
       extModule.default({
         params: grootParams,
@@ -64,11 +72,12 @@ const Studio: React.FC<{ params: Record<string, string> } & { account: any }> & 
           }
         }
       } as ExtensionContext)
+      setRegistorReady(true)
       readyCallback()
     })
   }
 
-  return layout ? <Workbench layout={layout} /> : null
+  return layout && startWork ? <Workbench layout={layout} /> : null
 
 }
 
