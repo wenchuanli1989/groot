@@ -35,7 +35,7 @@ export const instanceBootstrap = () => {
   })
 
   groot.onReady(() => {
-    watchState('gs.componentInstance', updateBreadcrumbList)
+    watchState('gs.activeComponentInstance', updateBreadcrumbList)
   })
 }
 

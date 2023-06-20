@@ -129,7 +129,7 @@ function PropBlockPane({ block, freezeSetting, noWrapMode }: PropType) {
       if (!isPrototypeMode() && valueStruct === ValueStruct.ChildComponentList) {
         grootManager.command.executeCommand('gc.pushMetadata');
       } else {
-        const instanceId = grootManager.state.getState('gs.componentInstance')?.id
+        const instanceId = grootManager.state.getState('gs.activeComponentInstance')?.id
         grootManager.command.executeCommand('gc.pushMetadata', instanceId);
       }
     })
@@ -141,7 +141,7 @@ function PropBlockPane({ block, freezeSetting, noWrapMode }: PropType) {
   if (isPrototypeMode()) {
     formKey = `componentId:${component.id}|versionId:${component.componentVersion.id}`
   } else {
-    const instance = grootManager.state.getState('gs.componentInstance')
+    const instance = grootManager.state.getState('gs.activeComponentInstance')
     formKey = `releaseId:${grootManager.state.getState('gs.release').id}|instanceId:${instance.id}`;
   }
 

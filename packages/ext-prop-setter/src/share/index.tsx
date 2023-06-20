@@ -1,4 +1,4 @@
-import { commandBridge, getContext, grootManager, isPrototypeMode } from "context";
+import { getContext, grootManager, isPrototypeMode } from "context";
 import { PropSetter } from "./PropSetter";
 import FormRender from './FormRender'
 import { ViewsContainer } from "@grootio/common";
@@ -56,7 +56,7 @@ export const getComponentVersionId = () => {
   if (isPrototypeMode()) {
     componentVersionId = component.componentVersion.id;
   } else {
-    const componentInstance = grootManager.state.getState('gs.componentInstance');
+    const componentInstance = grootManager.state.getState('gs.activeComponentInstance');
     componentVersionId = componentInstance.componentVersion.id;
   }
 

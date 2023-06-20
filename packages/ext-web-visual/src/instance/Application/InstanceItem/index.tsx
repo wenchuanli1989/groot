@@ -4,7 +4,7 @@ import { grootManager } from "context";
 import styles from './index.module.less'
 
 const InstanceItem: React.FC<{ instance: ComponentInstance }> = ({ instance }) => {
-  const [currInstance] = grootManager.state.useStateByName('gs.componentInstance');
+  const [currInstance] = grootManager.state.useStateByName('gs.activeComponentInstance');
 
   return <div className={`${styles.componentItem} ${(currInstance.rootId || currInstance.id) === instance.id ? styles.active : ''}`}>
     <div className={styles.componentItemName}>

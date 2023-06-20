@@ -24,7 +24,7 @@ export default class ResourceModel extends BaseModel {
     const releaseId = grootManager.state.getState('gs.release').id
 
     if (this.isLocalResource) {
-      const componentInstanceId = grootManager.state.getState('gs.componentInstance').id
+      const componentInstanceId = grootManager.state.getState('gs.activeComponentInstance').id
       const data = rawResource as InstanceResource
       data.releaseId = releaseId
       data.componentInstanceId = componentInstanceId

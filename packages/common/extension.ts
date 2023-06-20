@@ -176,7 +176,7 @@ export type GrootStateDict = {
   'gs.entry': [ComponentInstance, false],
   'gs.localResourceList': [Resource, true],
   'gs.localResourceConfigList': [ResourceConfig, true],
-  'gs.componentInstance': [ComponentInstance, false],
+  'gs.activeComponentInstance': [ComponentInstance, false],
   'gs.allComponentInstance': [ComponentInstance, true],
 
   'gs.solution': [Solution, false],

@@ -67,7 +67,7 @@ export default class ApplicationModel extends BaseModel {
     return getContext().request(APIPath.release_add, rawRelease).then(({ data }) => {
       this.releaseList.push(data);
 
-      const currInstance = grootManager.state.getState('gs.componentInstance')
+      const currInstance = grootManager.state.getState('gs.activeComponentInstance')
       const rootInstanceId = currInstance.rootId || currInstance.id
 
       return this.switchRelease(data.id, rootInstanceId);

@@ -13,7 +13,7 @@ import DeployModal from "./DeployModal";
 import { grootManager } from "context";
 
 export const Application = () => {
-  const [currInstance] = grootManager.state.useStateByName('gs.componentInstance');
+  const [currInstance] = grootManager.state.useStateByName('gs.activeComponentInstance');
   const applicationModel = useRegisterModel(ApplicationModel)
   const [release] = grootManager.state.useStateByName('gs.release')
 

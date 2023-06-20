@@ -25,7 +25,7 @@ export const instanceBootstrap = () => {
   registerState('gs.entryList', null, true)
   registerState('gs.globalResourceList', null, true)
   registerState('gs.globalResourceConfigList', null, true)
-  registerState('gs.componentInstance', null, false)
+  registerState('gs.activeComponentInstance', null, false)
   registerState('gs.allComponentInstance', null, true)
   registerState('gs.localResourceList', null, true)
   registerState('gs.localResourceConfigList', null, true)
@@ -281,7 +281,6 @@ const switchComponentInstance = (instanceId: number, entryId?: number) => {
   if (selectEntryId !== entryId) {
     const { root, children, resourceList, resourceConfigList } = entryCache.get(entryId)
 
-    debugger
     setState('gs.allComponentInstance', [root, ...children])
     setState('gs.localResourceList', resourceList)
     setState('gs.localResourceConfigList', resourceConfigList)
@@ -292,6 +291,6 @@ const switchComponentInstance = (instanceId: number, entryId?: number) => {
 
   const list = grootManager.state.getState('gs.allComponentInstance');
   const instance = list.find(item => item.id === instanceId);
-  grootManager.state.setState('gs.componentInstance', instance);
+  grootManager.state.setState('gs.activeComponentInstance', instance);
   grootManager.state.setState('gs.component', instance.component);
 }

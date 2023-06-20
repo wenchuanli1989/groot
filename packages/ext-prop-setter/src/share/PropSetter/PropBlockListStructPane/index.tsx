@@ -152,7 +152,7 @@ const PropBlockListStructPane: React.FC<PropsType> = ({ block: propBlock }) => {
     });
 
     propPersistModel.updateValue({ propItem, value: changedValues[updateKey], abstractValueId: +abstractValueId }).then(() => {
-      const instanceId = grootManager.state.getState('gs.componentInstance')?.id
+      const instanceId = grootManager.state.getState('gs.activeComponentInstance')?.id
       grootManager.command.executeCommand('gc.pushMetadata', instanceId);
     })
   }
@@ -162,7 +162,7 @@ const PropBlockListStructPane: React.FC<PropsType> = ({ block: propBlock }) => {
   if (isPrototypeMode()) {
     formKey = `componentId:${component.id}|versionId:${component.componentVersion.id}`
   } else {
-    const instance = grootManager.state.getState('gs.componentInstance')
+    const instance = grootManager.state.getState('gs.activeComponentInstance')
     formKey = `releaseId:${grootManager.state.getState('gs.release').id}|instanceId:${instance.id}`;
   }
 

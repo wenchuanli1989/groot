@@ -1,5 +1,5 @@
 import { ComponentInstance, PropMetadataComponentItem, PropMetadataComponent, DragAddComponentEventData, getOrigin, PostMessageType, PropBlock, PropGroup, PropItem, PropValueType, ValueStruct, wrapperState, BaseModel, PropItemStruct, viewRender, FormItemRender } from "@grootio/common";
-import { commandBridge, grootManager, isPrototypeMode } from "context";
+import { grootManager, isPrototypeMode } from "context";
 import React from "react";
 
 import PropPersistModel from "./PropPersistModel";
@@ -267,7 +267,7 @@ export default class PropHandleModel extends BaseModel {
       grootManager.state.watchState('gs.component', this.propTreeListener.bind(this))
     } else {
       // 实例模式会多次调用
-      grootManager.state.watchState('gs.componentInstance', this.propTreeListener.bind(this))
+      grootManager.state.watchState('gs.activeComponentInstance', this.propTreeListener.bind(this))
     }
 
     grootManager.hook.registerHook(PostMessageType.InnerDragHitSlot, (detail) => {
@@ -376,7 +376,7 @@ export default class PropHandleModel extends BaseModel {
   public removeChild(instanceId: number, itemId: number, abstractValueIdChain?: string) {
     this.propPersist.removeChildInstance(instanceId, itemId, abstractValueIdChain).then(() => {
       const allComponentInstance = grootManager.state.getState('gs.allComponentInstance');
-      const componentInstance = grootManager.state.getState('gs.componentInstance');
+      const componentInstance = grootManager.state.getState('gs.activeComponentInstance');
 
       const instanceIndex = allComponentInstance.findIndex(i => i.id === instanceId);
       const instance = allComponentInstance[instanceIndex];

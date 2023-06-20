@@ -21,7 +21,7 @@ const ResourceForm: React.FC = () => {
     }
 
     if (!resourceModel.isLocalResource) {
-      form.setFieldValue('instanceId', grootManager.state.getState('gs.componentInstance').id);
+      form.setFieldValue('instanceId', grootManager.state.getState('gs.activeComponentInstance').id);
     }
   }, [resourceModel.formVisible]);
 
