@@ -44,9 +44,7 @@ export const shareBootstrap = () => {
     { label: '函数', value: 'function' },
   ], true)
 
-  grootManager.command.registerCommand('gc.pushPropItemToStack', (_, propItem) => {
-    commandBridge.pushPropItemToStack(propItem)
-  })
+
 }
 
 

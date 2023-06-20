@@ -1,11 +1,11 @@
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { PropItem, PropItemStruct, PropItemViewType } from "@grootio/common";
+import { PropItem, PropItemStruct, PropItemViewType, useModel } from "@grootio/common";
 import { Button, Checkbox, DatePicker, Form, Input, InputNumber, Radio, Select, Switch, SwitchProps, TimePicker, Tooltip } from "antd";
-import { grootManager } from "context";
 import dayjs from "dayjs";
 import ComponentChildren from "./ComponentChildren";
 import NumberSlider from "./NumberSlider";
 import TextEditor from "./TextEditor";
+import PropHandleModel from "share/PropSetter/PropHandleModel";
 
 type PropType = {
   formItemProps: any,
@@ -14,6 +14,8 @@ type PropType = {
 }
 
 const FormRender: React.FC<PropType> = ({ propItem, simplify, formItemProps, ...props }) => {
+  const propHandleModel = useModel(PropHandleModel);
+
   let field = <>未知类型</>
   let initialValue = formItemProps.initialValue ? JSON.parse(formItemProps.initialValue.replace(/\n|\r/mg, '')) : undefined;
 
@@ -43,11 +45,11 @@ const FormRender: React.FC<PropType> = ({ propItem, simplify, formItemProps, ...
     } else {
       if (propItem.struct === PropItemStruct.Flat) {
         field = <Button block onClick={() => {
-          grootManager.command.executeCommand('gc.pushPropItemToStack', propItem)
+          propHandleModel.pushPropItemToStack(propItem)
         }}>平铺</Button>
       } else if (propItem.struct === PropItemStruct.Hierarchy) {
         field = <Button block onClick={() => {
-          grootManager.command.executeCommand('gc.pushPropItemToStack', propItem)
+          propHandleModel.pushPropItemToStack(propItem)
         }}>层级</Button>
       } else if (propItem.struct === PropItemStruct.Component) {
         field = <ComponentChildren {...props} />

@@ -18,10 +18,8 @@ export const Application = () => {
   const [release] = grootManager.state.useStateByName('gs.release')
 
   useEffect(() => {
-    if (currInstance) {
-      applicationModel.init()
-    }
-  }, [currInstance])
+    applicationModel.init()
+  }, [])
 
   const switchEntry = (instance: ComponentInstance) => {
     grootManager.command.executeCommand('gc.switchEntry', instance.id)

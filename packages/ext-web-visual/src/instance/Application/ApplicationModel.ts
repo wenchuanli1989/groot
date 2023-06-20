@@ -21,6 +21,14 @@ export default class ApplicationModel extends BaseModel {
       this.releaseList = data;
     })
 
+    const entryList = grootManager.state.getState('gs.entryList')
+    entryList.forEach(item => {
+      if (item.mainEntry) {
+        this.mainEntryInstanceList.push(item)
+      } else {
+        this.entryInstanceList.push(item)
+      }
+    })
   }
 
   public addEntry(rawComponentInstance: ComponentInstance) {

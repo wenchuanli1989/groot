@@ -288,7 +288,6 @@ export default class PropHandleModel extends BaseModel {
       this.propItemViewTypeObj[item.label] = item.value
     })
 
-    commandBridge.pushPropItemToStack = this.pushPropItemToStack.bind(this)
   }
 
   private propTreeListener(newValue: { propTree: PropGroup[] }, event) {

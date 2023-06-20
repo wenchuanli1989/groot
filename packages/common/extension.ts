@@ -142,7 +142,6 @@ export type GrootCommandDict = {
   'gc.unloadEntry': [[number], void],
   'gc.loadComponent': [[number], Promise<{ component: Component, metadataList: Metadata[], propTaskList: PropTask[] }>],
 
-  'gc.pushPropItemToStack': [[PropItem], void]
 }
 
 export type GrootStateDict = {

@@ -248,7 +248,7 @@ const switchEntry = (entryId: number, mainEntry = true) => {
 const unloadEntry = (entryId: number) => {
   const { groot: { extHandler } } = getContext();
 
-  Array.from(extHandler.solutionExt.get(entryId).entries()).forEach(([solutionId, solutionExtMap]) => {
+  [...(extHandler.solutionExt.get(entryId)?.entries() || [])].forEach(([solutionId, solutionExtMap]) => {
     [...solutionExtMap.values()].forEach(ext => {
       extHandler.uninstall({
         extInstanceId: ext.instance.id,
@@ -259,7 +259,7 @@ const unloadEntry = (entryId: number) => {
     })
   });
 
-  [...extHandler.entryExt.get(entryId).values()].forEach((ext) => {
+  [...(extHandler.entryExt.get(entryId)?.values() || [])].forEach((ext) => {
     extHandler.uninstall({
       extInstanceId: ext.instance.id,
       level: ExtensionLevel.Entry,
@@ -281,6 +281,7 @@ const switchComponentInstance = (instanceId: number, entryId?: number) => {
   if (selectEntryId !== entryId) {
     const { root, children, resourceList, resourceConfigList } = entryCache.get(entryId)
 
+    debugger
     setState('gs.allComponentInstance', [root, ...children])
     setState('gs.localResourceList', resourceList)
     setState('gs.localResourceConfigList', resourceConfigList)

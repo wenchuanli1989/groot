@@ -9,6 +9,7 @@ import Workbench from './Workbench';
 const Studio: React.FC<{ params: Record<string, string> } & { account: any }> & { Wrapper: React.FC<{ account: any }> } = (props) => {
   const [layout, setLayout] = useState<GridLayout>();
   const [startWork, setStartWork] = useState(false)
+  const mode = props.params.mode as StudioMode || StudioMode.Instance
 
   useEffect(() => {
 
@@ -17,7 +18,7 @@ const Studio: React.FC<{ params: Record<string, string> } & { account: any }> & 
     })
 
     request(APIPath.secretCore, {
-      mode: props.params.mode as StudioMode,
+      mode,
       releaseId: props.params.releaseId,
       solutionVersionId: props.params.solutionVersionId
     }).then(({ data: extInstance }) => {
@@ -27,12 +28,14 @@ const Studio: React.FC<{ params: Record<string, string> } & { account: any }> & 
   }, [])
 
   const loadCoreExt = (packageName: string, moduleName: string, assetUrl: string) => {
+
     loadRemoteModule(packageName, moduleName, assetUrl).then((extModule) => {
       const layout = new GridLayout();
       setLayout(layout);
 
       const grootParams = {
         ...props.params,
+        mode,
         account: props.account
       } as GrootContextParams
 

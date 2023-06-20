@@ -28,7 +28,5 @@ export const isPrototypeMode = () => {
 }
 
 export const commandBridge = {
-  pushPropItemToStack: (propItem: PropItem): void => {
-    throw new Error('方法未实现')
-  }
+
 }
