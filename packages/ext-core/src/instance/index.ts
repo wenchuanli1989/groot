@@ -80,7 +80,7 @@ const onReady = () => {
 
       launchExtension(remoteExtensionList, ExtensionLevel.Application)
 
-      grootManager.hook.callHook('gh.startWork')
+      grootManager.hook.callHook('gh.allReady')
       getContext().layout.refresh()
     })
 

@@ -12,7 +12,7 @@ const Studio: React.FC<{ params: Record<string, string> } & { account: any }> & 
 
   useEffect(() => {
 
-    hookManager().registerHook('gh.startWork', () => {
+    hookManager().registerHook('gh.allReady', () => {
       setStartWork(true)
     })
 

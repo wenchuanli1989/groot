@@ -26,7 +26,7 @@ export const shareBootstrap = () => {
     }
   ], true)
 
-  registerState('gs.ui.stageViewport', 'desktop', false)
+  registerState('gs.ui.stage.viewport', 'desktop', false)
 
 
   grootManager.command.registerCommand('gc.stageRefresh', (_, viewKey, data, callback) => {

@@ -131,23 +131,16 @@ export type GrootCommandDict = {
   'gc.ui.render.panel': [[], ReactElement | null],
   'gc.ui.render.statusBar': [[], ReactElement | null],
 
-  'gc.loadEntry': [[number], Promise<ViewDataCore>],
   'gc.switchEntry': [[number, boolean] | [number], void],
-  'gc.unloadEntry': [[number], void],
-  'gc.loadComponent': [[number], Promise<{
-    component: Component,
-    metadataList: Metadata[],
-    propTaskList: PropTask[]
-  }>]
-
-
+  'gc.loadEntry': [[number], Promise<ViewDataCore>],
+  'gc.switchIstance': [[number, number] | [number], void],
   'gc.createMetadata': [[number] | [], { metadataList: Metadata[], propTaskList: PropTask[] }],
   'gc.createResource': [[number] | [], { resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[] }],
   'gc.pushMetadata': [[] | [number] | [], void],
   'gc.pushResource': [[number] | [], void],
-
-  'gc.switchIstance': [[number, number] | [number], void],
   'gc.stageRefresh': [[string, ViewDataCore, Function] | [string, ViewDataCore], void],
+  'gc.unloadEntry': [[number], void],
+  'gc.loadComponent': [[number], Promise<{ component: Component, metadataList: Metadata[], propTaskList: PropTask[] }>],
 
   'gc.pushPropItemToStack': [[PropItem], void]
 }
@@ -171,7 +164,8 @@ export type GrootStateDict = {
   'gs.ui.secondarySidebar.active': [string, false],
   'gs.ui.stage.active': [string, false],
   'gs.ui.panel.viewsContainers': [string, true],
-  'gs.ui.stageViewport': ['desktop' | 'mobile', false],
+  'gs.ui.panel.active': [string, false],
+  'gs.ui.stage.viewport': ['desktop' | 'mobile', false],
   'gs.ui.banner.views': [{ id: string, placement: 'left' | 'center' | 'right' }, true],
   // 'gs.ui.propSettingViews': [{ name: string, remotePackage: string, remoteUrl: string, remoteModule: string }, true],
 
@@ -189,16 +183,17 @@ export type GrootStateDict = {
   'gs.solution': [Solution, false],
   'gs.component': [Component, false],
 
+  'gs.stage.playgroundPath': [string, false],
+  'gs.stage.debugBaseUrl': [string, false],
+
   'gs.propItem.viewTypeList': [{ label: string, value: string }, true],
   'gs.propItem.formRenderList': [{ viewType: string, render: React.FC<FormItemRender> }, true],
   'gs.propItem.settingRenderList': [{ viewType: string, render: React.FC<FormItemRender> }, true],
   'gs.propSetting.breadcrumbList': [{ id: number, name: string }, true],
-  'gs.stage.playgroundPath': [string, false],
-  'gs.stage.debugBaseUrl': [string, false],
 }
 
 export type GrootHookDict = {
-  'gh.startWork': [[], void],
+  'gh.allReady': [[], void],
   'gh.sidebar.dragStart': [[], void],
   'gh.sidebar.dragEnd': [[], void],
   'gh.component.dragStart': [[], void],
@@ -217,15 +212,17 @@ export type GrootHookDict = {
 
   [PostMessageType.OuterDragComponentEnter]: [[], void],
   [PostMessageType.OuterDragComponentOver]: [[{ positionX: number, positionY: number }], void],
+  [PostMessageType.InnerUpdateDragAnchor]: [[ComponentDragAnchor], void],
+  [PostMessageType.OuterDragComponentDrop]: [[{ positionX: number, positionY: number, componentId: number }], void],
   [PostMessageType.InnerDragHitSlot]: [[DragAddComponentEventData], void],
   [PostMessageType.OuterDragComponentLeave]: [[], void],
-  [PostMessageType.OuterDragComponentDrop]: [[{ positionX: number, positionY: number, componentId: number }], void],
+
   [PostMessageType.InnerOutlineHover]: [[ComponentAnchor], void],
-  [PostMessageType.InnerUpdateDragAnchor]: [[ComponentDragAnchor], void],
   [PostMessageType.InnerOutlineSelect]: [[ComponentAnchor], void],
+  [PostMessageType.InnerOutlineUpdate]: [[{ selected: ComponentAnchor, hover: ComponentAnchor }], void],
+
   [PostMessageType.OuterComponentSelect]: [[number], void],
   [PostMessageType.OuterOutlineReset]: [['hover' | 'selected'] | [], void],
-  [PostMessageType.InnerOutlineUpdate]: [[{ selected: ComponentAnchor, hover: ComponentAnchor }], void],
 
   [PostMessageType.OuterRefreshView]: [[string], void]
 }
