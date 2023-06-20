@@ -322,7 +322,7 @@ export default class PropHandleModel extends BaseModel {
     } as ComponentInstance;
 
     this.propPersist.addChildComponentInstance(rawInstance).then((instanceData) => {
-      grootManager.state.getState('gs.allComponentInstance').push(instanceData)
+      grootManager.state.getState('gs.entry').children.push(instanceData)
 
       const propItem = this.getItemById(data.propItemId, data.parentInstanceId);
       const propValue = propItem.valueList.filter(v => v.type === PropValueType.Instance).find(value => {
@@ -375,12 +375,12 @@ export default class PropHandleModel extends BaseModel {
 
   public removeChild(instanceId: number, itemId: number, abstractValueIdChain?: string) {
     this.propPersist.removeChildInstance(instanceId, itemId, abstractValueIdChain).then(() => {
-      const allComponentInstance = grootManager.state.getState('gs.allComponentInstance');
+      const { children } = grootManager.state.getState('gs.entry');
       const componentInstance = grootManager.state.getState('gs.activeComponentInstance');
 
-      const instanceIndex = allComponentInstance.findIndex(i => i.id === instanceId);
-      const instance = allComponentInstance[instanceIndex];
-      allComponentInstance.splice(instanceIndex, 1);
+      const instanceIndex = children.findIndex(i => i.id === instanceId);
+      const instance = children[instanceIndex];
+      children.splice(instanceIndex, 1);
 
       if (instance.parentId && instance.parentId !== instance.rootId) {
         if (componentInstance.id === instanceId) {
@@ -410,8 +410,8 @@ export default class PropHandleModel extends BaseModel {
   }
 
   private getItemById(propItemId: number, instanceId: number) {
-    const allComponentInstance = grootManager.state.getState('gs.allComponentInstance');
-    const instance = allComponentInstance.find(item => item.id === instanceId);
+    const { root, children } = grootManager.state.getState('gs.entry');
+    const instance = [root, ...children].find(item => item.id === instanceId);
 
     if (!instance) {
       return null;

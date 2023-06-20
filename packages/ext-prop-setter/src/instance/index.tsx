@@ -11,7 +11,7 @@ export const instanceBootstrap = () => {
   registerState('gs.propSetting.breadcrumbList', [], true)
 
   registerCommand('gc.pushMetadata', (_, instanceId) => {
-    const entryId = grootManager.state.getState('gs.entry').id
+    const entryId = grootManager.state.getState('gs.entry').root.id
     const data = executeCommand('gc.createMetadata', entryId)
     const entry = getState('gs.entryList').find(item => item.id === entryId)
     callHook(PostMessageType.OuterUpdateComponent, {
@@ -42,7 +42,8 @@ export const instanceBootstrap = () => {
 
 const updateBreadcrumbList = (newInstance: ComponentInstance) => {
   const { getState } = grootManager.state
-  const list = getState('gs.allComponentInstance')
+  const { root, children } = getState('gs.entry')
+  const list = [root, ...children]
   const breadcrumbList = grootManager.state.getState('gs.propSetting.breadcrumbList')
   breadcrumbList.length = 0;
 

@@ -395,14 +395,14 @@ export default class PropPersistModel extends BaseModel {
         paramData.type = PropValueType.Prototype;
       } else {
         const componentInstance = grootManager.state.getState('gs.activeComponentInstance')
-        const allComponentInstance = grootManager.state.getState('gs.allComponentInstance')
+        const { root, children } = grootManager.state.getState('gs.entry')
         paramData.type = PropValueType.Instance;
         paramData.releaseId = grootManager.state.getState('gs.release').id
         paramData.componentInstanceId = componentInstance.id;
 
         if (hostComponentInstanceId) {
           paramData.componentInstanceId = hostComponentInstanceId;
-          const instance = allComponentInstance.find(item => item.id === hostComponentInstanceId);
+          const instance = [root, ...children].find(item => item.id === hostComponentInstanceId);
           paramData.componentId = instance.component.id;
           paramData.componentVersionId = instance.componentVersion.id;
         }
@@ -427,12 +427,14 @@ export default class PropPersistModel extends BaseModel {
   }
 
   public removeChildInstance(instanceId: number, itemId: number, abstractValueIdChain?: string) {
-    const allComponentInstance = grootManager.state.getState('gs.allComponentInstance')
 
     return this.request(APIPath.componentInstance_remove_instanceId, { instanceId }).then(() => {
+      const { root, children } = grootManager.state.getState('gs.entry')
+      const list = [root, ...children]
+
       let propItem;
-      for (let index = 0; index < allComponentInstance.length; index++) {
-        const instance = allComponentInstance[index];
+      for (let index = 0; index < list.length; index++) {
+        const instance = list[index];
         propItem = this.propHandle.getPropItem(itemId, [null], instance.propTree);
         if (propItem) {
           break;

@@ -1,4 +1,4 @@
-import { APIPath, ComponentInstance, ExtensionInstance, ExtensionLevel, ExtensionRuntime, ExtensionStatus, PropBlockStructType, PropGroup, PropItemPipelineParams, Release, Resource, ResourceConfig, SolutionInstance, propAppendTask } from "@grootio/common"
+import { APIPath, ComponentInstance, ExtensionInstance, ExtensionLevel, PropBlockStructType, PropGroup, PropItemPipelineParams, Release, Resource, ResourceConfig, SolutionInstance, propAppendTask } from "@grootio/common"
 import { metadataFactory, pipelineExec, propTreeFactory } from '@grootio/core'
 import { getContext, grootManager } from "context"
 import { parseOptions } from "../util"
@@ -26,7 +26,6 @@ export const instanceBootstrap = () => {
   registerState('gs.globalResourceList', null, true)
   registerState('gs.globalResourceConfigList', null, true)
   registerState('gs.activeComponentInstance', null, false)
-  registerState('gs.allComponentInstance', null, true)
   registerState('gs.localResourceList', null, true)
   registerState('gs.localResourceConfigList', null, true)
   registerState('gs.entry', null, false)
@@ -278,19 +277,18 @@ const switchComponentInstance = (instanceId: number, entryId?: number) => {
     throw new Error(`未找到entry: ${entryId}`)
   }
 
+  const entry = entryCache.get(entryId)
   if (selectEntryId !== entryId) {
-    const { root, children, resourceList, resourceConfigList } = entryCache.get(entryId)
+    const { root, children, resourceList, resourceConfigList } = entry
 
-    setState('gs.allComponentInstance', [root, ...children])
     setState('gs.localResourceList', resourceList)
     setState('gs.localResourceConfigList', resourceConfigList)
 
     selectEntryId = entryId
-    setState('gs.entry', root)
+    setState('gs.entry', { root, children })
   }
 
-  const list = grootManager.state.getState('gs.allComponentInstance');
-  const instance = list.find(item => item.id === instanceId);
+  const instance = [entry.root, ...entry.children].find(item => item.id === instanceId);
   grootManager.state.setState('gs.activeComponentInstance', instance);
   grootManager.state.setState('gs.component', instance.component);
 }

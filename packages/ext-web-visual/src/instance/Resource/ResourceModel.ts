@@ -31,7 +31,7 @@ export default class ResourceModel extends BaseModel {
       getContext().request(APIPath.resource_add_instance_resource, data).then((res) => {
         const localSttateList = grootManager.state.getState('gs.localResourceList');
         localSttateList.push(res.data as Resource);
-        const entryId = grootManager.state.getState('gs.entry').id
+        const entryId = grootManager.state.getState('gs.entry').root.id
         grootManager.command.executeCommand('gc.pushResource', entryId)
         this.hideForm();
       })
@@ -54,7 +54,7 @@ export default class ResourceModel extends BaseModel {
       const list = this.isLocalResource ? grootManager.state.getState('gs.localResourceList') : grootManager.state.getState('gs.globalResourceList') as any[];
       const originResource = list.find(item => item.id === this.currResource.id);
       Object.assign(originResource, pick(res.data, ['type', 'name', 'value']));
-      const entryId = this.isLocalResource ? grootManager.state.getState('gs.entry').id : undefined
+      const entryId = this.isLocalResource ? grootManager.state.getState('gs.entry').root.id : undefined
       grootManager.command.executeCommand('gc.pushResource', entryId)
       this.hideForm();
     });
@@ -69,7 +69,7 @@ export default class ResourceModel extends BaseModel {
       if (index !== -1) {
         list.splice(index, 1);
       }
-      const entryId = this.isLocalResource ? grootManager.state.getState('gs.entry').id : undefined
+      const entryId = this.isLocalResource ? grootManager.state.getState('gs.entry').root.id : undefined
       grootManager.command.executeCommand('gc.pushResource', entryId)
       this.hideForm();
     });
