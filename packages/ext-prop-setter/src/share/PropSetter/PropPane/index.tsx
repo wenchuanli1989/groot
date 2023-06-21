@@ -5,7 +5,7 @@ import { Tabs, Typography } from "antd";
 import PropGroupPane from "../PropGroupPane";
 import PropBlockPane from "../PropBlockPane";
 import PropGroupToolBar from "../PropGroupToolBar";
-import { isPrototypeMode } from "context";
+import { grootManager, isPrototypeMode } from "context";
 import PropHandleModel from "../PropHandleModel";
 import PropPersistModel from "../PropPersistModel";
 import { autoIncrementForName } from "util/index";
@@ -15,6 +15,8 @@ import styles from './index.module.less'
 function PropPane() {
   const propHandleModel = useModel(PropHandleModel);
   const propPersistModel = useModel(PropPersistModel);
+  const [activeGroupId] = grootManager.state.useStateByName('gs.activePropGroupId')
+  const [propTree] = grootManager.state.useStateByName('gs.propTree')
 
   const renderTabBarItem = (group: PropGroup) => {
     return <div>{group.name}<i className="highlight" hidden={!group.highlight} /></div>;
@@ -28,7 +30,7 @@ function PropPane() {
       return;
     }
 
-    const nameSuffix = autoIncrementForName(propHandleModel.propTree.map(g => g.name));
+    const nameSuffix = autoIncrementForName(propTree.map(g => g.name));
     // 显示分组弹框
     propPersistModel.currSettingPropGroup = {
       name: `配置组${nameSuffix}`,
@@ -36,7 +38,8 @@ function PropPane() {
   }
 
   const createTabItems = () => {
-    const list = propHandleModel.propTree.map((group) => {
+
+    const list = propTree.map((group) => {
       let content = <PropGroupPane group={group} key={`group-${group.id}-${propHandleModel.forceUpdateFormKey}`} />;
       if (group.struct === PropGroupStructType.Flat) {
         content = <PropBlockPane noWrapMode block={group.propBlockList[0]} key={`block-${group.propBlockList[0].id}-${propHandleModel.forceUpdateFormKey}`} />;
@@ -57,7 +60,7 @@ function PropPane() {
 
   /////////////////////////////////////////////////////////////////////////////
   return <div className={styles.container}>
-    <Tabs size="small" activeKey={propHandleModel.activeGroupId?.toString()}
+    <Tabs size="small" activeKey={activeGroupId?.toString()}
       onChange={tabOnChange} tabBarExtraContent={<PropGroupToolBar />} items={createTabItems() as any} />
   </div>
 }

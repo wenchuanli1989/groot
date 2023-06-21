@@ -290,5 +290,7 @@ const switchComponentInstance = (instanceId: number, entryId?: number) => {
 
   const instance = [entry.root, ...entry.children].find(item => item.id === instanceId);
   grootManager.state.setState('gs.activeComponentInstance', instance);
+  grootManager.state.setState('gs.propTree', instance.propTree)
+  grootManager.state.setState('gs.activePropGroupId', instance.propTree[0].id)
   grootManager.state.setState('gs.component', instance.component);
 }

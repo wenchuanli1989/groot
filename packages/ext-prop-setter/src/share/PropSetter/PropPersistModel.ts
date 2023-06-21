@@ -71,27 +71,28 @@ export default class PropPersistModel extends BaseModel {
       targetId: hoverId === '__add' ? null : +hoverId,
       type: 'group'
     }).then(() => {
-      const groups = this.propHandle.propTree;
+      const groups = grootManager.state.getState('gs.propTree')
+      const activeGroupId = grootManager.state.getState('gs.activePropGroupId')
 
       const drag = groups.find(g => g.id === +dragId)!;
       const hoverIndex = hoverId === '__add' ? groups.length : groups.findIndex(g => g.id === +hoverId);
       const dragIndex = groups.findIndex(g => g.id === +dragId);
-      const currentIndex = groups.findIndex(g => g.id === this.propHandle.activeGroupId);
+      const currentIndex = groups.findIndex(g => g.id === activeGroupId);
 
       groups.splice(hoverIndex, 0, drag);
 
       if (hoverIndex < dragIndex) {
         groups.splice(dragIndex + 1, 1);
         if (currentIndex >= hoverIndex && currentIndex < dragIndex) {
-          this.propHandle.activeGroupId = groups[currentIndex + 1].id;
+          grootManager.state.setState('gs.activePropGroupId', groups[currentIndex + 1].id)
         } else if (currentIndex === dragIndex) {
-          this.propHandle.activeGroupId = +hoverId
+          grootManager.state.setState('gs.activePropGroupId', +hoverId)
         }
       } else {
         if (currentIndex === dragIndex && currentIndex < hoverIndex) {
-          this.propHandle.activeGroupId = groups[currentIndex - 1]?.id
+          grootManager.state.setState('gs.activePropGroupId', groups[currentIndex - 1]?.id)
         } else if (currentIndex === dragIndex) {
-          this.propHandle.activeGroupId = groups[hoverIndex - 1]?.id
+          grootManager.state.setState('gs.activePropGroupId', groups[hoverIndex - 1]?.id)
         }
         groups.splice(dragIndex, 1);
       }
@@ -128,8 +129,9 @@ export default class PropPersistModel extends BaseModel {
     this.settingModalSubmitting = true;
     if (groupData.id) {
       this.request(APIPath.group_update, groupData).then(() => {
-        let groupIndex = this.propHandle.propTree.findIndex(g => g.id === groupData.id);
-        assignBaseType(this.propHandle.propTree[groupIndex], groupData);
+        const propTree = grootManager.state.getState('gs.propTree')
+        let groupIndex = propTree.findIndex(g => g.id === groupData.id);
+        assignBaseType(propTree[groupIndex], groupData);
 
         this.currSettingPropGroup = undefined;
         const instanceId = grootManager.state.getState('gs.activeComponentInstance')?.id
@@ -141,8 +143,9 @@ export default class PropPersistModel extends BaseModel {
       this.request(APIPath.group_add, groupData).then(({ data: { newGroup, extra } }) => {
         newGroup.expandBlockIdList = [];
         newGroup.propBlockList = [];
-        this.propHandle.propTree.push(newGroup);
-        this.propHandle.activeGroupId = newGroup.id;
+        const propTree = grootManager.state.getState('gs.propTree')
+        propTree.push(newGroup);
+        grootManager.state.setState('gs.activePropGroupId', newGroup.id)
 
         // 补充新创建配置块相关属性
         if (extra?.newBlock) {
@@ -256,11 +259,13 @@ export default class PropPersistModel extends BaseModel {
 
   public delGroup(groupId: number) {
     this.request(APIPath.group_remove_groupId, { groupId }).then(() => {
-      const index = this.propHandle.propTree.findIndex(g => g.id === groupId);
-      this.propHandle.propTree.splice(index, 1);
+      const propTree = grootManager.state.getState('gs.propTree')
+      const index = propTree.findIndex(g => g.id === groupId);
+      propTree.splice(index, 1);
 
-      if (this.propHandle.activeGroupId === groupId) {
-        this.propHandle.activeGroupId = this.propHandle.propTree[0]?.id
+      const activeGroupId = grootManager.state.getState('gs.activePropGroupId')
+      if (activeGroupId === groupId) {
+        grootManager.state.setState('gs.activePropGroupId', propTree[0]?.id)
       }
       grootManager.command.executeCommand('gc.pushMetadata');
     })

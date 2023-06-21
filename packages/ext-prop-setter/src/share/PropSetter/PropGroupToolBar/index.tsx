@@ -7,18 +7,20 @@ import { pick, PropGroup, useModel } from "@grootio/common";
 import styles from './index.module.less';
 import PropPersistModel from "../PropPersistModel";
 import PropHandleModel from "../PropHandleModel";
-import { isPrototypeMode } from "context";
+import { grootManager, isPrototypeMode } from "context";
 
 const PropGroupToolBar: React.FC = () => {
   const propPersistModel = useModel(PropPersistModel);
   const propHandleModel = useModel(PropHandleModel);
+  const [activeGroupId] = grootManager.state.useStateByName('gs.activePropGroupId')
+  const [propTree] = grootManager.state.useStateByName('gs.propTree')
 
   const [group, setGroup] = useState<PropGroup>();
 
   useEffect(() => {
-    const group = propHandleModel.getPropGroup(propHandleModel.activeGroupId);
+    const group = propHandleModel.getPropGroup(activeGroupId);
     setGroup(group);
-  }, [propHandleModel.activeGroupId]);
+  }, [activeGroupId]);
 
   if (!isPrototypeMode() || !group) {
     return null;
@@ -33,7 +35,7 @@ const PropGroupToolBar: React.FC = () => {
         <EditOutlined />
       </Typography.Link>
 
-      <Typography.Link disabled={propHandleModel.propTree.length === 1} onClick={() => {
+      <Typography.Link disabled={propTree.length === 1} onClick={() => {
         propPersistModel.delGroup(group.id);
       }}>
         <DeleteOutlined />

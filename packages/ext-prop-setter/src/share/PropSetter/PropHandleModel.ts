@@ -1,5 +1,5 @@
 import { ComponentInstance, PropMetadataComponentItem, PropMetadataComponent, DragAddComponentEventData, getOrigin, PostMessageType, PropBlock, PropGroup, PropItem, PropValueType, ValueStruct, wrapperState, BaseModel, PropItemStruct, viewRender, FormItemRender } from "@grootio/common";
-import { grootManager, isPrototypeMode } from "context";
+import { grootManager } from "context";
 import React from "react";
 
 import PropPersistModel from "./PropPersistModel";
@@ -16,15 +16,6 @@ export default class PropHandleModel extends BaseModel {
    * 级联属性分组
    */
   public propItemStack: PropItem[] = [];
-  /**
-   * 当前选中的分组
-   */
-  public activeGroupId?: number;
-  /**
-   * 根属性分组
-   */
-  public propTree: PropGroup[] = [];
-  private propTreeCancel: Function;
   public propPathChainEle: HTMLElement;
 
   public propItemViewTypeObj = {} as Record<string, string>;
@@ -133,15 +124,16 @@ export default class PropHandleModel extends BaseModel {
   }
 
   public switchActiveGroup(id: number) {
-
-    const group = this.propTree.find(g => g.id === id);
+    const propTree = grootManager.state.getState('gs.propTree')
+    const group = propTree.find(g => g.id === id);
     if (!group) {
       return
     }
 
-    const preActiveGroup = this.propTree.find(g => g.id === this.activeGroupId);
+    const activeGroupId = grootManager.state.getState('gs.activePropGroupId')
+    const preActiveGroup = propTree.find(g => g.id === activeGroupId);
     preActiveGroup.templateDesignMode = false;
-    this.activeGroupId = id;
+    grootManager.state.setState('gs.activePropGroupId', id)
   }
 
 
@@ -177,7 +169,7 @@ export default class PropHandleModel extends BaseModel {
       pathChain = [] as any;
     }
 
-    const rootGroupList = propTree || this.propTree;
+    const rootGroupList = propTree || grootManager.state.getState('gs.propTree');
     for (let index = 0; index < rootGroupList.length; index++) {
       const rootGroup = rootGroupList[index];
 
@@ -263,12 +255,6 @@ export default class PropHandleModel extends BaseModel {
   }
 
   private init() {
-    if (isPrototypeMode()) {
-      grootManager.state.watchState('gs.component', this.propTreeListener.bind(this))
-    } else {
-      // 实例模式会多次调用
-      grootManager.state.watchState('gs.activeComponentInstance', this.propTreeListener.bind(this))
-    }
 
     grootManager.hook.registerHook(PostMessageType.InnerDragHitSlot, (detail) => {
       this.addChildComponent(detail);
@@ -290,28 +276,6 @@ export default class PropHandleModel extends BaseModel {
 
   }
 
-  private propTreeListener(newValue: { propTree: PropGroup[] }, event) {
-    if (newValue?.propTree && event.directChange) {
-      const originPropTree = getOrigin(newValue.propTree)
-
-      // 擦除外部包裹的代理对象，取内部原生对象，避免外部代理对象不能监听对象属性变化
-      if (originPropTree !== getOrigin(this.propTree)) {
-        if (this.propTreeCancel) {
-          this.propTreeCancel()
-        }
-
-        const [propTree, propTreeCancel] = wrapperState(originPropTree, () => {
-          this.emitter('propTree change ');
-        })
-        this.propTree = propTree;
-        this.propTreeCancel = propTreeCancel;
-
-        if (!this.propTree.map(item => item.id).includes(this.activeGroupId)) {
-          this.activeGroupId = this.propTree[0].id;
-        }
-      }
-    }
-  }
 
   private addChildComponent(data: DragAddComponentEventData) {
     const rawInstance = {

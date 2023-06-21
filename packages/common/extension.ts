@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import React from "react";
 import { APIStore } from "./api/API.store";
-import { Application, Component, ComponentInstance, ExtensionInstance, PropItem, Release, Resource, ResourceConfig, Solution } from "./entities";
+import { Application, Component, ComponentInstance, ExtensionInstance, PropGroup, PropItem, Release, Resource, ResourceConfig, Solution } from "./entities";
 import { GridLayout } from "./GridLayout";
 import { ApplicationData, Metadata, ViewDataCore } from "./internal";
 import { ExtensionLevel, ExtensionPipelineLevel } from "./enum";
@@ -180,6 +180,9 @@ export type GrootStateDict = {
 
   'gs.solution': [Solution, false],
   'gs.component': [Component, false],
+
+  'gs.propTree': [PropGroup, true],
+  'gs.activePropGroupId': [number, false],
 
   'gs.stage.playgroundPath': [string, false],
   'gs.stage.debugBaseUrl': [string, false],

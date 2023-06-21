@@ -84,6 +84,9 @@ const createFullMetadata = (component: Component) => {
 
 const openComponent = (versionId: number) => {
   return getContext().request(APIPath.componentPrototype_detailByVersionId, { versionId }).then(({ data: component }) => {
+    const { setState } = grootManager.state
+    setState('gs.component', component)
+
     const { blockList, itemList } = component;
     blockList.filter(block => block.struct === PropBlockStructType.List).forEach((block) => {
       block.listStructData = JSON.parse(block.listStructData as any || '[]');
@@ -93,11 +96,11 @@ const openComponent = (versionId: number) => {
       parseOptions(item);
     })
 
-    const { setState } = grootManager.state
-    setState('gs.component', component)
 
     const { executeCommand } = grootManager.command
+
     const data = executeCommand('gc.createMetadata')
+    setState('gs.propTree', component.propTree)
 
     return {
       component,
