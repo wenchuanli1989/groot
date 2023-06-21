@@ -442,9 +442,20 @@ export default class PropPersistModel extends BaseModel {
       let propItem;
       for (let index = 0; index < list.length; index++) {
         const instance = list[index];
-        propItem = this.propHandle.getPropItem(itemId, [null], instance.propTree);
-        if (propItem) {
-          break;
+        if (instance.id !== instanceId) {
+          continue
+        }
+
+        if (!instance.parentId) {
+          throw new Error('数据异常')
+        } else {
+          const parentInstance = list.find(item => item.id === instance.parentId)
+          propItem = this.propHandle.getPropItem(itemId, [null], parentInstance.propTree);
+          if (propItem) {
+            break;
+          } else {
+            throw new Error('数据异常')
+          }
         }
       }
 
