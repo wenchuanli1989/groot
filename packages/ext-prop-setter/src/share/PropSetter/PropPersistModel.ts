@@ -355,15 +355,17 @@ export default class PropPersistModel extends BaseModel {
     })
   }
 
-  public updateValue(params: { propItem: PropItem, value: any, abstractValueId?: number, abstractValueIdChain?: string, valueStruct?: ValueStruct, hostComponentInstanceId?: number }) {
+  public updateValue(params: { propItem: PropItem, value: any, immediate?: boolean, abstractValueId?: number, abstractValueIdChain?: string, valueStruct?: ValueStruct, hostComponentInstanceId?: number }) {
     if (this.updateValueTimeout) {
       clearTimeout(this.updateValueTimeout)
     }
 
+    const updateValueInterval = params.immediate ? 0 : this.updateValueInterval
+
     return new Promise((resolve, reject) => {
       this.updateValueTimeout = window.setTimeout(() => {
         this._updateValue(params).then((data) => resolve(data), (e) => reject(e))
-      }, this.updateValueInterval)
+      }, updateValueInterval)
     })
   }
 
@@ -454,7 +456,7 @@ export default class PropPersistModel extends BaseModel {
       const index = componentValue.list.findIndex(i => i.instanceId === instanceId);
       componentValue.list.splice(index, 1);
 
-      return this.updateValue({ propItem, value: componentValue, abstractValueIdChain: propValue.abstractValueIdChain, valueStruct: ValueStruct.ChildComponentList })
+      return this.updateValue({ immediate: true, propItem, value: componentValue, abstractValueIdChain: propValue.abstractValueIdChain, valueStruct: ValueStruct.ChildComponentList })
     });
   }
 

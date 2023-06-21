@@ -323,6 +323,7 @@ export default class PropHandleModel extends BaseModel {
       value.list = value.list.sort((a, b) => a.order - b.order);
 
       this.propPersist.updateValue({
+        immediate: true,
         propItem, value,
         abstractValueIdChain: data.abstractValueIdChain,
         valueStruct: ValueStruct.ChildComponentList,

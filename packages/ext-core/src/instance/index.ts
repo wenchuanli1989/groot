@@ -273,6 +273,9 @@ const unloadEntry = (entryId: number) => {
 const switchComponentInstance = (instanceId: number, entryId?: number) => {
   const { setState } = grootManager.state
 
+  if (!entryId) {
+    entryId = grootManager.state.getState('gs.entry').root.id
+  }
   if (!entryCache.has(entryId)) {
     throw new Error(`未找到entry: ${entryId}`)
   }
