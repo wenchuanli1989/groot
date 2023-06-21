@@ -21,8 +21,8 @@ export const Application = () => {
     applicationModel.init()
   }, [])
 
-  const switchEntry = (instance: ComponentInstance) => {
-    grootManager.command.executeCommand('gc.switchEntry', instance.id)
+  const openEntry = (instance: ComponentInstance) => {
+    grootManager.command.executeCommand('gc.openEntry', instance.id)
   }
 
   if (!currInstance) {
@@ -65,7 +65,7 @@ export const Application = () => {
           applicationModel.entryInstanceList.map((instance) => {
             return (<div key={instance.id}
               className={`${styles.componentItem} ${(currInstance.rootId || currInstance.id) === instance.id ? styles.active : ''}`}
-              onClick={() => switchEntry(instance)}>
+              onClick={() => openEntry(instance)}>
               <InstanceItem instance={instance} />
             </div>)
           })
@@ -75,7 +75,7 @@ export const Application = () => {
           applicationModel.mainEntryInstanceList.map((instance) => {
             return (<div key={instance.id}
               className={`${styles.componentItem} ${(currInstance.rootId || currInstance.id) === instance.id ? styles.active : ''}`}
-              onClick={() => switchEntry(instance)}>
+              onClick={() => openEntry(instance)}>
               <InstanceItem instance={instance} />
             </div>)
           })

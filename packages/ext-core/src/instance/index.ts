@@ -43,8 +43,8 @@ export const instanceBootstrap = () => {
     return loadEntry(entryId);
   })
 
-  registerCommand('gc.switchEntry', (_, entryId, mainEntry) => {
-    switchEntry(entryId, mainEntry)
+  registerCommand('gc.openEntry', (_, entryId, mainEntry) => {
+    openEntry(entryId, mainEntry)
   })
 
   registerCommand('gc.unloadEntry', (_, entryId) => {
@@ -222,7 +222,7 @@ const loadEntry = (entryId: number) => {
   });
 }
 
-const switchEntry = (entryId: number, mainEntry = true) => {
+const openEntry = (entryId: number, mainEntry = true) => {
   const { executeCommand } = grootManager.command
   const { getState } = grootManager.state
 

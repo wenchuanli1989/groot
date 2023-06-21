@@ -39,7 +39,7 @@ export const prototypeBootstrap = () => {
   layout.primarySidebarWidth = '220px'
 
   groot.onReady(() => {
-    executeCommand('gc.loadComponent', +params.componentVersionId).then(({ component, propTaskList, metadataList }) => {
+    executeCommand('gc.openComponent', +params.componentVersionId).then(({ component, propTaskList, metadataList }) => {
       const viewKey = getState('gs.stage.playgroundPath')
       executeCommand('gc.stageRefresh', viewKey, {
         resourceList: [], resourceConfigList: [], resourceTaskList: [],

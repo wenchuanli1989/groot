@@ -131,7 +131,7 @@ export type GrootCommandDict = {
   'gc.ui.render.panel': [[], ReactElement | null],
   'gc.ui.render.statusBar': [[], ReactElement | null],
 
-  'gc.switchEntry': [[number, boolean] | [number], void],
+  'gc.openEntry': [[number, boolean] | [number], void],
   'gc.loadEntry': [[number], Promise<ViewDataCore>],
   'gc.switchIstance': [[number, number] | [number], void],
   'gc.createMetadata': [[number] | [], { metadataList: Metadata[], propTaskList: PropTask[] }],
@@ -140,7 +140,7 @@ export type GrootCommandDict = {
   'gc.pushResource': [[number] | [], void],
   'gc.stageRefresh': [[string, ViewDataCore, Function] | [string, ViewDataCore], void],
   'gc.unloadEntry': [[number], void],
-  'gc.loadComponent': [[number], Promise<{ component: Component, metadataList: Metadata[], propTaskList: PropTask[] }>],
+  'gc.openComponent': [[number], Promise<{ component: Component, metadataList: Metadata[], propTaskList: PropTask[] }>],
 
 }
 

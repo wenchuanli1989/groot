@@ -67,7 +67,7 @@ export const instanceBootstrap = () => {
   registerState('gs.ui.primarySidebar.active', 'application', false);
 
   groot.onReady(() => {
-    executeCommand('gc.switchEntry', +params.instanceId)
+    executeCommand('gc.openEntry', +params.instanceId)
   })
 }
 

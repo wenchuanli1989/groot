@@ -17,7 +17,7 @@ export default class SolutionModel extends BaseModel {
     }).then(({ data }) => {
       this.componentAddModalStatus = ModalStatus.None;
       this.componentList.push(data)
-      grootManager.command.executeCommand('gc.loadComponent', data.id)
+      grootManager.command.executeCommand('gc.openComponent', data.id)
     });
   }
 

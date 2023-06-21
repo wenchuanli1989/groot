@@ -14,8 +14,8 @@ export const prototypeBootstrap = () => {
     return createFullMetadata(component)
   })
 
-  registerCommand('gc.loadComponent', (_, componentVersionId) => {
-    return loadComponent(componentVersionId);
+  registerCommand('gc.openComponent', (_, componentVersionId) => {
+    return openComponent(componentVersionId);
   })
 
   getContext().groot.onReady(onReady)
@@ -82,7 +82,7 @@ const createFullMetadata = (component: Component) => {
   }
 }
 
-const loadComponent = (versionId: number) => {
+const openComponent = (versionId: number) => {
   return getContext().request(APIPath.componentPrototype_detailByVersionId, { versionId }).then(({ data: component }) => {
     const { blockList, itemList } = component;
     blockList.filter(block => block.struct === PropBlockStructType.List).forEach((block) => {
