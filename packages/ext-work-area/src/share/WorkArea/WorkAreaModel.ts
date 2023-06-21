@@ -199,6 +199,7 @@ export default class WorkAreaModel extends BaseModel {
 
     const path = `${iframeBasePath}${viewKey}`;
     if (this.iframeEle.src) {
+      grootManager.hook.callHook(PostMessageType.OuterOutlineReset)
       if (this.iframeEle.src === path) {
         grootManager.hook.callHook(PostMessageType.OuterRefreshView, path)
       } else {
