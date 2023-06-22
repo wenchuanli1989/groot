@@ -30,7 +30,7 @@ export default class PropPersistModel extends BaseModel {
 
   public updateValueInterval = 1000
 
-  private updateValueTimeout: number
+  private updateValueTimeoutObj: Record<string, number> = {}
 
   private request = getContext().request;
 
@@ -356,16 +356,20 @@ export default class PropPersistModel extends BaseModel {
   }
 
   public updateValue(params: { propItem: PropItem, value: any, immediate?: boolean, abstractValueId?: number, abstractValueIdChain?: string, valueStruct?: ValueStruct, hostComponentInstanceId?: number }) {
-    if (this.updateValueTimeout) {
-      clearTimeout(this.updateValueTimeout)
+    const updateValueTimeoutKey = (params.abstractValueIdChain || '') + params.propItem.id
+    const updateValueTimeout = this.updateValueTimeoutObj[updateValueTimeoutKey]
+    if (updateValueTimeout) {
+      clearTimeout(updateValueTimeout)
+      delete this.updateValueTimeoutObj[updateValueTimeoutKey]
     }
 
     const updateValueInterval = params.immediate ? 0 : this.updateValueInterval
 
     return new Promise((resolve, reject) => {
-      this.updateValueTimeout = window.setTimeout(() => {
+      const updateValueTimeout = window.setTimeout(() => {
         this._updateValue(params).then((data) => resolve(data), (e) => reject(e))
       }, updateValueInterval)
+      this.updateValueTimeoutObj[updateValueTimeoutKey] = updateValueTimeout
     })
   }
 
