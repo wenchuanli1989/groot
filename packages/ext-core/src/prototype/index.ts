@@ -101,6 +101,7 @@ const openComponent = (versionId: number) => {
 
     const data = executeCommand('gc.createMetadata')
     setState('gs.propTree', component.propTree)
+    setState('gs.activePropGroupId', component.propTree[0].id)
 
     return {
       component,
