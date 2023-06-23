@@ -9,7 +9,6 @@ import { PropBlock } from 'entities/PropBlock';
 import { PropGroup } from 'entities/PropGroup';
 import { PropItem } from 'entities/PropItem';
 import { PropValue } from 'entities/PropValue';
-import { Solution } from 'entities/Solution';
 import { SolutionVersion } from 'entities/SolutionVersion';
 
 
@@ -45,10 +44,6 @@ export class ComponentService {
     if (!rawComponent.packageName || !rawComponent.componentName) {
       throw new LogicException('参数packageName和componentName不能同时为空', LogicExceptionCode.ParamEmpty);
     }
-    LogicException.assertParamEmpty(rawComponent.solutionId, 'solutionId');
-
-    const solution = await em.findOne(Solution, rawComponent.solutionId);
-    LogicException.assertNotFound(solution, 'Solution', rawComponent.solutionId);
 
     LogicException.assertParamEmpty(rawComponent.solutionVersionId, 'solutionVersionId');
     const solutionVersion = await em.findOne(SolutionVersion, rawComponent.solutionVersionId)
