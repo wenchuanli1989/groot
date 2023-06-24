@@ -9,7 +9,8 @@ export const prototypeBootstrap = () => {
   const { getState } = grootManager.state
 
   registerCommand('gc.pushMetadata', () => {
-    const data = executeCommand('gc.createMetadata')
+    const componentVersionId = getState('gs.component').componentVersion.id
+    const data = executeCommand('gc.createMetadata', componentVersionId)
     callHook(PostMessageType.OuterUpdateComponent, {
       ...data,
       viewKey: getState('gs.stage.playgroundPath')
