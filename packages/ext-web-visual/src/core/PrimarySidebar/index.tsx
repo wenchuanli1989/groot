@@ -3,9 +3,9 @@ import { grootManager } from "context";
 
 const PrimarySidebar = () => {
   const { useStateByName } = grootManager.state
-  const [viewsContainers] = useStateByName('gs.ui.viewsContainers', []);
+  const [viewContainerMap] = useStateByName('gs.ui.viewContainerMap');
   const [viewKey] = useStateByName('gs.ui.primarySidebar.active', '');
-  const view = viewsContainers.find(item => item.id === viewKey)?.view
+  const view = viewContainerMap.get(viewKey)?.view
 
   return viewRender(view)
 }

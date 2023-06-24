@@ -53,8 +53,19 @@ export const isBaseType = (value: any) => {
   return typeList.includes(typeStr) || value === null || value === undefined
 }
 
-export const isNativeType = (value: any) => {
-  return ['[object Map]', '[object Set]', '[object Date]'].includes(Object.prototype.toString.call(value))
+
+export const mapFilter = <K, V>(map: Map<K, V>, fn: (key: K, value: V) => boolean) => {
+  const result: V[] = []
+  map.forEach((value, key) => {
+    if (fn(key, value)) {
+      result.push(value)
+    }
+  })
+  return result
+}
+
+export const getType = (obj: any) => {
+  return Object.prototype.toString.call(obj).replace(/^\[|\]$/g, '').split(' ')[1]
 }
 
 export const viewRender = (view: ViewElement, props?: any) => {

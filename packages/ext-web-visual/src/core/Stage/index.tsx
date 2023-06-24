@@ -3,9 +3,9 @@ import { grootManager } from "context";
 
 const Stage = () => {
   const { useStateByName } = grootManager.state
-  const [viewItemList] = useStateByName('gs.ui.views', []);
+  const [viewItemMap] = useStateByName('gs.ui.viewMap');
   const [viewKey] = useStateByName('gs.ui.stage.active', '');
-  const view = viewItemList.find(item => item.id === viewKey)?.view
+  const view = viewItemMap.get(viewKey)?.view
 
   return viewRender(view)
 }

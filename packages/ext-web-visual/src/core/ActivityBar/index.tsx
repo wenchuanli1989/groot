@@ -1,17 +1,15 @@
-import { viewRender } from "@grootio/common";
+import { mapFilter, viewRender } from "@grootio/common";
 import { grootManager } from "context";
 import styles from './index.module.less';
 
 
 const ActivityBar: React.FC = () => {
   const { useStateByName } = grootManager.state
-  const [viewKeys] = useStateByName('gs.ui.activityBar.viewsContainers', []);
-  const [viewsContainers] = useStateByName('gs.ui.viewsContainers', []);
+  const [viewKeys] = useStateByName('gs.ui.activityBar.viewContainers');
+  const [viewContainerMap] = useStateByName('gs.ui.viewContainerMap');
   const [active, setActive] = useStateByName('gs.ui.activityBar.active', '');
 
-  const items = viewsContainers.filter(vc => {
-    return viewKeys.includes(vc.id)
-  })
+  const items = mapFilter(viewContainerMap, (key) => viewKeys.has(key))
 
   const change = (key: string) => {
     setActive(key);

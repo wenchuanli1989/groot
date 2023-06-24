@@ -9,30 +9,27 @@ export const prototypeBootstrap = () => {
   const { registerState, getState } = grootManager.state
   const { executeCommand } = grootManager.command
 
-  getState('gs.ui.viewsContainers').push(...[
-    {
-      id: 'solution',
-      name: '组件',
-      icon: () => {
-        return <AppstoreOutlined />
-      },
-      view: function () {
-        return <ViewsContainer context={this} groot={groot} />
-      },
-    }
-  ])
-
-  getState('gs.ui.views').push(...[
-    {
-      id: 'solution',
-      name: '组件',
-      view: <Solution />,
-      parent: 'solution'
+  const solutionViewContainer = {
+    id: 'solution',
+    name: '组件',
+    icon: () => {
+      return <AppstoreOutlined />
     },
-  ])
+    view: () => {
+      return <ViewsContainer context={solutionViewContainer} groot={groot} />
+    },
+  }
+  getState('gs.ui.viewContainerMap').set(solutionViewContainer.id, solutionViewContainer)
+
+  getState('gs.ui.viewMap').set('solution', {
+    id: 'solution',
+    name: '组件',
+    view: <Solution />,
+    parent: 'solution'
+  })
 
 
-  registerState('gs.ui.activityBar.viewsContainers', ['solution'], true)
+  registerState('gs.ui.activityBar.viewContainers', new Set(['solution']), false)
   registerState('gs.ui.activityBar.active', 'solution', false);
   registerState('gs.ui.primarySidebar.active', 'solution', false);
 

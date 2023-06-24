@@ -1,12 +1,12 @@
-import { viewRender } from "@grootio/common";
+import { mapFilter, viewRender } from "@grootio/common";
 import { Tabs } from "antd";
 import { grootManager } from "context";
 
 const Panel = () => {
   const { useStateByName } = grootManager.state
-  const [viewsContainers] = useStateByName('gs.ui.viewsContainers', []);
-  const [viewKeyList] = useStateByName('gs.ui.panel.viewsContainers', []);
-  const viewList = viewsContainers.filter(item => viewKeyList.includes(item.id));
+  const [viewContainerMap] = useStateByName('gs.ui.viewContainerMap');
+  const [viewKeySet] = useStateByName('gs.ui.panel.viewContainers');
+  const viewList = mapFilter(viewContainerMap, (key, value) => viewKeySet.has(key))
 
   return <>
     <Tabs items={viewList.map(item => {

@@ -6,21 +6,21 @@ export const shareBootstrap = () => {
   const { layout } = getContext();
   const { registerState } = grootManager.state
 
-  registerState('gs.ui.views', [
-    {
+  registerState('gs.ui.viewMap', new Map([
+    ['toolBar', {
       id: 'toolBar',
       name: '工具栏',
       view: <ToolBar />,
-    }
-  ], true)
+    }]
+  ]), false)
 
-  registerState('gs.ui.viewsContainers', [], true)
+  registerState('gs.ui.viewContainerMap', new Map(), false)
 
   registerState('gs.ui.secondarySidebar.active', 'propSetter', false);
   registerState('gs.ui.stage.active', 'workArea', false);
-  registerState('gs.ui.banner.views', [
-    { id: 'toolBar', placement: 'center' }
-  ], true)
+  const bannerViewMap = new Map()
+  bannerViewMap.set('toolBar', { id: 'toolBar', placement: 'center' })
+  registerState('gs.ui.banner.viewMap', bannerViewMap, false)
 
   layout.design('visible', 'secondarySidebar', true);
   layout.design('visible', 'panel', false);

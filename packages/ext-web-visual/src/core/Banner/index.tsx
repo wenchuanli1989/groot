@@ -5,15 +5,15 @@ import styles from './index.module.less'
 
 const Banner = () => {
   const { useStateByName } = grootManager.state
-  const [viewList] = useStateByName('gs.ui.views', []);
-  const [viewKeyList] = useStateByName('gs.ui.banner.views');
+  const [viewMap] = useStateByName('gs.ui.viewMap');
+  const [bannerViewMap] = useStateByName('gs.ui.banner.viewMap');
 
   const leftViewItemList: ViewItem[] = [];
   const centerViewItemList: ViewItem[] = [];
   const rightViewItemList: ViewItem[] = [];
 
-  viewKeyList.forEach((viewKey) => {
-    const viewItem = viewList.find(item => viewKey.id === item.id)
+  bannerViewMap.forEach((viewKey) => {
+    const viewItem = viewMap.get(viewKey.id)
     if (!viewItem) {
       return
     }

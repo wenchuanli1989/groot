@@ -4,16 +4,17 @@ import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { PropItem, PropItemViewType, useModel } from "@grootio/common";
 import PropPersistModel from "../PropPersistModel";
 import { propKeyRule } from "util/index";
-import PropHandleModel from "../PropHandleModel";
+import { grootManager } from "context";
 
 
 const PropItemSetting: React.FC = () => {
   const propPersistModel = useModel(PropPersistModel);
-  const propHandleModel = useModel(PropHandleModel);
 
   const [form] = Form.useForm<PropItem>();
   const [propTypeOptions] = useState(() => {
-    return [...Object.keys(propHandleModel.propItemViewTypeObj)].map(([label]) => ({ label, value: propHandleModel.propItemViewTypeObj[label] }))
+    const viewTypeMap = grootManager.state.getState('gs.propItem.viewTypeMap')
+    const result = [...viewTypeMap.keys()].map((value) => ({ label: viewTypeMap.get(value).label, value }))
+    return result
   })
 
   const handleOk = async () => {
@@ -88,8 +89,8 @@ const PropItemSetting: React.FC = () => {
       <Form.Item name="label" label="名称" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
-      <Form.Item label="类型" name="viewType" rules={[{ required: true }]} >
-        <Select options={propTypeOptions} fieldNames={{ label: 'name', value: 'key' }} />
+      <Form.Item label="类型" name="viewType" rules={[{ required: true }]} initialValue="text">
+        <Select options={propTypeOptions} />
       </Form.Item>
 
       <Form.Item label="属性名" rules={[{ required: true }, { pattern: propKeyRule, message: '格式错误，必须是标准js标识符' }]} name="propKey">

@@ -7,24 +7,25 @@ export const shareBootstrap = () => {
   const { groot } = getContext();
   const { registerState } = grootManager.state
 
-  registerState('gs.ui.viewsContainers', [
-    {
-      id: 'workArea',
-      name: '工作区',
-      view: function () {
-        return <ViewsContainer context={this} groot={groot} />
-      }
+  const workAreaViewContainer = {
+    id: 'workArea',
+    name: '工作区',
+    view: () => {
+      return <ViewsContainer context={workAreaViewContainer} groot={groot} />
     }
-  ], true)
+  }
+  registerState('gs.ui.viewContainerMap', new Map([
+    [workAreaViewContainer.id, workAreaViewContainer]
+  ]), false)
 
-  registerState('gs.ui.views', [
-    {
+  registerState('gs.ui.viewMap', new Map([
+    ['workArea', {
       id: 'workArea',
       name: '工作区',
       view: <WorkArea />,
       parent: 'workArea'
-    }
-  ], true)
+    }]
+  ]), false)
 
   registerState('gs.ui.stage.viewport', 'desktop', false)
 

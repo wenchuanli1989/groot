@@ -145,8 +145,8 @@ export type GrootCommandDict = {
 }
 
 export type GrootStateDict = {
-  'gs.ui.views': [ViewItem, true],
-  'gs.ui.viewsContainers': [ViewContainerItem, true],
+  'gs.ui.viewMap': [Map<string, ViewItem>, false],
+  'gs.ui.viewContainerMap': [Map<string, ViewContainerItem>, false],
 
   'gs.ui.style.container': [React.CSSProperties, false],
   'gs.ui.style.banner': [React.CSSProperties, false],
@@ -157,15 +157,15 @@ export type GrootStateDict = {
   'gs.ui.style.panel': [React.CSSProperties, false],
   'gs.ui.style.statusBar': [React.CSSProperties, false],
 
-  'gs.ui.activityBar.viewsContainers': [string, true],
+  'gs.ui.activityBar.viewContainers': [Set<string>, false],
   'gs.ui.activityBar.active': [string, false],
   'gs.ui.primarySidebar.active': [string, false],
   'gs.ui.secondarySidebar.active': [string, false],
   'gs.ui.stage.active': [string, false],
-  'gs.ui.panel.viewsContainers': [string, true],
+  'gs.ui.panel.viewContainers': [Set<string>, false],
   'gs.ui.panel.active': [string, false],
   'gs.ui.stage.viewport': ['desktop' | 'mobile', false],
-  'gs.ui.banner.views': [{ id: string, placement: 'left' | 'center' | 'right' }, true],
+  'gs.ui.banner.viewMap': [Map<string, { id: string, placement: 'left' | 'center' | 'right' }>, false],
   // 'gs.ui.propSettingViews': [{ name: string, remotePackage: string, remoteUrl: string, remoteModule: string }, true],
 
   'gs.app': [Application, false],
@@ -187,7 +187,7 @@ export type GrootStateDict = {
   'gs.stage.playgroundPath': [string, false],
   'gs.stage.debugBaseUrl': [string, false],
 
-  'gs.propItem.viewTypeList': [{ label: string, value: string }, true],
+  'gs.propItem.viewTypeMap': [Map<string, { label: string }>, false],
   'gs.propItem.formRenderList': [{ viewType: string, render: React.FC<FormItemRender> }, true],
   'gs.propItem.settingRenderList': [{ viewType: string, render: React.FC<FormItemRender> }, true],
   'gs.propSetting.breadcrumbList': [{ id: number, name: string }, true],

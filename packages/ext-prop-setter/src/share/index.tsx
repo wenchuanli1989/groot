@@ -8,41 +8,43 @@ export const shareBootstrap = () => {
   const { groot } = getContext();
   const { registerState } = grootManager.state
 
-  registerState('gs.ui.viewsContainers', [
-    {
-      id: 'propSetter',
-      name: '属性设置器',
-      view: function () {
-        return <ViewsContainer context={this} groot={groot} />
-      },
-    }
-  ], true)
+  const viewsContainers = new Map()
+  const propSetterView = {
+    id: 'propSetter',
+    name: '属性设置器',
+    view: () => {
+      return <ViewsContainer context={propSetterView} groot={groot} />
+    },
+  }
+  viewsContainers.set(propSetterView.id, propSetterView)
+  registerState('gs.ui.viewContainerMap', viewsContainers, false)
 
-  registerState('gs.ui.views', [
-    {
+  registerState('gs.ui.viewMap', new Map([
+    ['propSetter', {
       id: 'propSetter',
       name: '属性设置器',
       view: <PropSetter />,
       parent: 'propSetter'
-    }
-  ], true)
+    }]
+  ]), false)
 
   registerState('gs.propItem.formRenderList', [{ viewType: '*', render: FormRender }], true)
-  registerState('gs.propItem.viewTypeList', [
-    { label: '文本', value: 'text' },
-    { label: '多行文本', value: 'textarea' },
-    { label: '数字', value: 'number' },
-    { label: '滑块', value: 'slider' },
-    { label: '按钮组', value: 'buttonGroup' },
-    { label: '开关', value: 'switch' },
-    { label: '下拉框', value: 'select' },
-    { label: '多选', value: 'checkbox' },
-    { label: '单选', value: 'radio' },
-    { label: '日期', value: 'datePicker' },
-    { label: '时间', value: 'timePicker' },
-    { label: 'json', value: 'json' },
-    { label: '函数', value: 'function' },
-  ], true)
+
+  registerState('gs.propItem.viewTypeMap', new Map([
+    ['text', { label: '文本' }],
+    ['textarea', { label: '多行文本' }],
+    ['number', { label: '数字' }],
+    ['slider', { label: '滑块' }],
+    ['buttonGroup', { label: '按钮组' }],
+    ['switch', { label: '开关' }],
+    ['select', { label: '下拉框' }],
+    ['checkbox', { label: '多选' }],
+    ['radio', { label: '单选' }],
+    ['datePicker', { label: '日期' }],
+    ['timePicker', { label: '时间' }],
+    ['json', { label: 'json' }],
+    ['function', { label: '函数' }],
+  ]), false);
 
 
 }
