@@ -367,3 +367,25 @@ type HookObject = { callback: Function, provider: string }
 
 // 默认state
 registerState('gs.exensionHandle', extHandler, false);
+registerState('gs.ui.viewContainerMap', new Map(), false)
+registerState('gs.ui.viewMap', new Map(), false)
+
+
+registerState('gs.ui.style.container', null, false)
+registerState('gs.ui.style.banner', null, false)
+registerState('gs.ui.style.activityBar', null, false)
+registerState('gs.ui.style.primarySidebar', null, false)
+registerState('gs.ui.style.secondarySidebar', null, false)
+registerState('gs.ui.style.stage', null, false)
+registerState('gs.ui.style.panel', null, false)
+registerState('gs.ui.style.statusBar', null, false)
+
+registerState('gs.ui.activityBar.viewContainers', new Set(), false)
+registerState('gs.ui.activityBar.active', null, false)
+registerState('gs.ui.primarySidebar.active', null, false)
+registerState('gs.ui.secondarySidebar.active', null, false)
+registerState('gs.ui.stage.active', null, false)
+registerState('gs.ui.panel.viewContainers', new Set(), false)
+registerState('gs.ui.panel.active', null, false)
+registerState('gs.ui.panel.viewport', null, false)
+registerState('gs.ui.banner.viewMap', new Map(), false)

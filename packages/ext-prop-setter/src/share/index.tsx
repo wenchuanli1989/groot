@@ -6,27 +6,24 @@ import { ViewsContainer } from "@grootio/common";
 
 export const shareBootstrap = () => {
   const { groot } = getContext();
-  const { registerState } = grootManager.state
+  const { registerState, getState } = grootManager.state
 
-  const viewsContainers = new Map()
-  const propSetterView = {
+  const propSetterViewContainer = {
     id: 'propSetter',
     name: '属性设置器',
     view: () => {
-      return <ViewsContainer context={propSetterView} groot={groot} />
+      return <ViewsContainer context={propSetterViewContainer} groot={groot} />
     },
   }
-  viewsContainers.set(propSetterView.id, propSetterView)
-  registerState('gs.ui.viewContainerMap', viewsContainers, false)
+  getState('gs.ui.viewContainerMap').set(propSetterViewContainer.id, propSetterViewContainer)
 
-  registerState('gs.ui.viewMap', new Map([
-    ['propSetter', {
-      id: 'propSetter',
-      name: '属性设置器',
-      view: <PropSetter />,
-      parent: 'propSetter'
-    }]
-  ]), false)
+  const propSetterView = {
+    id: 'propSetter',
+    name: '属性设置器',
+    view: <PropSetter />,
+    parent: 'propSetter'
+  }
+  getState('gs.ui.viewMap').set(propSetterView.id, propSetterView)
 
   registerState('gs.propItem.formRenderList', [{ viewType: '*', render: FormRender }], true)
 

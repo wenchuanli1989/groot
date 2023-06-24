@@ -9,7 +9,7 @@ import ResourceList from "./Resource";
 
 export const instanceBootstrap = () => {
   const { groot, params } = getContext();
-  const { registerState, getState } = grootManager.state;
+  const { getState, setState } = grootManager.state;
   const { executeCommand } = grootManager.command;
 
   const appViewContainer = {
@@ -43,19 +43,14 @@ export const instanceBootstrap = () => {
     }
   }
 
-  const viewContainerMap = getState('gs.ui.viewContainerMap')
-  viewContainerMap.set(appViewContainer.id, appViewContainer)
-  viewContainerMap.set(materialViewContainer.id, materialViewContainer)
-  viewContainerMap.set(resourceViewContainer.id, resourceViewContainer)
 
-  const viewMap = getState('gs.ui.viewMap')
+
   const appView = {
     id: 'application',
     name: '页面',
     view: <Application />,
     parent: 'application'
   }
-  viewMap.set(appView.id, appView)
 
   const materialView = {
     id: 'material',
@@ -63,7 +58,6 @@ export const instanceBootstrap = () => {
     view: <Material />,
     parent: 'material'
   }
-  viewMap.set(materialView.id, materialView)
 
   const resourceView = {
     id: 'resource',
@@ -71,14 +65,26 @@ export const instanceBootstrap = () => {
     view: <ResourceList />,
     parent: 'resource'
   }
-  viewMap.set(resourceView.id, resourceView)
 
 
-  registerState('gs.ui.activityBar.viewContainers', new Set(['application', 'material', 'resource']), false)
-  registerState('gs.ui.activityBar.active', 'application', false);
-  registerState('gs.ui.primarySidebar.active', 'application', false);
+
 
   groot.onReady(() => {
+
+    const viewContainerMap = getState('gs.ui.viewContainerMap')
+    viewContainerMap.set(appViewContainer.id, appViewContainer)
+    viewContainerMap.set(materialViewContainer.id, materialViewContainer)
+    viewContainerMap.set(resourceViewContainer.id, resourceViewContainer)
+
+    const viewMap = getState('gs.ui.viewMap')
+    viewMap.set(appView.id, appView)
+    viewMap.set(materialView.id, materialView)
+    viewMap.set(resourceView.id, resourceView)
+
+    setState('gs.ui.activityBar.viewContainers', new Set(['application', 'material', 'resource']))
+    setState('gs.ui.activityBar.active', 'application');
+    setState('gs.ui.primarySidebar.active', 'application');
+
     executeCommand('gc.openEntry', +params.instanceId)
   })
 }

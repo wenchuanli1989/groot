@@ -3,29 +3,27 @@ import ToolBar from "./ToolBar";
 
 
 export const shareBootstrap = () => {
-  const { layout } = getContext();
-  const { registerState } = grootManager.state
-
-  registerState('gs.ui.viewMap', new Map([
-    ['toolBar', {
-      id: 'toolBar',
-      name: '工具栏',
-      view: <ToolBar />,
-    }]
-  ]), false)
-
-  registerState('gs.ui.viewContainerMap', new Map(), false)
-
-  registerState('gs.ui.secondarySidebar.active', 'propSetter', false);
-  registerState('gs.ui.stage.active', 'workArea', false);
-  const bannerViewMap = new Map()
-  bannerViewMap.set('toolBar', { id: 'toolBar', placement: 'center' })
-  registerState('gs.ui.banner.viewMap', bannerViewMap, false)
+  const { layout, groot } = getContext();
+  const { getState, setState } = grootManager.state
 
   layout.design('visible', 'secondarySidebar', true);
   layout.design('visible', 'panel', false);
   layout.design('banner', 'center', null)
 
+  const toolBarView = {
+    id: 'toolBar',
+    name: '工具栏',
+    view: <ToolBar />,
+  }
+
+  groot.onReady(() => {
+    getState('gs.ui.viewMap').set(toolBarView.id, toolBarView)
+
+    setState('gs.ui.secondarySidebar.active', 'propSetter');
+    setState('gs.ui.stage.active', 'workArea');
+
+    getState('gs.ui.banner.viewMap').set('toolBar', { id: 'toolBar', placement: 'center' })
+  })
 }
 
 

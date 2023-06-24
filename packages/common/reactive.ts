@@ -30,7 +30,7 @@ export function wrapperState(target: any, listener: Function, originWatch = true
   ++wrapCount
   const proxyObj = new Proxy(target, {
     get(target, key, receiver) {
-      getHandler(target, key, receiver, terminate, listener, originWatch)
+      return getHandler(target, key, receiver, terminate, listener, originWatch)
     },
     set(target, key, value, receiver) {
       if (terminate) {
@@ -62,6 +62,8 @@ const getHandler = (target, key, receiver, terminate, listener, originWatch) => 
     return target;
   } else if (key === '__groot_origin_listener') {
     return listener
+  } else if (target instanceof EventTarget) {
+    return target
   }
 
   const targetType = getType(target)
@@ -75,6 +77,8 @@ const getHandler = (target, key, receiver, terminate, listener, originWatch) => 
   } else if (isBaseType(value)) {
     // 基本数据类型直接放行
     return value;
+  } if (value instanceof EventTarget) {
+    return value
   }
 
   // 用于基准性能测试
@@ -99,6 +103,7 @@ const getHandler = (target, key, receiver, terminate, listener, originWatch) => 
       return value.bind(getOrigin(target));
     }
 
+    // 确保方法执行时this上下文是代理对象
     return value.bind(receiver);
 
   } else {
@@ -114,12 +119,8 @@ const getHandler = (target, key, receiver, terminate, listener, originWatch) => 
 
 export const getOrigin = (target) => {
   let data = target;
-  while (data?.__groot_origin) {
+  while (!!data?.__groot_origin) {
     data = data.__groot_origin
-  }
-
-  if (data && Array.isArray(data)) {
-    return data.map(item => getOrigin(item))
   }
 
   return data;

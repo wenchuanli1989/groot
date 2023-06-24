@@ -6,8 +6,10 @@ import { Solution } from "./Solution";
 
 export const prototypeBootstrap = () => {
   const { groot, layout, params } = getContext();
-  const { registerState, getState } = grootManager.state
+  const { getState, setState } = grootManager.state
   const { executeCommand } = grootManager.command
+
+  layout.primarySidebarWidth = '220px'
 
   const solutionViewContainer = {
     id: 'solution',
@@ -19,23 +21,21 @@ export const prototypeBootstrap = () => {
       return <ViewsContainer context={solutionViewContainer} groot={groot} />
     },
   }
-  getState('gs.ui.viewContainerMap').set(solutionViewContainer.id, solutionViewContainer)
-
-  getState('gs.ui.viewMap').set('solution', {
-    id: 'solution',
-    name: '组件',
-    view: <Solution />,
-    parent: 'solution'
-  })
-
-
-  registerState('gs.ui.activityBar.viewContainers', new Set(['solution']), false)
-  registerState('gs.ui.activityBar.active', 'solution', false);
-  registerState('gs.ui.primarySidebar.active', 'solution', false);
-
-  layout.primarySidebarWidth = '220px'
 
   groot.onReady(() => {
+    getState('gs.ui.viewContainerMap').set(solutionViewContainer.id, solutionViewContainer)
+
+    getState('gs.ui.viewMap').set('solution', {
+      id: 'solution',
+      name: '组件',
+      view: <Solution />,
+      parent: 'solution'
+    })
+
+    setState('gs.ui.activityBar.viewContainers', new Set(['solution']))
+    setState('gs.ui.activityBar.active', 'solution');
+    setState('gs.ui.primarySidebar.active', 'solution');
+
     executeCommand('gc.openComponent', +params.componentVersionId).then(({ component, propTaskList, metadataList }) => {
       const viewKey = getState('gs.stage.playgroundPath')
       executeCommand('gc.stageRefresh', viewKey, {
