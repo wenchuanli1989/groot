@@ -3,19 +3,24 @@ import { metadataFactory, pipelineExec, propTreeFactory } from "@grootio/core";
 import { getContext, grootManager } from "context"
 import { parseOptions } from "../util";
 
+const componentCache = new Map<number, Component>()
 
 export const prototypeBootstrap = () => {
   const { registerCommand } = grootManager.command
   const { registerState } = grootManager.state
   registerState('gs.solution', null, false)
 
-  registerCommand('gc.createMetadata', () => {
-    const component = grootManager.state.getState('gs.component');
+  registerCommand('gc.createMetadata', (_, componentVersionId) => {
+    const component = componentCache.get(componentVersionId)
     return createFullMetadata(component)
   })
 
   registerCommand('gc.openComponent', (_, componentVersionId) => {
     return openComponent(componentVersionId);
+  })
+
+  registerCommand('gc.loadComponent', (_, componentVersionId) => {
+    return loadComponent(componentVersionId)
   })
 
   getContext().groot.onReady(onReady)
@@ -83,9 +88,23 @@ const createFullMetadata = (component: Component) => {
 }
 
 const openComponent = (versionId: number) => {
-  return getContext().request(APIPath.componentPrototype_detailByVersionId, { versionId }).then(({ data: component }) => {
-    const { setState } = grootManager.state
+  const { executeCommand } = grootManager.command
+
+  return executeCommand('gc.loadComponent', versionId).then((data) => {
+    const { setState, getState } = grootManager.state
+    const viewKey = getState('gs.stage.playgroundPath')
+    executeCommand('gc.stageRefresh', viewKey, data)
+
+    const component = componentCache.get(versionId)
+    setState('gs.propTree', component.propTree)
+    setState('gs.activePropGroupId', component.propTree[0].id)
     setState('gs.component', component)
+  })
+}
+
+const loadComponent = (versionId: number) => {
+  return getContext().request(APIPath.componentPrototype_detailByVersionId, { versionId }).then(({ data: component }) => {
+    const { executeCommand } = grootManager.command
 
     const { blockList, itemList } = component;
     blockList.filter(block => block.struct === PropBlockStructType.List).forEach((block) => {
@@ -96,16 +115,7 @@ const openComponent = (versionId: number) => {
       parseOptions(item);
     })
 
-
-    const { executeCommand } = grootManager.command
-
-    const data = executeCommand('gc.createMetadata')
-    setState('gs.propTree', component.propTree)
-    setState('gs.activePropGroupId', component.propTree[0].id)
-
-    return {
-      component,
-      ...data
-    }
+    componentCache.set(versionId, component)
+    return executeCommand('gc.createMetadata', versionId)
   })
 }

@@ -44,7 +44,7 @@ export const instanceBootstrap = () => {
   })
 
   registerCommand('gc.openEntry', (_, entryId, mainEntry) => {
-    openEntry(entryId, mainEntry)
+    return openEntry(entryId, mainEntry)
   })
 
   registerCommand('gc.unloadEntry', (_, entryId) => {
@@ -233,7 +233,7 @@ const openEntry = (entryId: number, mainEntry = true) => {
   entryCache.clear()
   if (mainEntry) {
     // todo 清空缓存数据
-    executeCommand('gc.loadEntry', entryId).then((data) => {
+    return executeCommand('gc.loadEntry', entryId).then((data) => {
       const entry = getState('gs.entryList').find(item => item.id === entryId)
       executeCommand('gc.stageRefresh', entry.key, data)
       executeCommand('gc.switchIstance', entryId, entryId)

@@ -36,13 +36,6 @@ export const prototypeBootstrap = () => {
     setState('gs.ui.activityBar.active', 'solution');
     setState('gs.ui.primarySidebar.active', 'solution');
 
-    executeCommand('gc.openComponent', +params.componentVersionId).then(({ component, propTaskList, metadataList }) => {
-      const viewKey = getState('gs.stage.playgroundPath')
-      executeCommand('gc.stageRefresh', viewKey, {
-        resourceList: [], resourceConfigList: [], resourceTaskList: [],
-        propTaskList, metadataList,
-      })
-      grootManager.state.setState('gs.component', component)
-    })
+    executeCommand('gc.openComponent', +params.componentVersionId)
   })
 }
