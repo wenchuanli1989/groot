@@ -47,7 +47,7 @@ const InstanceAddModal: React.FC = () => {
             <Select disabled={empty}>
               {
                 componentList.map((c) => {
-                  return <Select.Option key={c.componentVersionId} value={c.componentVersionId}>{c.name}</Select.Option>
+                  return <Select.Option key={c.activeVersionId} value={c.activeVersionId}>{c.name}</Select.Option>
                 })
               }
             </Select>
