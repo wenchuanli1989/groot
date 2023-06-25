@@ -88,6 +88,8 @@ export class ComponentService {
       await em.flush();
 
       await em.commit();
+
+      newComponent.componentVersion = wrap(newVersion).toObject()
     } catch (e) {
       await em.rollback();
       throw e;

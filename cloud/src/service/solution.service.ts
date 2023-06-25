@@ -40,7 +40,7 @@ export class SolutionService {
     const componentList = solutionVersion.componentVersionList.getItems().filter(item => {
       return all || !!item.publish
     }).map(item => {
-      item.component.componentVersionId = item.id;
+      item.component.activeVersionId = item.id;
       return item.component
     })
 

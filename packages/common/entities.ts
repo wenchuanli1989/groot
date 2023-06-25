@@ -120,9 +120,15 @@ export type Component = {
   itemList: PropItem[],
   valueList: PropValue[],
 
+  /**
+   * 最新一个版本
+   */
   recentVersionId: number,
-  componentVersionId: number,
   // ************************** 分割线已下是界面属性 **************************
+  /**
+   * 仅UI相关
+   */
+  currVersionId: number,
   propTree: PropGroup[]
 } & Omit<import("../../cloud/src/entities/Component").Component, 'componentVersion' | 'groupList' | 'blockList' | 'itemList' | 'valueList' | 'versionList'>;
 

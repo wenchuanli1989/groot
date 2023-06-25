@@ -20,6 +20,7 @@ export class Component extends BaseEntity {
   componentName: string;
 
   /**
+   * 改组件最新版本
    * 此处必须为可选，否则创建组建会引发recentVersion非空校验
    */
   @OneToOne({ serializer: value => value?.id, serializedName: 'recentVersionId', comment: '组件最新版本' })
@@ -61,6 +62,9 @@ export class Component extends BaseEntity {
   @Property({ persist: false })
   solutionVersionId?: number;
 
+  /**
+   * 和解决方案关联版本
+   */
   @Property({ persist: false })
-  componentVersionId?: number;
+  activeVersionId?: number;
 }

@@ -175,23 +175,15 @@ export class ComponentVersionService {
     return componentVersion;
   }
 
-  async publish(componentId: number, versionId: number) {
+  async publish(componentVersionId: number) {
     const em = RequestContext.getEntityManager();
 
-    LogicException.assertParamEmpty(componentId, 'componentId');
-    LogicException.assertParamEmpty(versionId, 'versionId');
+    LogicException.assertParamEmpty(componentVersionId, 'componentVersionId');
 
-    const component = await em.findOne(Component, componentId);
-    LogicException.assertNotFound(component, 'Component', componentId);
+    const componentVersion = await em.findOne(ComponentVersion, componentVersionId, { populate: ['component'] });
+    LogicException.assertNotFound(componentVersion, 'ComponentVersion', componentVersionId);
 
-    const componentVersion = await em.findOne(ComponentVersion, versionId);
-    LogicException.assertNotFound(componentVersion, 'ComponentVersion', versionId);
-
-    if (componentVersion.component.id !== componentId) {
-      throw new LogicException(`无效的组件版本号`, LogicExceptionCode.ParamError);
-    }
-
-    component.recentVersion = componentVersion;
+    componentVersion.component.recentVersion = componentVersion;
     componentVersion.publish = true;
     await em.flush();
   }

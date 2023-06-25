@@ -172,8 +172,8 @@ export class WorkbenchController {
   }
 
   @Post('/component-version/publish')
-  async componentVersionPublish(@Body('componentId') componentId: number, @Body('versioinId') versionId: number) {
-    await this.componentVersionService.publish(componentId, versionId);
+  async componentVersionPublish(@Body('componentVersionId') componentVersionId: number) {
+    await this.componentVersionService.publish(componentVersionId);
   }
 
 

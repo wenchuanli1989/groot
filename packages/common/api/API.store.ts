@@ -19,7 +19,7 @@ export type APIStore = {
   [APIPath.org_detail_orgId]: [{ orgId: number }, API.Response<Organization>];
   [APIPath.component_add]: [Component, API.Response<Component>];
   [APIPath.componentVersion_add]: [ComponentVersion, API.Response<ComponentVersion>];
-  [APIPath.componentVersion_publish]: [{ componentId: number, versioinId: number }];
+  [APIPath.componentVersion_publish]: [{ componentVersionId: number }];
   [APIPath.componentInstance_entryDetail_entryId]: [{ entryId: number }, API.Response<{
     children: ComponentInstance[],
     root: ComponentInstance,
