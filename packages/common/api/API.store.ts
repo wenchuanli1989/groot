@@ -9,8 +9,6 @@ import type { APIPath } from './API.path';
  * 格式 [key APIPath枚举值]: [请求参数类型 , 返回数据类型] 
  */
 export type APIStore = {
-  [APIPath.auth_currentAccount]: [null, API.Response<API.Account>];
-  [APIPath.auth_logout]: [];
   [APIPath.system_dict]: [null, API.Response<Record<string, API.SystemDict[]>>];
 
   [APIPath.application_detailByReleaseId]: [{ releaseId: number }, API.Response<Application>];
@@ -81,7 +79,7 @@ export type APIStore = {
 
   [APIPath.resource_remove_resourceId]: [{ resourceId: number, type: 'app' | 'instance' | 'project' }],
 
-  [APIPath.solution_componentList_solutionVersionId]: [{ solutionVersionId: number, all: boolean }, API.Response<Component[]>],
+  [APIPath.solution_componentList_solutionVersionId]: [{ solutionVersionId: number, all?: boolean, allVersion?: boolean }, API.Response<Component[]>],
 
   [APIPath.application_releaseList_appId]: [{ appId: number }, API.Response<Release[]>]
 

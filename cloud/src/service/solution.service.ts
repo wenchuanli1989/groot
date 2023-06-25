@@ -2,6 +2,7 @@ import { ExtensionRelationType } from '@grootio/common';
 import { RequestContext, wrap } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { LogicException } from 'config/logic.exception';
+import { ComponentVersion } from 'entities/ComponentVersion';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
 import { Solution } from 'entities/Solution';
 import { SolutionVersion } from 'entities/SolutionVersion';
@@ -15,7 +16,7 @@ export class SolutionService {
 
     LogicException.assertParamEmpty(solutionVersionId, 'solutionVersionId')
 
-    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId, { populate: ['componentVersionList.component'] })
+    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId)
     LogicException.assertNotFound(solutionVersion, 'SolutionVersion', solutionVersionId);
 
     const solution = await em.findOne(Solution, solutionVersion.solution.id);
@@ -32,20 +33,22 @@ export class SolutionService {
     return solution;
   }
 
-  async componentListBySolutionVersionId(solutionVersionId: number, all = false) {
+  async componentListBySolutionVersionId(solutionVersionId: number, all = false, allVersion = false) {
     const em = RequestContext.getEntityManager();
 
     const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId, { populate: ['componentVersionList.component'] });
     const componentList = solutionVersion.componentVersionList.getItems().filter(item => {
-      if (all) {
-        return true
-      }
-
-      return !!item.publish
+      return all || !!item.publish
     }).map(item => {
       item.component.componentVersionId = item.id;
       return item.component
     })
+
+    if (allVersion) {
+      for (let component of componentList) {
+        component.versionList = await em.find(ComponentVersion, { component })
+      }
+    }
 
     return componentList;
   }
