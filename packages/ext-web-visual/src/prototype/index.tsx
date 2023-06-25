@@ -11,18 +11,25 @@ export const prototypeBootstrap = () => {
 
   layout.primarySidebarWidth = '220px'
 
-  const solutionViewContainer = {
-    id: 'solution',
-    name: '组件',
-    icon: () => {
-      return <AppstoreOutlined />
-    },
-    view: () => {
-      return <ViewsContainer context={solutionViewContainer} groot={groot} />
-    },
-  }
-
   groot.onReady(() => {
+    executeCommand('gc.openComponent', +params.componentVersionId).then(() => {
+      initUI()
+    })
+  })
+
+  const initUI = () => {
+
+    const solutionViewContainer = {
+      id: 'solution',
+      name: '组件',
+      icon: () => {
+        return <AppstoreOutlined />
+      },
+      view: () => {
+        return <ViewsContainer context={solutionViewContainer} groot={groot} />
+      },
+    }
+
     getState('gs.ui.viewContainerMap').set(solutionViewContainer.id, solutionViewContainer)
 
     getState('gs.ui.viewMap').set('solution', {
@@ -35,7 +42,5 @@ export const prototypeBootstrap = () => {
     setState('gs.ui.activityBar.viewContainers', new Set(['solution']))
     setState('gs.ui.activityBar.active', 'solution');
     setState('gs.ui.primarySidebar.active', 'solution');
-
-    executeCommand('gc.openComponent', +params.componentVersionId)
-  })
+  }
 }

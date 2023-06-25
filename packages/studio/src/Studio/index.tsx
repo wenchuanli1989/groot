@@ -80,7 +80,7 @@ const Studio: React.FC<{ params: Record<string, string> } & { account: any }> & 
     })
   }
 
-  return layout && startWork ? <Workbench layout={layout} /> : null
+  return props.account && layout && startWork ? <Workbench layout={layout} /> : null
 
 }
 

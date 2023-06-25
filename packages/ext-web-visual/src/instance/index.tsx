@@ -12,64 +12,67 @@ export const instanceBootstrap = () => {
   const { getState, setState } = grootManager.state;
   const { executeCommand } = grootManager.command;
 
-  const appViewContainer = {
-    id: 'application',
-    name: '页面',
-    icon: () => {
-      return <AppstoreOutlined />
-    },
-    view: () => {
-      return <ViewsContainer context={appViewContainer} groot={groot} />
-    },
-  }
-
-  const materialViewContainer = {
-    id: 'material',
-    name: '物料',
-    icon: () => {
-      return <AppstoreOutlined />
-    },
-    view: () => {
-      return <ViewsContainer context={materialViewContainer} groot={groot} />
-    },
-  }
-
-  const resourceViewContainer = {
-    id: 'resource',
-    name: '状态',
-    icon: <AppstoreOutlined />,
-    view: () => {
-      return <ViewsContainer context={resourceViewContainer} groot={groot} />
-    }
-  }
-
-
-
-  const appView = {
-    id: 'application',
-    name: '页面',
-    view: <Application />,
-    parent: 'application'
-  }
-
-  const materialView = {
-    id: 'material',
-    name: '物料',
-    view: <Material />,
-    parent: 'material'
-  }
-
-  const resourceView = {
-    id: 'resource',
-    name: '状态',
-    view: <ResourceList />,
-    parent: 'resource'
-  }
-
-
-
 
   groot.onReady(() => {
+    executeCommand('gc.openEntry', +params.instanceId).then(() => {
+      initUI()
+    })
+  })
+
+  const initUI = () => {
+    const appViewContainer = {
+      id: 'application',
+      name: '页面',
+      icon: () => {
+        return <AppstoreOutlined />
+      },
+      view: () => {
+        return <ViewsContainer context={appViewContainer} groot={groot} />
+      },
+    }
+
+    const materialViewContainer = {
+      id: 'material',
+      name: '物料',
+      icon: () => {
+        return <AppstoreOutlined />
+      },
+      view: () => {
+        return <ViewsContainer context={materialViewContainer} groot={groot} />
+      },
+    }
+
+    const resourceViewContainer = {
+      id: 'resource',
+      name: '状态',
+      icon: <AppstoreOutlined />,
+      view: () => {
+        return <ViewsContainer context={resourceViewContainer} groot={groot} />
+      }
+    }
+
+
+
+    const appView = {
+      id: 'application',
+      name: '页面',
+      view: <Application />,
+      parent: 'application'
+    }
+
+    const materialView = {
+      id: 'material',
+      name: '物料',
+      view: <Material />,
+      parent: 'material'
+    }
+
+    const resourceView = {
+      id: 'resource',
+      name: '状态',
+      view: <ResourceList />,
+      parent: 'resource'
+    }
 
     const viewContainerMap = getState('gs.ui.viewContainerMap')
     viewContainerMap.set(appViewContainer.id, appViewContainer)
@@ -84,9 +87,7 @@ export const instanceBootstrap = () => {
     setState('gs.ui.activityBar.viewContainers', new Set(['application', 'material', 'resource']))
     setState('gs.ui.activityBar.active', 'application');
     setState('gs.ui.primarySidebar.active', 'application');
-
-    executeCommand('gc.openEntry', +params.instanceId)
-  })
+  }
 }
 
 
