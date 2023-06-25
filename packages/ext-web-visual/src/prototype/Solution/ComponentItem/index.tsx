@@ -1,36 +1,40 @@
 import { CaretDownOutlined, PlusOutlined, SendOutlined } from "@ant-design/icons"
 import { Component, ModalStatus, useModel } from "@grootio/common"
 import { Modal, Select, Space } from "antd"
-import { useEffect } from "react"
 import SolutionModel from "../SolutionModel"
 
 import styles from './index.module.less'
+import { grootManager } from "context"
 
 const ComponentItem: React.FC<{ component: Component }> = ({ component }) => {
   const solutionModel = useModel(SolutionModel)
 
-  useEffect(() => {
-    component.componentVersionId = component.recentVersionId
-  }, [])
-
-  const onSwitchVersion = (value) => {
-    component.componentVersionId = value
-    // todo-reload grootManager.command.executeCommand('gc.fetch.prototype', component.id, value)
+  const onSwitchVersion = (versionId) => {
+    component.currVersionId = versionId
+    solutionModel.activeComponentId = component.id;
+    grootManager.command.executeCommand('gc.openComponent', versionId)
   }
 
-  return <div className={`${styles.componentItem} ${solutionModel.currComponentId === component.id ? styles.active : ''}`}>
+  let versionStyle = '';
+  if (component.currVersionId !== component.activeVersionId) {
+    versionStyle = styles.versionChange
+  } else if (component.activeVersionId !== component.recentVersionId) {
+    versionStyle = styles.versionFallBehind
+  }
+  return <div className={`${styles.componentItem} ${solutionModel.activeComponentId === component.id || component.activeVersionId !== component.currVersionId ? styles.active : ''}`}>
     <div className={styles.componentItemName}>
       {component.name}
     </div>
     <div className={styles.componentItemVersion} onClick={(e) => e.stopPropagation()}>
       <Space size="small">
         <PlusOutlined onClick={() => {
-          solutionModel.component = component;
+          solutionModel.componentIdForAddComponentVersion = component.id;
           solutionModel.componentVersionAddModalStatus = ModalStatus.Init
         }} />
 
+
         {
-          component.recentVersionId !== component.componentVersionId ? (
+          component.currVersionId !== component.activeVersionId ? (
             <SendOutlined onClick={() => {
               Modal.confirm({
                 title: '确定发布版本',
@@ -44,8 +48,9 @@ const ComponentItem: React.FC<{ component: Component }> = ({ component }) => {
         }
       </Space>
       <Select
+        className={versionStyle}
         onChange={onSwitchVersion}
-        value={component.componentVersionId}
+        value={component.currVersionId}
         suffixIcon={<CaretDownOutlined />}
         dropdownMatchSelectWidth={false}
         defaultValue={component.recentVersionId}

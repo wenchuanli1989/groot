@@ -18,11 +18,11 @@ export const Solution = () => {
   }, [])
 
   const switchComponent = (component: Component) => {
-    if (solutionModel.currComponentId === component.id) {
+    if (solutionModel.activeComponentId === component.id) {
       return;
     }
-    grootManager.command.executeCommand('gc.openComponent', component.id)
-    solutionModel.currComponentId = component.id
+    solutionModel.activeComponentId = component.id
+    grootManager.command.executeCommand('gc.openComponent', component.currVersionId)
   }
 
   return <div className={styles.container}>
@@ -39,7 +39,7 @@ export const Solution = () => {
         {
           solutionModel.componentList.map((component) => {
             return (<div key={component.id}
-              className={`${styles.componentItem} ${solutionModel.currComponentId === component.id ? styles.active : ''}`}
+              className={`${styles.componentItem} ${solutionModel.activeComponentId === component.id ? styles.active : ''}`}
               onClick={() => switchComponent(component)}>
               <ComponentItem component={component} />
             </div>)

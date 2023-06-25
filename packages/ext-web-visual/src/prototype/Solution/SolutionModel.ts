@@ -7,8 +7,8 @@ export default class SolutionModel extends BaseModel {
   componentAddModalStatus: ModalStatus = ModalStatus.None
   componentVersionAddModalStatus: ModalStatus = ModalStatus.None
   componentList: Component[] = [];
-  component: Component
-  currComponentId: number
+  componentIdForAddComponentVersion: number
+  activeComponentId: number
 
   public addComponent(rawComponent: Component) {
     this.componentAddModalStatus = ModalStatus.Submit;
@@ -18,34 +18,43 @@ export default class SolutionModel extends BaseModel {
     }).then(({ data }) => {
       this.componentAddModalStatus = ModalStatus.None;
       this.componentList.push(data)
-      grootManager.command.executeCommand('gc.openComponent', data.id)
+      data.versionList = [data.componentVersion]
+      data.currVersionId = data.componentVersion.id
+      data.activeVersionId = data.componentVersion.id;
+
+      this.activeComponentId = data.id;
+      grootManager.command.executeCommand('gc.openComponent', data.recentVersionId)
     });
   }
 
   public loadList() {
-    this.currComponentId = grootManager.state.getState('gs.component').id
+    this.activeComponentId = grootManager.state.getState('gs.component').id
 
     getContext().request(APIPath.solution_componentList_solutionVersionId, { solutionVersionId: 1, all: true, allVersion: true }).then(({ data }) => {
       this.componentList = data;
+      data.forEach(item => {
+        item.currVersionId = item.activeVersionId
+      })
     })
   }
 
-  public addComponentVersion = (rawComponentVersion: ComponentVersion) => {
+  public addComponentVersion(rawComponentVersion: ComponentVersion) {
     this.componentVersionAddModalStatus = ModalStatus.Submit;
     getContext().request(APIPath.componentVersion_add, rawComponentVersion).then(({ data }) => {
       this.componentVersionAddModalStatus = ModalStatus.None;
-      this.component.versionList.push(data);
-      this.component.componentVersion = data;
+      const component = this.componentList.find(item => item.id === this.componentIdForAddComponentVersion)
+      component.versionList = [...component.versionList, data]
+      component.currVersionId = data.id
 
-      // todo-reload grootManager.command.executeCommand('gc.fetch.prototype', this.component.id, data.id)
+      this.activeComponentId = component.id
+      grootManager.command.executeCommand('gc.openComponent', data.id)
     });
   }
 
   public publish = (component: Component) => {
-    const componentId = component.id
-    const versioinId = component.componentVersionId
-    getContext().request(APIPath.componentVersion_publish, { componentId, versioinId }).then(() => {
-      this.component.recentVersionId = versioinId;
+    const componentVersionId = component.currVersionId
+    getContext().request(APIPath.componentVersion_publish, { componentVersionId }).then(() => {
+      component.recentVersionId = componentVersionId;
     });
   }
 }

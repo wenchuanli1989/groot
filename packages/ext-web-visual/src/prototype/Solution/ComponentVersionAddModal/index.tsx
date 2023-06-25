@@ -1,19 +1,22 @@
-import { ComponentVersion, ModalStatus, useModel } from "@grootio/common";
+import { Component, ComponentVersion, ModalStatus, useModel } from "@grootio/common";
 import { Form, Input, Modal, Select } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import SolutionModel from "../SolutionModel";
 
 
 const ComponentVersionAddModal: React.FC = () => {
   const [form] = Form.useForm();
   const solutionModel = useModel(SolutionModel)
+  const [currComponent, setCurrComponent] = useState<Component>()
 
   useEffect(() => {
-    if (solutionModel.componentVersionAddModalStatus !== ModalStatus.None) {
-      form.setFieldValue('imageVersionId', solutionModel.component.componentVersionId)
+    if (solutionModel.componentVersionAddModalStatus !== ModalStatus.None && solutionModel.componentIdForAddComponentVersion) {
+      const component = solutionModel.componentList.find(item => item.id === solutionModel.componentIdForAddComponentVersion)
       form.resetFields();
+      form.setFieldValue('imageVersionId', component.currVersionId)
+      setCurrComponent(component)
     }
-  }, [solutionModel.componentVersionAddModalStatus])
+  }, [solutionModel.componentVersionAddModalStatus, solutionModel.componentIdForAddComponentVersion])
 
   const handleOk = async () => {
     const formData = await form.validateFields();
@@ -33,7 +36,7 @@ const ComponentVersionAddModal: React.FC = () => {
       </Form.Item>
 
       <Form.Item label="关联版本" name="imageVersionId" rules={[{ required: true }]} >
-        <Select options={solutionModel.component?.versionList.map((item) => {
+        <Select options={currComponent?.versionList.map((item) => {
           return { label: item.name, value: item.id }
         })} />
       </Form.Item>
