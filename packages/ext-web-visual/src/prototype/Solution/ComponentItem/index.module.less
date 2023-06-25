@@ -2,8 +2,11 @@
   display: flex;
   padding-left: var(--groot-padding-x);
 
-  &.active .componentItemVersion {
-    visibility: visible;
+  &.active,
+  &:hover {
+    .componentItemVersion {
+      display: inline-block;
+    }
   }
 }
 
@@ -12,5 +15,5 @@
 }
 
 .componentItemVersion {
-  visibility: hidden
+  display: none;
 }

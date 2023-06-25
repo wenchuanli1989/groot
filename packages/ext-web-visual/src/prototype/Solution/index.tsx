@@ -11,24 +11,18 @@ import styles from './index.module.less'
 import SolutionModel from "./SolutionModel";
 
 export const Solution = () => {
-  const [currComponent] = grootManager.state.useStateByName('gs.component');
   const solutionModel = useRegisterModel(SolutionModel)
 
   useEffect(() => {
     solutionModel.loadList();
   }, [])
 
-
   const switchComponent = (component: Component) => {
-    const currComponent = grootManager.state.getState('gs.component')
-    if (currComponent.id === component.id) {
+    if (solutionModel.currComponentId === component.id) {
       return;
     }
     grootManager.command.executeCommand('gc.openComponent', component.id)
-  }
-
-  if (!currComponent) {
-    return null;
+    solutionModel.currComponentId = component.id
   }
 
   return <div className={styles.container}>
@@ -45,7 +39,7 @@ export const Solution = () => {
         {
           solutionModel.componentList.map((component) => {
             return (<div key={component.id}
-              className={`${styles.componentItem} ${currComponent.id === component.id ? styles.active : ''}`}
+              className={`${styles.componentItem} ${solutionModel.currComponentId === component.id ? styles.active : ''}`}
               onClick={() => switchComponent(component)}>
               <ComponentItem component={component} />
             </div>)

@@ -8,6 +8,7 @@ export default class SolutionModel extends BaseModel {
   componentVersionAddModalStatus: ModalStatus = ModalStatus.None
   componentList: Component[] = [];
   component: Component
+  currComponentId: number
 
   public addComponent(rawComponent: Component) {
     this.componentAddModalStatus = ModalStatus.Submit;
@@ -22,7 +23,9 @@ export default class SolutionModel extends BaseModel {
   }
 
   public loadList() {
-    getContext().request(APIPath.solution_componentList_solutionVersionId, { solutionVersionId: 1, all: true }).then(({ data }) => {
+    this.currComponentId = grootManager.state.getState('gs.component').id
+
+    getContext().request(APIPath.solution_componentList_solutionVersionId, { solutionVersionId: 1, all: true, allVersion: true }).then(({ data }) => {
       this.componentList = data;
     })
   }
