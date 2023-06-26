@@ -25,9 +25,6 @@ export const Application = () => {
     grootManager.command.executeCommand('gc.openEntry', instance.id)
   }
 
-  if (!currInstance) {
-    return null;
-  }
 
   return <div className={styles.container}>
     <div>
@@ -64,7 +61,7 @@ export const Application = () => {
         {
           applicationModel.entryInstanceList.map((instance) => {
             return (<div key={instance.id}
-              className={`${styles.componentItem} ${(currInstance.rootId || currInstance.id) === instance.id ? styles.active : ''}`}
+              className={`${styles.componentItem} ${(currInstance?.rootId || currInstance?.id) === instance.id ? styles.active : ''}`}
               onClick={() => openEntry(instance)}>
               <InstanceItem instance={instance} />
             </div>)
@@ -74,7 +71,7 @@ export const Application = () => {
         {
           applicationModel.mainEntryInstanceList.map((instance) => {
             return (<div key={instance.id}
-              className={`${styles.componentItem} ${(currInstance.rootId || currInstance.id) === instance.id ? styles.active : ''}`}
+              className={`${styles.componentItem} ${(currInstance?.rootId || currInstance?.id) === instance.id ? styles.active : ''}`}
               onClick={() => openEntry(instance)}>
               <InstanceItem instance={instance} />
             </div>)
