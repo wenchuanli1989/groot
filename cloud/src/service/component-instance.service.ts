@@ -171,17 +171,26 @@ export class ComponentInstanceService {
   }
 
   // todo **id为componentInstanceId**
-  async getEntryDetail(entryId: number) {
+  async getEntryDetailByEntryIdAndReleaseId(entryId: number, releaseId: number) {
     const em = RequestContext.getEntityManager();
 
     LogicException.assertParamEmpty(entryId, 'entryId');
+    LogicException.assertParamEmpty(releaseId, 'releaseId');
+
+    const release = await em.findOne(Release, releaseId)
+    LogicException.assertNotFound(release, 'Release', releaseId);
+
     const rootInstance = await em.findOne(ComponentInstance, entryId, {
       populate: ['componentVersion', 'component',]
     });
     LogicException.assertNotFound(rootInstance, 'Instance', entryId);
-    if (rootInstance.root || !rootInstance.entry) {
+
+    if (rootInstance.release.id !== release.id) {
+      throw new LogicException(`实例{entryId:${entryId}}不属于当前release`, LogicExceptionCode.UnExpect);
+    } else if (rootInstance.root || !rootInstance.entry) {
       throw new LogicException(`当前组件不是入口组件`, LogicExceptionCode.UnExpect);
     }
+
 
     const entryExtensionInstanceList = await em.find(ExtensionInstance, {
       relationId: rootInstance.id,

@@ -14,7 +14,7 @@ export enum APIPath {
   component_add = 'POST component/add',
   componentVersion_add = 'POST component-version/add',
   componentVersion_publish = 'POST component-version/publish',
-  componentInstance_entryDetail_entryId = 'component-instance/entry-detail/:entryId',
+  component_instance_entry_detail_by_entryId_and_releaseId = 'component-instance/entry-detail-by-entryId-and-releaseId',
   componentInstance_addEntry = 'POST component-instance/add-entry',
   componentInstance_reverseDetectId = 'component-instance/reverse-detect-id',
   release_add = 'POST release/add',

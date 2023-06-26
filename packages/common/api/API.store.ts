@@ -20,7 +20,7 @@ export type APIStore = {
   [APIPath.component_add]: [Component, API.Response<Component>];
   [APIPath.componentVersion_add]: [ComponentVersion, API.Response<ComponentVersion>];
   [APIPath.componentVersion_publish]: [{ componentVersionId: number }];
-  [APIPath.componentInstance_entryDetail_entryId]: [{ entryId: number }, API.Response<{
+  [APIPath.component_instance_entry_detail_by_entryId_and_releaseId]: [{ entryId: number, releaseId: number }, API.Response<{
     children: ComponentInstance[],
     root: ComponentInstance,
     entryExtensionInstanceList: ExtensionRuntime[],

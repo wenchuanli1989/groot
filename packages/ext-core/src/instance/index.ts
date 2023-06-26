@@ -176,8 +176,9 @@ const createFullMetadata = (entryId: number) => {
 }
 
 const loadEntry = (entryId: number) => {
-  const { request, groot: { loadExtension, launchExtension } } = getContext();
-  return request(APIPath.componentInstance_entryDetail_entryId, { entryId }).then(({ data: { children, root, solutionInstanceList, entryExtensionInstanceList, resourceList, resourceConfigList } }) => {
+  const { request, groot: { loadExtension, launchExtension }, params } = getContext();
+  const releaseId = +params.releaseId
+  return request(APIPath.component_instance_entry_detail_by_entryId_and_releaseId, { entryId, releaseId }).then(({ data: { children, root, solutionInstanceList, entryExtensionInstanceList, resourceList, resourceConfigList } }) => {
     activeEntryIdSet.add(entryId)
     entryCache.set(root.id, {
       children, root, solutionInstanceList, entryExtensionInstanceList, resourceList, resourceConfigList

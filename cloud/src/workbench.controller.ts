@@ -151,9 +151,9 @@ export class WorkbenchController {
     return this.applicationService.getDetailByReleaseId(releaseId);
   }
 
-  @Get('/component-instance/entry-detail/:entryId')
-  async componentInstanceEntryDetail(@Param('entryId') entryId: number) {
-    return this.componentInstanceService.getEntryDetail(entryId);
+  @Get('/component-instance/entry-detail-by-entryId-and-releaseId')
+  async componentInstanceEntryDetailByEntryIdAndReleaseId(@Query('entryId') entryId: number, @Query('releaseId') releaseId: number) {
+    return this.componentInstanceService.getEntryDetailByEntryIdAndReleaseId(entryId, releaseId);
   }
 
   @Post('/component-version/add')
