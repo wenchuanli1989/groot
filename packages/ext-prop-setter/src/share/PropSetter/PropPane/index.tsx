@@ -58,6 +58,10 @@ function PropPane() {
     return list;
   }
 
+  if (!propTree || !propTree.length) {
+    return <div className={styles.empty}>未选择内容</div>
+  }
+
   /////////////////////////////////////////////////////////////////////////////
   return <div className={styles.container}>
     <Tabs size="small" activeKey={activeGroupId?.toString()}
