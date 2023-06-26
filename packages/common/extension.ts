@@ -142,7 +142,8 @@ export type GrootCommandDict = {
   'gc.unloadEntry': [[number], void],
 
   'gc.openComponent': [[number], Promise<void>],
-  'gc.loadComponent': [[number], Promise<ViewDataCore>]
+  'gc.loadComponent': [[number], Promise<ViewDataCore>],
+  'gc.navSolution': [[number] | [number, number], void]
 }
 
 export type GrootStateDict = {

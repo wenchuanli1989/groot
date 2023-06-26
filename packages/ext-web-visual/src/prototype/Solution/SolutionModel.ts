@@ -1,4 +1,4 @@
-import { APIPath, BaseModel, Component, ComponentVersion, ModalStatus } from "@grootio/common";
+import { APIPath, BaseModel, Component, ComponentVersion, ModalStatus, SolutionVersion } from "@grootio/common";
 import { getContext, grootManager } from "context";
 
 export default class SolutionModel extends BaseModel {
@@ -6,9 +6,20 @@ export default class SolutionModel extends BaseModel {
 
   componentAddModalStatus: ModalStatus = ModalStatus.None
   componentVersionAddModalStatus: ModalStatus = ModalStatus.None
+  solutionVersionAddModalStatus: ModalStatus = ModalStatus.None
   componentList: Component[] = [];
   componentIdForAddComponentVersion: number
   activeComponentId: number
+  solutionVersionList: SolutionVersion[]
+  currSolutionVersionId: number
+
+  public init() {
+    this.activeComponentId = grootManager.state.getState('gs.component').id
+    this.solutionVersionList = grootManager.state.getState('gs.solution').versionList
+    this.currSolutionVersionId = +getContext().params.solutionVersionId
+
+    this.loadList()
+  }
 
   public addComponent(rawComponent: Component) {
     this.componentAddModalStatus = ModalStatus.Submit;
@@ -28,9 +39,7 @@ export default class SolutionModel extends BaseModel {
   }
 
   public loadList() {
-    this.activeComponentId = grootManager.state.getState('gs.component').id
-
-    getContext().request(APIPath.solution_componentList_solutionVersionId, { solutionVersionId: 1, all: true, allVersion: true }).then(({ data }) => {
+    getContext().request(APIPath.solution_componentList_solutionVersionId, { solutionVersionId: this.currSolutionVersionId, all: true, allVersion: true }).then(({ data }) => {
       this.componentList = data;
       data.forEach(item => {
         item.currVersionId = item.activeVersionId
@@ -51,10 +60,16 @@ export default class SolutionModel extends BaseModel {
     });
   }
 
-  public publish = (component: Component) => {
+  public publish(component: Component) {
     const componentVersionId = component.currVersionId
     getContext().request(APIPath.componentVersion_publish, { componentVersionId }).then(() => {
       component.recentVersionId = componentVersionId;
     });
+  }
+
+  public addSolutionVersion(imageVersionId: number, name: string) {
+    getContext().request(APIPath.solution_version_add, { imageVersionId, name }).then(({ data }) => {
+      grootManager.command.executeCommand('gc.navSolution', data.id, this.activeComponentId)
+    })
   }
 }

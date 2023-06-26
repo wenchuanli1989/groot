@@ -177,7 +177,7 @@ export type ExtensionInstance = {
 
 export type Solution = {
   extensionInstanceList: ExtensionRuntime[];
-
+  versionList: SolutionVersion[];
   // ************************** 分割线已下是界面属性 **************************
 
 } & Omit<import("../../cloud/src/entities/Solution").Solution, ''>;

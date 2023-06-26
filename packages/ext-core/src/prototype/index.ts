@@ -23,6 +23,10 @@ export const prototypeBootstrap = () => {
     return loadComponent(componentVersionId)
   })
 
+  registerCommand('gc.navSolution', (_, solutionVersionId, componentVersionId) => {
+    navSolution(solutionVersionId, componentVersionId)
+  })
+
   getContext().groot.onReady(onReady)
 }
 
@@ -117,5 +121,19 @@ const loadComponent = (versionId: number) => {
 
     componentCache.set(versionId, component)
     return executeCommand('gc.createMetadata', versionId)
+  })
+}
+
+const navSolution = (solutionVersionId: number, componentId?: number) => {
+  if (!componentId) {
+    location.href = `/studio?mode=prototype&solutionVersionId=${solutionVersionId}`
+  }
+
+  getContext().request(APIPath.componentVersion_get_by_solutionVersionId_and_componentId, { solutionVersionId, componentId }).then(({ data }) => {
+    if (data) {
+      location.href = `/studio?mode=prototype&solutionVersionId=${solutionVersionId}&componentVersionId=${data.id}`
+    } else {
+      location.href = `/studio?mode=prototype&solutionVersionId=${solutionVersionId}`
+    }
   })
 }

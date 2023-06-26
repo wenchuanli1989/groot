@@ -19,6 +19,7 @@ import { ResourceService } from 'service/resource.service';
 import { AssetController } from 'asset.controller';
 import { SolutionService } from 'service/solution.service';
 import { ExtensionInstanceService } from 'service/extension-instance.service';
+import { SolutionVersionService } from 'service/solution-version.service';
 @Module({
   imports: [
     MikroOrmModule.forRoot(config)
@@ -39,7 +40,8 @@ import { ExtensionInstanceService } from 'service/extension-instance.service';
     AssetService,
     ResourceService,
     SolutionService,
-    ExtensionInstanceService
+    ExtensionInstanceService,
+    SolutionVersionService
   ],
 })
 export class AppModule { }

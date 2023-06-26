@@ -24,6 +24,8 @@ export class SolutionService {
 
     solution.solutionVersion = wrap(solutionVersion).toObject() as any
 
+    solution.versionList = await em.find(SolutionVersion, { solution })
+
     solution.extensionInstanceList = await em.find(ExtensionInstance, {
       relationType: ExtensionRelationType.Solution,
       relationId: solutionVersion.id,

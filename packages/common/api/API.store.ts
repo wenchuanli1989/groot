@@ -1,4 +1,4 @@
-import { SolutionInstance, Application, Component, ComponentInstance, ComponentVersion, Deploy, Organization, PropBlock, PropGroup, PropItem, PropValue, Release, Solution, ExtensionInstance, AppResource, InstanceResource, ResourceConfig, Resource } from '../entities';
+import { SolutionInstance, Application, Component, ComponentInstance, ComponentVersion, Deploy, Organization, PropBlock, PropGroup, PropItem, PropValue, Release, Solution, ExtensionInstance, AppResource, InstanceResource, ResourceConfig, Resource, SolutionVersion } from '../entities';
 import { EnvType, StudioMode } from '../enum';
 import { ExtensionRuntime } from '../extension';
 import { API } from './API.common';
@@ -81,9 +81,12 @@ export type APIStore = {
 
   [APIPath.solution_componentList_solutionVersionId]: [{ solutionVersionId: number, all?: boolean, allVersion?: boolean }, API.Response<Component[]>],
 
-  [APIPath.application_releaseList_appId]: [{ appId: number }, API.Response<Release[]>]
+  [APIPath.application_releaseList_appId]: [{ appId: number }, API.Response<Release[]>],
 
-  [APIPath.secretCore]: [{ mode: StudioMode, releaseId: string, solutionVersionId: string }, API.Response<ExtensionInstance>]
+  [APIPath.secretCore]: [{ mode: StudioMode, releaseId: string, solutionVersionId: string }, API.Response<ExtensionInstance>],
+  [APIPath.componentVersion_get_by_solutionVersionId_and_componentId]: [{ solutionVersionId: number, componentId: number }, API.Response<ComponentVersion>],
+  [APIPath.solution_version_add]: [{ imageVersionId: number, name: string }, API.Response<SolutionVersion>]
+
 };
 
 

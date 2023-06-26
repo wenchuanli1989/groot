@@ -19,12 +19,13 @@ import { Release } from 'entities/Release';
 import { StandardResultInterceptor } from 'config/standard-result.interceptor';
 import { AssetService } from 'service/asset.service';
 import { ResourceService } from 'service/resource.service';
-import { EnvType, ExtensionRelationType, StudioMode } from '@grootio/common';
+import { EnvType, StudioMode } from '@grootio/common';
 import { SolutionService } from 'service/solution.service';
 import { ComponentService } from 'service/component.service';
 import { InstanceResource } from 'entities/InstanceResource';
 import { AppResource } from 'entities/AppResource';
 import { ExtensionInstanceService } from 'service/extension-instance.service';
+import { SolutionVersionService } from 'service/solution-version.service';
 
 @UseInterceptors(StandardResultInterceptor)
 @Controller('/workbench')
@@ -44,6 +45,7 @@ export class WorkbenchController {
     private readonly resourceService: ResourceService,
     private readonly solutionService: SolutionService,
     private readonly extensionInstanceService: ExtensionInstanceService,
+    private readonly solutionVersionService: SolutionVersionService
   ) { }
 
   @Post('/component/add')
@@ -283,5 +285,15 @@ export class WorkbenchController {
   async getSecretCore(@Query('mode') mode: StudioMode, @Query('releaseId') releaseId: string, @Query('solutionVersionId') solutionVersionId: string) {
 
     return await this.extensionInstanceService.getSecret({ mode, releaseId: +releaseId, solutionVersionId: +solutionVersionId })
+  }
+
+  @Get('/componentVersion/get-by-solutionVersionId-and-componentId')
+  async getBySolutionVersionIdAndComponentId(@Query('solutionVersionId') solutionVersionId: number, @Query('componentId') componentId: number) {
+    return await this.componentVersionService.getBySolutionVersionIdAndComponentId(solutionVersionId, componentId)
+  }
+
+  @Post('/solution-version/add')
+  async solutionVersionAdd(@Body('imageVersionId') imageVersionId: number, @Body('name') name: string) {
+    return await this.solutionVersionService.add(imageVersionId, name)
   }
 }

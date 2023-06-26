@@ -1,6 +1,4 @@
-import { PlusOutlined } from "@ant-design/icons";
-import { Component, ModalStatus, useRegisterModel } from "@grootio/common";
-import { Button } from "antd";
+import { Component, useRegisterModel } from "@grootio/common";
 import { grootManager } from "context";
 import { useEffect } from "react";
 import ComponentAddModal from "./ComponentAddModal";
@@ -9,12 +7,14 @@ import ComponentVersionAddModal from "./ComponentVersionAddModal";
 
 import styles from './index.module.less'
 import SolutionModel from "./SolutionModel";
+import SolutionManager from "./SolutionManager";
+import SolutionVersionAddModal from "./SolutionVersionAddModal";
 
 export const Solution = () => {
   const solutionModel = useRegisterModel(SolutionModel)
 
   useEffect(() => {
-    solutionModel.loadList();
+    solutionModel.init()
   }, [])
 
   const switchComponent = (component: Component) => {
@@ -26,30 +26,22 @@ export const Solution = () => {
   }
 
   return <div className={styles.container}>
-    <div>
-      <div className={styles.componentItemHeader}>
-        <div style={{ flexGrow: 1 }}>组件</div>
-        <div >
-          <Button icon={<PlusOutlined />} type="link" onClick={() => {
-            solutionModel.componentAddModalStatus = ModalStatus.Init
-          }} />
-        </div>
-      </div>
-      <div >
-        {
-          solutionModel.componentList.map((component) => {
-            return (<div key={component.id}
-              className={`${styles.componentItem} ${solutionModel.activeComponentId === component.id ? styles.active : ''}`}
-              onClick={() => switchComponent(component)}>
-              <ComponentItem component={component} />
-            </div>)
-          })
-        }
-      </div>
+    <SolutionManager />
+    <div >
+      {
+        solutionModel.componentList.map((component) => {
+          return (<div key={component.id}
+            className={`${styles.componentItem} ${solutionModel.activeComponentId === component.id ? styles.active : ''}`}
+            onClick={() => switchComponent(component)}>
+            <ComponentItem component={component} />
+          </div>)
+        })
+      }
     </div>
 
     <ComponentAddModal />
     <ComponentVersionAddModal />
+    <SolutionVersionAddModal />
   </div >
 
 }

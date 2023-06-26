@@ -4,7 +4,6 @@ import { BaseEntity } from "./BaseEntity";
 import { ExtensionInstance } from "./ExtensionInstance";
 import { Organization } from "./Organization";
 import { SolutionVersion } from "./SolutionVersion";
-import { Component } from "./Component";
 
 @Entity()
 export class Solution extends BaseEntity {
@@ -28,4 +27,6 @@ export class Solution extends BaseEntity {
   @Property({ persist: false })
   solutionVersion: SolutionVersion;
 
+  @Property({ persist: false })
+  versionList: SolutionVersion[]
 }
