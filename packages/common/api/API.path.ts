@@ -50,5 +50,6 @@ export enum APIPath {
 
   secretCore = 'secret-core',
   componentVersion_get_by_solutionVersionId_and_componentId = 'componentVersion/get-by-solutionVersionId-and-componentId',
-  solution_version_add = 'POST solution-version/add'
+  solution_version_add = 'POST solution-version/add',
+  solution_version_remove_component_version = 'POST solution-version/remove-component-version'
 }

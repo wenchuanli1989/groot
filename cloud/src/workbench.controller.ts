@@ -296,4 +296,9 @@ export class WorkbenchController {
   async solutionVersionAdd(@Body('imageVersionId') imageVersionId: number, @Body('name') name: string) {
     return await this.solutionVersionService.add(imageVersionId, name)
   }
+
+  @Post('/solution-version/remove-component-version')
+  async solutionVersionRemoveComponentVersion(@Body('solutionVersionId') solutionVersionId: number, @Body('componentVersionId') componentVersionId: number) {
+    return await this.solutionVersionService.removeComponentVersion(solutionVersionId, componentVersionId)
+  }
 }

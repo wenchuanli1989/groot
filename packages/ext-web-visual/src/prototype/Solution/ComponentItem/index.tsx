@@ -1,6 +1,6 @@
-import { CaretDownOutlined, PlusOutlined, SendOutlined } from "@ant-design/icons"
+import { CaretDownOutlined, DeleteOutlined, PlusOutlined, SendOutlined } from "@ant-design/icons"
 import { Component, ModalStatus, useModel } from "@grootio/common"
-import { Modal, Select, Space } from "antd"
+import { Modal, Popconfirm, Select, Space } from "antd"
 import SolutionModel from "../SolutionModel"
 
 import styles from './index.module.less'
@@ -27,6 +27,15 @@ const ComponentItem: React.FC<{ component: Component }> = ({ component }) => {
     </div>
     <div className={styles.componentItemVersion} onClick={(e) => e.stopPropagation()}>
       <Space size="small">
+        <Popconfirm title="确定删除吗"
+          onConfirm={() => {
+            solutionModel.removeComponentVersion(component)
+          }}
+          okText="删除"
+          cancelText="取消">
+          <DeleteOutlined />
+        </Popconfirm>
+
         <PlusOutlined onClick={() => {
           solutionModel.componentIdForAddComponentVersion = component.id;
           solutionModel.componentVersionAddModalStatus = ModalStatus.Init

@@ -72,4 +72,17 @@ export default class SolutionModel extends BaseModel {
       grootManager.command.executeCommand('gc.navSolution', data.id, this.activeComponentId)
     })
   }
+
+  public removeComponentVersion(component: Component) {
+    const solutionVersionId = +getContext().params.solutionVersionId
+    getContext().request(APIPath.solution_version_remove_component_version, { solutionVersionId, componentVersionId: component.activeVersionId }).then(() => {
+      this.componentList = this.componentList.filter(item => item.id !== component.id)
+
+      if (this.activeComponentId === component.id) {
+        const newActiveComponent = this.componentList[0]
+        this.activeComponentId = newActiveComponent.id
+        grootManager.command.executeCommand('gc.openComponent', newActiveComponent.activeVersionId)
+      }
+    })
+  }
 }
