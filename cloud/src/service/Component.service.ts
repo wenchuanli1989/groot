@@ -15,13 +15,22 @@ import { SolutionVersion } from 'entities/SolutionVersion';
 @Injectable()
 export class ComponentService {
 
-  async getComponentDetailByVersionId(versionId: number) {
+  async componentDetailByComponentVersionId(componentVersionId: number, solutionVersionId: number) {
     const em = RequestContext.getEntityManager();
 
-    LogicException.assertParamEmpty(versionId, 'versionId');
+    LogicException.assertParamEmpty(componentVersionId, 'componentVersionId');
+    LogicException.assertParamEmpty(solutionVersionId, 'solutionVersionId');
 
-    const version = await em.findOne(ComponentVersion, versionId);
-    LogicException.assertNotFound(version, 'ComponentVersion', versionId);
+    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId, { populate: ['componentVersionList'] });
+    LogicException.assertNotFound(solutionVersion, 'SolutionVersion', solutionVersionId);
+
+    const hitComponentVersion = [...solutionVersion.componentVersionList.getItems()].find(item => item.id === componentVersionId)
+    if (!hitComponentVersion) {
+      throw new LogicException(`组件{componentVersionId: ${componentVersionId}} 不在解决方案中`, LogicExceptionCode.UnExpect)
+    }
+
+    const version = await em.findOne(ComponentVersion, componentVersionId);
+    LogicException.assertNotFound(version, 'ComponentVersion', componentVersionId);
     const componentId = version.component.id
 
     const component = await em.findOne(Component, componentId);

@@ -15,7 +15,7 @@ export type APIStore = {
   [APIPath.solution_detailBySolutionVersionId]: [{ solutionVersionId: number }, API.Response<Solution>]
   [APIPath.move_position]: [{ originId: number, targetId: number, type: 'group' | 'block' | 'item' }];
   [APIPath.componentInstance_addChild]: [ComponentInstance, API.Response<ComponentInstance>];
-  [APIPath.componentPrototype_detailByVersionId]: [{ versionId: number }, API.Response<Component>];
+  [APIPath.component_detail_by_componentVersionId_and_solutionVersionId]: [{ componentVersionId: number, solutionVersionId: number }, API.Response<Component>];
   [APIPath.org_detail_orgId]: [{ orgId: number }, API.Response<Organization>];
   [APIPath.component_add]: [Component, API.Response<Component>];
   [APIPath.componentVersion_add]: [ComponentVersion, API.Response<ComponentVersion>];

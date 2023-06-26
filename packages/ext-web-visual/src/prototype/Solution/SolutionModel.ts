@@ -14,9 +14,14 @@ export default class SolutionModel extends BaseModel {
   currSolutionVersionId: number
 
   public init() {
-    this.activeComponentId = grootManager.state.getState('gs.component').id
     this.solutionVersionList = grootManager.state.getState('gs.solution').versionList
     this.currSolutionVersionId = +getContext().params.solutionVersionId
+
+    grootManager.state.watchState('gs.component', (newComponent) => {
+      if (this.activeComponentId !== newComponent?.id) {
+        this.activeComponentId = newComponent.id
+      }
+    })
 
     this.loadList()
   }

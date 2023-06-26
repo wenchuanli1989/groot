@@ -10,7 +10,7 @@ export enum APIPath {
   solution_detailBySolutionVersionId = 'solution/detail-by-solutionVersionId/:solutionVersionId',
   componentInstance_addChild = 'POST component-instance/add-child',
   componentInstance_remove_instanceId = 'component-instance/remove/:instanceId',
-  componentPrototype_detailByVersionId = 'component-prototype/detail-by-versionId/:versionId',
+  component_detail_by_componentVersionId_and_solutionVersionId = 'component/detail-by-componentVersionId-and-solutionVersionId',
   component_add = 'POST component/add',
   componentVersion_add = 'POST component-version/add',
   componentVersion_publish = 'POST component-version/publish',

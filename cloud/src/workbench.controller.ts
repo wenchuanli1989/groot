@@ -141,9 +141,9 @@ export class WorkbenchController {
     return this.orgService.getDetail(orgId);
   }
 
-  @Get('/component-prototype/detail-by-versionId/:versionId')
-  async componentDetailByVersionId(@Param('versionId') versionId: number) {
-    return this.componentService.getComponentDetailByVersionId(versionId);
+  @Get('/component/detail-by-componentVersionId-and-solutionVersionId')
+  async componentDetailByComponentVersionId(@Query('componentVersionId') componentVersionId: number, @Query('solutionVersionId') solutionVersionId: number) {
+    return this.componentService.componentDetailByComponentVersionId(+componentVersionId, +solutionVersionId);
   }
 
   @Get('/application/detail-by-releaseId/:releaseId')

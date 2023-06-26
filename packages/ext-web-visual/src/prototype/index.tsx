@@ -12,9 +12,11 @@ export const prototypeBootstrap = () => {
   layout.primarySidebarWidth = '220px'
 
   groot.onReady(() => {
-    executeCommand('gc.openComponent', +params.componentVersionId).then(() => {
-      initUI()
-    })
+    initUI()
+
+    if (+params.componentVersionId) {
+      executeCommand('gc.openComponent', +params.componentVersionId)
+    }
   })
 
   const initUI = () => {

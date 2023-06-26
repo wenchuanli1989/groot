@@ -91,23 +91,24 @@ const createFullMetadata = (component: Component) => {
   }
 }
 
-const openComponent = (versionId: number) => {
+const openComponent = (componentVersionId: number) => {
   const { executeCommand } = grootManager.command
 
-  return executeCommand('gc.loadComponent', versionId).then((data) => {
+  return executeCommand('gc.loadComponent', componentVersionId).then((data) => {
     const { setState, getState } = grootManager.state
     const viewKey = getState('gs.stage.playgroundPath')
     executeCommand('gc.stageRefresh', viewKey, data)
 
-    const component = componentCache.get(versionId)
+    const component = componentCache.get(componentVersionId)
     setState('gs.propTree', component.propTree)
     setState('gs.activePropGroupId', component.propTree[0].id)
     setState('gs.component', component)
   })
 }
 
-const loadComponent = (versionId: number) => {
-  return getContext().request(APIPath.componentPrototype_detailByVersionId, { versionId }).then(({ data: component }) => {
+const loadComponent = (componentVersionId: number) => {
+  const solutionVersionId = +getContext().params.solutionVersionId
+  return getContext().request(APIPath.component_detail_by_componentVersionId_and_solutionVersionId, { componentVersionId, solutionVersionId }).then(({ data: component }) => {
     const { executeCommand } = grootManager.command
 
     const { blockList, itemList } = component;
@@ -119,8 +120,8 @@ const loadComponent = (versionId: number) => {
       parseOptions(item);
     })
 
-    componentCache.set(versionId, component)
-    return executeCommand('gc.createMetadata', versionId)
+    componentCache.set(componentVersionId, component)
+    return executeCommand('gc.createMetadata', componentVersionId)
   })
 }
 
