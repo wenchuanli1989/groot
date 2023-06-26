@@ -108,7 +108,7 @@ const openComponent = (componentVersionId: number) => {
 
 const loadComponent = (componentVersionId: number) => {
   const solutionVersionId = +getContext().params.solutionVersionId
-  return getContext().request(APIPath.component_detail_by_componentVersionId_and_solutionVersionId, { componentVersionId, solutionVersionId }).then(({ data: component }) => {
+  return getContext().request(APIPath.component_detailByComponentVersionIdAndSolutionVersionId, { componentVersionId, solutionVersionId }).then(({ data: component }) => {
     const { executeCommand } = grootManager.command
 
     const { blockList, itemList } = component;
@@ -130,7 +130,7 @@ const navSolution = (solutionVersionId: number, componentId?: number) => {
     location.href = `/studio?mode=prototype&solutionVersionId=${solutionVersionId}`
   }
 
-  getContext().request(APIPath.componentVersion_get_by_solutionVersionId_and_componentId, { solutionVersionId, componentId }).then(({ data }) => {
+  getContext().request(APIPath.componentVersion_getBySolutionVersionIdAndComponentId, { solutionVersionId, componentId }).then(({ data }) => {
     if (data) {
       location.href = `/studio?mode=prototype&solutionVersionId=${solutionVersionId}&componentVersionId=${data.id}`
     } else {

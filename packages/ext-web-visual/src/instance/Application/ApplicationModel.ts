@@ -109,7 +109,7 @@ export default class ApplicationModel extends BaseModel {
 
   public createDeploy(formData: Deploy) {
     this.assetDeployModalStatus = ModalStatus.Submit;
-    getContext().request(APIPath.asset_create_deploy, { bundleId: this.deployBundleId, ...formData }).then(({ data: deploy }) => {
+    getContext().request(APIPath.asset_createDeploy, { bundleId: this.deployBundleId, ...formData }).then(({ data: deploy }) => {
       if (deploy.status === DeployStatusType.Approval) {
         this.assetDeployModalStatus = ModalStatus.None;
         message.success('流程审批中')

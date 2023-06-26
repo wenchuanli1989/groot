@@ -10,18 +10,18 @@ export enum APIPath {
   solution_detailBySolutionVersionId = 'solution/detail-by-solutionVersionId/:solutionVersionId',
   componentInstance_addChild = 'POST component-instance/add-child',
   componentInstance_remove_instanceId = 'component-instance/remove/:instanceId',
-  component_detail_by_componentVersionId_and_solutionVersionId = 'component/detail-by-componentVersionId-and-solutionVersionId',
+  component_detailByComponentVersionIdAndSolutionVersionId = 'component/detail-by-componentVersionId-and-solutionVersionId',
   component_add = 'POST component/add',
   componentVersion_add = 'POST component-version/add',
   componentVersion_publish = 'POST component-version/publish',
-  component_instance_entry_detail_by_entryId_and_releaseId = 'component-instance/entry-detail-by-entryId-and-releaseId',
+  componentInstance_entryDetailByEntryIdAndReleaseId = 'component-instance/entry-detail-by-entryId-and-releaseId',
   componentInstance_addEntry = 'POST component-instance/add-entry',
   componentInstance_reverseDetectId = 'component-instance/reverse-detect-id',
   release_add = 'POST release/add',
   asset_build = 'POST asset/build',
   asset_publish = 'POST asset/publish',
 
-  asset_create_deploy = 'POST asset/create-deploy',
+  asset_createDeploy = 'POST asset/create-deploy',
 
   item_update = 'POST item/update',
   item_add = 'POST item/add',
@@ -39,17 +39,17 @@ export enum APIPath {
   move_position = 'POST move/position',
 
   resource_remove_resourceId = 'resource/remove/:resourceId',
-  resource_add_instance_resource = 'POST resource/add-instance-resource',
-  resource_add_app_resource = 'POST resource/add-app-resource',
-  resource_update_instance_resource = 'POST resource/update-instance-resource',
-  resource_update_app_resource = 'POST resource/update-app-resource',
+  resource_addInstanceResource = 'POST resource/add-instance-resource',
+  resource_addAppResource = 'POST resource/add-app-resource',
+  resource_updateInstanceResource = 'POST resource/update-instance-resource',
+  resource_updateAppResource = 'POST resource/update-app-resource',
 
   solution_componentList_solutionVersionId = 'solution/component-list/:solutionVersionId',
 
   application_releaseList_appId = 'application/release-list/:appId',
 
   secretCore = 'secret-core',
-  componentVersion_get_by_solutionVersionId_and_componentId = 'componentVersion/get-by-solutionVersionId-and-componentId',
-  solution_version_add = 'POST solution-version/add',
-  solution_version_remove_component_version = 'POST solution-version/remove-component-version'
+  componentVersion_getBySolutionVersionIdAndComponentId = 'componentVersion/get-by-solutionVersionId-and-componentId',
+  solutionVersion_add = 'POST solution-version/add',
+  solutionVersion_removeComponentVersion = 'POST solution-version/remove-component-version'
 }

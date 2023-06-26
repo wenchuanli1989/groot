@@ -28,7 +28,7 @@ export default class ResourceModel extends BaseModel {
       const data = rawResource as InstanceResource
       data.releaseId = releaseId
       data.componentInstanceId = componentInstanceId
-      getContext().request(APIPath.resource_add_instance_resource, data).then((res) => {
+      getContext().request(APIPath.resource_addInstanceResource, data).then((res) => {
         const localSttateList = grootManager.state.getState('gs.localResourceList');
         localSttateList.push(res.data as Resource);
         const entryId = grootManager.state.getState('gs.entry').root.id
@@ -39,7 +39,7 @@ export default class ResourceModel extends BaseModel {
       const data = rawResource as AppResource
       data.releaseId = releaseId
       data.appId = grootManager.state.getState('gs.app').id
-      getContext().request(APIPath.resource_add_app_resource, data).then((res) => {
+      getContext().request(APIPath.resource_addAppResource, data).then((res) => {
         const globalResourceList = grootManager.state.getState('gs.globalResourceList');
         globalResourceList.push(res.data as Resource);
         grootManager.command.executeCommand('gc.pushResource')
@@ -50,7 +50,7 @@ export default class ResourceModel extends BaseModel {
   }
 
   updateResource(rawResource: Resource) {
-    getContext().request(this.isLocalResource ? APIPath.resource_update_instance_resource : APIPath.resource_update_app_resource, { id: this.currResource.id, ...rawResource } as any).then((res) => {
+    getContext().request(this.isLocalResource ? APIPath.resource_updateInstanceResource : APIPath.resource_updateAppResource, { id: this.currResource.id, ...rawResource } as any).then((res) => {
       const list = this.isLocalResource ? grootManager.state.getState('gs.localResourceList') : grootManager.state.getState('gs.globalResourceList') as any[];
       const originResource = list.find(item => item.id === this.currResource.id);
       Object.assign(originResource, pick(res.data, ['type', 'name', 'value']));
