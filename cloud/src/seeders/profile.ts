@@ -220,7 +220,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     solution,
     solutionVersion: solution.recentVersion,
     entry: profileComponentInstance,
-    primary: true
+    solutionEntry
   })
   await em.persistAndFlush(solutionInstance);
 

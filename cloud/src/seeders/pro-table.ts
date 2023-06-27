@@ -213,7 +213,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     solution,
     solutionVersion: solution.recentVersion,
     entry: tableComponentInstance,
-    primary: true
+    solutionEntry
   })
   await em.persistAndFlush(solutionInstance);
 

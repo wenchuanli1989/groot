@@ -5,6 +5,7 @@ import { ComponentInstance } from "./ComponentInstance";
 import { ExtensionInstance } from "./ExtensionInstance";
 import { Solution } from "./Solution";
 import { SolutionVersion } from "./SolutionVersion";
+import { SolutionEntry } from "./SolutionEntry";
 
 @Entity()
 export class SolutionInstance extends BaseEntity {
@@ -18,8 +19,8 @@ export class SolutionInstance extends BaseEntity {
   @ManyToOne({ serializer: value => value?.id, serializedName: 'entryId' })
   entry: ComponentInstance;
 
-  @Property()
-  primary = false
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'solutionEntryId' })
+  solutionEntry?: SolutionEntry
 
   //************************已下是接口入参或者查询返回需要定义的属性************************
 

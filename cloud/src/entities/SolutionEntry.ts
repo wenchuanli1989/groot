@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, Property } from "@mikro-orm/core";
+import { Collection, Entity, ManyToMany, ManyToOne, Property } from "@mikro-orm/core";
 
 import { BaseEntity } from "./BaseEntity";
 import { ComponentVersion } from "./ComponentVersion";
@@ -14,6 +14,9 @@ export class SolutionEntry extends BaseEntity {
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'componentVersionId' })
   componentVersion: ComponentVersion;
+
+  @ManyToMany()
+  componentVersionList = new Collection<ComponentVersion>(this);
 
   //************************已下是接口入参或者查询返回需要定义的属性************************
 

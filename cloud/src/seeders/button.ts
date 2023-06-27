@@ -1,7 +1,6 @@
 import { PropBlockLayout, PropBlockStructType, PropItemViewType } from "@grootio/common";
 import { EntityManager } from "@mikro-orm/core";
 
-import { SolutionInstance } from "../entities/SolutionInstance";
 import { Component } from "../entities/Component";
 import { ComponentInstance } from "../entities/ComponentInstance";
 import { ComponentVersion } from "../entities/ComponentVersion";
@@ -143,17 +142,4 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   })
   await em.persistAndFlush(instanceResource)
 
-
-  // 创建入口解决方案实例
-  const solutionInstance = em.create(SolutionInstance, {
-    solution,
-    solutionVersion: solution.recentVersion,
-    entry: btnComponentInstance,
-    primary: true
-  })
-  await em.persistAndFlush(solutionInstance);
-
-  // 更新组件实例关联解决方案实例
-  btnComponentInstance.solutionInstance = solutionInstance
-  await em.persistAndFlush(btnComponentInstance);
 }
