@@ -1,7 +1,7 @@
 import { ModalStatus, useModel } from '@grootio/common'
 import styles from './index.module.less'
 import SolutionModel from '../SolutionModel'
-import { CaretDownOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons'
+import { BlockOutlined, CaretDownOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Select } from 'antd'
 import { grootManager } from 'context'
 
@@ -19,7 +19,7 @@ const SolutionManager = () => {
       <Button icon={<PlusOutlined />} type="link" onClick={() => {
         solutionModel.componentAddModalStatus = ModalStatus.Init
       }} />
-      <Button icon={<SendOutlined />} type="link" onClick={() => {
+      <Button icon={<BlockOutlined />} type="link" onClick={() => {
         solutionModel.solutionVersionAddModalStatus = ModalStatus.Init
       }} />
 

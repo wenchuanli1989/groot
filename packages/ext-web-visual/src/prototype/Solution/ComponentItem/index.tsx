@@ -1,4 +1,4 @@
-import { CaretDownOutlined, DeleteOutlined, PlusOutlined, SendOutlined } from "@ant-design/icons"
+import { BlockOutlined, CaretDownOutlined, DeleteOutlined, SendOutlined } from "@ant-design/icons"
 import { Component, ModalStatus, useModel } from "@grootio/common"
 import { Modal, Popconfirm, Select, Space } from "antd"
 import SolutionModel from "../SolutionModel"
@@ -36,7 +36,7 @@ const ComponentItem: React.FC<{ component: Component }> = ({ component }) => {
           <DeleteOutlined />
         </Popconfirm>
 
-        <PlusOutlined onClick={() => {
+        <BlockOutlined onClick={() => {
           solutionModel.componentIdForAddComponentVersion = component.id;
           solutionModel.componentVersionAddModalStatus = ModalStatus.Init
         }} />
