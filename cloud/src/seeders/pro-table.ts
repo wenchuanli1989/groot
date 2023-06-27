@@ -1,7 +1,6 @@
 import { PropBlockLayout, PropBlockStructType, PropItemStruct, PropItemViewType, PropValueType } from "@grootio/common";
 import { EntityManager } from "@mikro-orm/core";
 
-import { SolutionEntry } from "../entities/SolutionEntry";
 import { SolutionInstance } from "../entities/SolutionInstance";
 import { Component } from "../entities/Component";
 import { ComponentInstance } from "../entities/ComponentInstance";
@@ -12,6 +11,7 @@ import { PropItem } from "../entities/PropItem";
 import { PropValue } from "../entities/PropValue";
 import { Release } from "../entities/Release";
 import { Solution } from "../entities/Solution";
+import { SolutionComponent } from "../entities/SolutionComponent";
 
 export const create = async (em: EntityManager, solution: Solution, release: Release) => {
   // 创建组件
@@ -33,16 +33,12 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   await em.persistAndFlush(tableComponent);
 
   // 将组件和解决方案进行关联
-  solution.recentVersion.componentVersionList.add(tableComponentVersion)
-  await em.persistAndFlush(solution.recentVersion);
-
-  // 创建解决方案首选入口
-  const solutionEntry = em.create(SolutionEntry, {
-    name: tableComponent.name,
+  const solutionComponentRelation = em.create(SolutionComponent, {
     solutionVersion: solution.recentVersion,
-    componentVersion: tableComponentVersion
+    componentVersion: tableComponentVersion,
+    entry: true
   })
-  await em.persistAndFlush(solutionEntry);
+  await em.persistAndFlush(solutionComponentRelation);
 
   // 创建组件配置项
   const commonGroup = em.create(PropGroup, {
@@ -210,10 +206,9 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
 
   // 创建入口解决方案实例
   const solutionInstance = em.create(SolutionInstance, {
-    solution,
     solutionVersion: solution.recentVersion,
     entry: tableComponentInstance,
-    solutionEntry
+    solutionEntry: solutionComponentRelation
   })
   await em.persistAndFlush(solutionInstance);
 

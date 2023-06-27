@@ -15,6 +15,7 @@ import { Release } from 'entities/Release';
 import { SolutionInstance } from 'entities/SolutionInstance';
 import { InstanceResource } from 'entities/InstanceResource';
 import { parseResource } from 'util/common';
+import { SolutionComponent } from 'entities/SolutionComponent';
 
 @Injectable()
 export class ComponentInstanceService {
@@ -262,12 +263,13 @@ export class ComponentInstanceService {
 
     LogicException.assertParamEmpty(rawComponentInstace.solutionInstanceId, 'solutionInstanceId');
     const solutionInstance = await em.findOne(SolutionInstance, rawComponentInstace.solutionInstanceId, {
-      populate: ['solutionVersion.componentVersionList']
+      populate: ['solutionVersion']
     });
     LogicException.assertNotFound(solutionInstance, 'SolutionInstance', rawComponentInstace.solutionInstanceId);
 
+    const solutionComponentList = await em.find(SolutionComponent, { solutionVersion: solutionInstance.solutionVersion })
     let componentVersionExists = false
-    for (const componentVersion of solutionInstance.solutionVersion.componentVersionList) {
+    for (const { componentVersion } of solutionComponentList) {
       if (componentVersion.id === rawComponentInstace.componentVersionId) {
         componentVersionExists = true
       }

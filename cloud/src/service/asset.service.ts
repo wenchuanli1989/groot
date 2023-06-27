@@ -126,7 +126,7 @@ export class AssetService {
 
 
     const appPropItemExtScriptModuleList = extHandler.getPipeline('propItem', ExtensionLevel.Application)
-    const entryList = await em.find(ComponentInstance, { release, entry: true }, { populate: ['solutionInstance.solution', 'component'] });
+    const entryList = await em.find(ComponentInstance, { release, entry: true }, { populate: ['solutionInstance.solutionVersion', 'component'] });
     for (let entry of entryList) {
       const viewData = {
         key: entry.key,
@@ -153,8 +153,8 @@ export class AssetService {
         entry
       })
 
-      const primarySolutionInstance = solutionInstanceList.find(item => !!item.primary)
-      const noPrimarySolutionInstanceList = solutionInstanceList.filter(item => !item.primary)
+      const primarySolutionInstance = solutionInstanceList.find(item => !!item.solutionEntry)
+      const noPrimarySolutionInstanceList = solutionInstanceList.filter(item => !item.solutionEntry)
       // 加载解决方案级别插件
       for (const solutionInstance of [primarySolutionInstance, ...noPrimarySolutionInstanceList]) {
         const solutionExtensionInstanceList = await em.find(ExtensionInstance, {
@@ -163,7 +163,7 @@ export class AssetService {
           secret: false
         }, { populate: ['extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw', 'extension'] })
 
-        const solutionId = solutionInstance.solution.id
+        const solutionId = solutionInstance.solutionVersion.solution.id
         installPipelineModule({
           list: solutionExtensionInstanceList,
           level: ExtensionLevel.Solution,
@@ -197,16 +197,16 @@ export class AssetService {
       viewData.resourceConfigList = [...resourceConfigMap.values()]
 
       // 生成根实例metadata
-      const solutionId = entry.solutionInstance.solution.id;
+      const solutionId = entry.solutionInstance.solutionVersion.solution.id;
       const solutionPropItemExtScriptModuleList = extHandler.getPipeline('propItem', ExtensionLevel.Solution, entry.id, solutionId)
       const entryMetadata = await this.createMetadata(entry, em, appPropItemExtScriptModuleList, solutionPropItemExtScriptModuleList, entryPropItemExtScriptModuleList, viewData);
       viewData.metadataList.push(entryMetadata);
 
-      const childInstanceList = await em.find(ComponentInstance, { root: entry }, { populate: ['component', 'componentVersion', 'solutionInstance.solution'] });
+      const childInstanceList = await em.find(ComponentInstance, { root: entry }, { populate: ['component', 'componentVersion', 'solutionInstance.solutionVersion'] });
 
       // 生成子实例metadata
       for (let childInstance of childInstanceList) {
-        const solutionId = childInstance.solutionInstance.solution.id
+        const solutionId = childInstance.solutionInstance.solutionVersion.solution.id
         const solutionPropItemExtScriptModuleList = extHandler.getPipeline('propItem', ExtensionLevel.Solution, entry.id, solutionId)
 
         const childMetadata = await this.createMetadata(childInstance, em, appPropItemExtScriptModuleList, solutionPropItemExtScriptModuleList, entryPropItemExtScriptModuleList, viewData);

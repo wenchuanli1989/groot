@@ -35,25 +35,6 @@ export class SolutionService {
     return solution;
   }
 
-  async componentListBySolutionVersionId(solutionVersionId: number, all = false, allVersion = false) {
-    const em = RequestContext.getEntityManager();
-
-    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId, { populate: ['componentVersionList.component'] });
-    const componentList = solutionVersion.componentVersionList.getItems().filter(item => {
-      return all || !!item.publish
-    }).map(item => {
-      item.component.activeVersionId = item.id;
-      return item.component
-    })
-
-    if (allVersion) {
-      for (let component of componentList) {
-        component.versionList = await em.find(ComponentVersion, { component })
-      }
-    }
-
-    return componentList;
-  }
 }
 
 

@@ -11,7 +11,7 @@ import { PropValue } from 'entities/PropValue';
 import { PropBlockService } from './prop-block.service';
 import { PropGroupService } from './prop-group.service';
 import { PropItemService } from './prop-item.service';
-import { SolutionVersion } from 'entities/SolutionVersion';
+import { SolutionComponent } from 'entities/SolutionComponent';
 
 const tempIdData = {
   itemId: 1,
@@ -194,11 +194,12 @@ export class ComponentVersionService {
 
     const em = RequestContext.getEntityManager();
 
-    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId, { populate: ['componentVersionList'], populateWhere: { componentVersionList: { component: componentId } } })
-    LogicException.assertNotFound(solutionVersion, 'SolutionVersion', solutionVersionId);
+    const solutionComponent = await em.findOne(SolutionComponent,
+      { solutionVersion: solutionVersionId },
+      { populate: ['componentVersion'], populateWhere: { componentVersion: { component: componentId } } }
+    )
 
-    const hitComponent = solutionVersion.componentVersionList[0]
-    return hitComponent
+    return solutionComponent?.componentVersion
   }
 }
 

@@ -9,6 +9,7 @@ import { PropBlock } from 'entities/PropBlock';
 import { PropGroup } from 'entities/PropGroup';
 import { PropItem } from 'entities/PropItem';
 import { PropValue } from 'entities/PropValue';
+import { SolutionComponent } from 'entities/SolutionComponent';
 import { SolutionVersion } from 'entities/SolutionVersion';
 
 
@@ -21,11 +22,11 @@ export class ComponentService {
     LogicException.assertParamEmpty(componentVersionId, 'componentVersionId');
     LogicException.assertParamEmpty(solutionVersionId, 'solutionVersionId');
 
-    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId, { populate: ['componentVersionList'] });
+    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId);
     LogicException.assertNotFound(solutionVersion, 'SolutionVersion', solutionVersionId);
 
-    const hitComponentVersion = [...solutionVersion.componentVersionList.getItems()].find(item => item.id === componentVersionId)
-    if (!hitComponentVersion) {
+    const hitSolutionComponent = await em.findOne(SolutionComponent, { solutionVersion: solutionVersionId, componentVersion: componentVersionId })
+    if (!hitSolutionComponent) {
       throw new LogicException(`组件{componentVersionId: ${componentVersionId}} 不在解决方案中`, LogicExceptionCode.UnExpect)
     }
 
@@ -76,7 +77,10 @@ export class ComponentService {
       newComponent.recentVersion = newVersion;
       await em.flush();
 
-      solutionVersion.componentVersionList.add(newVersion)
+      em.create(SolutionComponent, {
+        solutionVersion,
+        componentVersion: newVersion
+      })
 
       // 创建默认配置组
       const newGroup = em.create(PropGroup, {

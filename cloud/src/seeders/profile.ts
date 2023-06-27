@@ -11,7 +11,7 @@ import { PropItem } from "../entities/PropItem";
 import { Release } from "../entities/Release";
 import { Solution } from "../entities/Solution";
 import { SolutionInstance } from "../entities/SolutionInstance";
-import { SolutionEntry } from "../entities/SolutionEntry";
+import { SolutionComponent } from "../entities/SolutionComponent";
 
 export const create = async (em: EntityManager, solution: Solution, release: Release) => {
   // 创建组件
@@ -32,8 +32,11 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   await em.persistAndFlush(avatarComponentVersion);
 
   // 将组件和解决方案进行关联
-  solution.recentVersion.componentVersionList.add(avatarComponentVersion)
-  await em.persistAndFlush(solution.recentVersion);
+  const solutionComponentRelation = em.create(SolutionComponent, {
+    solutionVersion: solution.recentVersion,
+    componentVersion: avatarComponentVersion,
+  })
+  await em.persistAndFlush(solutionComponentRelation);
 
   // 创建组件配置项
   const avatarGroup = em.create(PropGroup, {
@@ -119,16 +122,12 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   await em.persistAndFlush(profileComponentVersion);
 
   // 将组件和解决方案进行关联
-  solution.recentVersion.componentVersionList.add(profileComponentVersion)
-  await em.persistAndFlush(solution.recentVersion);
-
-  // 创建解决方案首选入口
-  const solutionEntry = em.create(SolutionEntry, {
-    name: profileComponent.name,
+  const profileSolutionComponentRelation = em.create(SolutionComponent, {
     solutionVersion: solution.recentVersion,
-    componentVersion: profileComponentVersion
+    componentVersion: profileComponentVersion,
+    entry: true
   })
-  await em.persistAndFlush(solutionEntry);
+  await em.persistAndFlush(solutionComponentRelation);
 
   // 创建组件配置项
   const profileGroup = em.create(PropGroup, {
@@ -217,10 +216,9 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
 
   // 创建入口解决方案实例
   const solutionInstance = em.create(SolutionInstance, {
-    solution,
     solutionVersion: solution.recentVersion,
     entry: profileComponentInstance,
-    solutionEntry
+    solutionEntry: profileSolutionComponentRelation
   })
   await em.persistAndFlush(solutionInstance);
 

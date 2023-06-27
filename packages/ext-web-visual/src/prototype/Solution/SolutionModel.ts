@@ -44,7 +44,7 @@ export default class SolutionModel extends BaseModel {
   }
 
   public loadList() {
-    getContext().request(APIPath.solution_componentList_solutionVersionId, { solutionVersionId: this.currSolutionVersionId, all: true, allVersion: true }).then(({ data }) => {
+    getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: this.currSolutionVersionId, all: true, allVersion: true }).then(({ data }) => {
       this.componentList = data;
       data.forEach(item => {
         item.currVersionId = item.activeVersionId

@@ -2,7 +2,7 @@ import React from "react";
 import { ViewElement } from "./extension";
 
 // 从对象中抓取部分属性生成另一个对象
-export function pick<O extends Object, P extends string>(obj: O, props: AutoPath<O, P>[], target?: O): O {
+export function pick<O extends Object, P extends string>(obj: O, props: AutoPath<O, P>[], target?: Partial<O>): O {
   const newObj = target || {} as O;
 
   Object.keys(obj).forEach(function (key) {
@@ -16,7 +16,7 @@ export function pick<O extends Object, P extends string>(obj: O, props: AutoPath
     }
   });
 
-  return newObj;
+  return newObj as O;
 }
 
 

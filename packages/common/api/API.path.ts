@@ -44,7 +44,7 @@ export enum APIPath {
   resource_updateInstanceResource = 'POST resource/update-instance-resource',
   resource_updateAppResource = 'POST resource/update-app-resource',
 
-  solution_componentList_solutionVersionId = 'solution/component-list/:solutionVersionId',
+  solutionComponent_list_solutionVersionId = 'solution-component/list/:solutionVersionId',
 
   application_releaseList_appId = 'application/release-list/:appId',
 

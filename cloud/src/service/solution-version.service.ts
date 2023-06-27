@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { LogicException, LogicExceptionCode } from 'config/logic.exception';
 import { ComponentVersion } from 'entities/ComponentVersion';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
+import { SolutionComponent } from 'entities/SolutionComponent';
 import { SolutionVersion } from 'entities/SolutionVersion';
 
 
@@ -16,7 +17,7 @@ export class SolutionVersionService {
     LogicException.assertParamEmpty(imageVersionId, 'imageVersionId')
     LogicException.assertParamEmpty(name, 'name')
 
-    const originSolutionVersion = await em.findOne(SolutionVersion, imageVersionId, { populate: ['componentVersionList'] })
+    const originSolutionVersion = await em.findOne(SolutionVersion, imageVersionId)
     LogicException.assertNotFound(originSolutionVersion, 'SolutionVersion', imageVersionId);
 
     const sameNameCount = await em.count(SolutionVersion, {
@@ -33,8 +34,9 @@ export class SolutionVersionService {
 
     const newSolutionVersion = em.create(SolutionVersion, _newSolutionVersion)
 
-    for (const componentVersion of originSolutionVersion.componentVersionList) {
-      newSolutionVersion.componentVersionList.add(componentVersion)
+    const originSolutionComponentRelation = await em.find(SolutionComponent, { solutionVersion: originSolutionVersion })
+    for (const item of originSolutionComponentRelation) {
+      em.create(SolutionComponent, pick(item, ['componentVersion', 'entry', 'parent'], { solutionVersion: newSolutionVersion }))
     }
 
     const extInstanceList = await em.find(ExtensionInstance, {
@@ -69,13 +71,13 @@ export class SolutionVersionService {
     LogicException.assertParamEmpty(solutionVersionId, 'solutionVersionId')
     LogicException.assertParamEmpty(componentVersionId, 'componentVersionId')
 
-    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId, { populate: ['componentVersionList'] })
+    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId)
     LogicException.assertNotFound(solutionVersion, 'SolutionVersion', solutionVersionId);
 
     const componentVersion = await em.findOne(ComponentVersion, componentVersionId)
     LogicException.assertNotFound(solutionVersion, 'ComponentVersion', componentVersionId);
 
-    solutionVersion.componentVersionList.remove(componentVersion)
+    await em.nativeDelete(SolutionComponent, { solutionVersion, componentVersion })
 
     await em.flush()
   }

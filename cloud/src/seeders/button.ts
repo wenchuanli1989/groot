@@ -13,6 +13,7 @@ import { ResourceConfig } from "../entities/ResourceConfig";
 import { ProjectResource } from "../entities/ProjectResource";
 import { InstanceResource } from "../entities/InstanceResource";
 import { Project } from "../entities/Project";
+import { SolutionComponent } from "../entities/SolutionComponent";
 
 export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project) => {
   // 创建组件
@@ -33,8 +34,11 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   await em.persistAndFlush(btnComponentVersion);
 
   // 将组件和解决方案进行关联
-  solution.recentVersion.componentVersionList.add(btnComponentVersion)
-  await em.persistAndFlush(solution.recentVersion);
+  const solutionComponentRelation = em.create(SolutionComponent, {
+    solutionVersion: solution.recentVersion,
+    componentVersion: btnComponentVersion
+  })
+  await em.persistAndFlush(solutionComponentRelation);
 
   // 创建组件配置项
   const btnGroup = em.create(PropGroup, {

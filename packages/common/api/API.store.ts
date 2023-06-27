@@ -79,7 +79,7 @@ export type APIStore = {
 
   [APIPath.resource_remove_resourceId]: [{ resourceId: number, type: 'app' | 'instance' | 'project' }],
 
-  [APIPath.solution_componentList_solutionVersionId]: [{ solutionVersionId: number, all?: boolean, allVersion?: boolean }, API.Response<Component[]>],
+  [APIPath.solutionComponent_list_solutionVersionId]: [{ solutionVersionId: number, all?: boolean, allVersion?: boolean }, API.Response<Component[]>],
 
   [APIPath.application_releaseList_appId]: [{ appId: number }, API.Response<Release[]>],
 

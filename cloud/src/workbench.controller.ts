@@ -26,6 +26,7 @@ import { InstanceResource } from 'entities/InstanceResource';
 import { AppResource } from 'entities/AppResource';
 import { ExtensionInstanceService } from 'service/extension-instance.service';
 import { SolutionVersionService } from 'service/solution-version.service';
+import { SolutionComponentService } from 'service/solution-component.service'
 
 @UseInterceptors(StandardResultInterceptor)
 @Controller('/workbench')
@@ -45,7 +46,8 @@ export class WorkbenchController {
     private readonly resourceService: ResourceService,
     private readonly solutionService: SolutionService,
     private readonly extensionInstanceService: ExtensionInstanceService,
-    private readonly solutionVersionService: SolutionVersionService
+    private readonly solutionVersionService: SolutionVersionService,
+    private readonly solutionComponentService: SolutionComponentService
   ) { }
 
   @Post('/component/add')
@@ -270,9 +272,9 @@ export class WorkbenchController {
   }
 
   // todo 添加解决方案实现
-  @Get('/solution/component-list/:solutionVersionId')
+  @Get('/solution-component/list/:solutionVersionId')
   async solutionCompoentList(@Param('solutionVersionId') solutionVersionId: number, @Query('all') all: string, @Query('allVersion') allVersion: string) {
-    return await this.solutionService.componentListBySolutionVersionId(solutionVersionId, all === 'true', allVersion === 'true');
+    return await this.solutionComponentService.list(solutionVersionId, all === 'true', allVersion === 'true');
   }
 
 
