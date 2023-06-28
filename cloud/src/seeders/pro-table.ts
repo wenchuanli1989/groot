@@ -16,6 +16,7 @@ import { SolutionComponent } from "../entities/SolutionComponent";
 export const create = async (em: EntityManager, solution: Solution, release: Release) => {
   // 创建组件
   const tableComponent = em.create(Component, {
+    solution,
     name: '列表查询',
     packageName: '@ant-design/pro-table',
     componentName: 'ProTable',

@@ -1,4 +1,4 @@
-import { Entity, OneToOne, Property } from "@mikro-orm/core";
+import { Entity, ManyToOne, OneToOne, Property } from "@mikro-orm/core";
 
 import { BaseEntity } from "./BaseEntity";
 import { ComponentVersion } from "./ComponentVersion";
@@ -6,7 +6,10 @@ import { PropBlock } from "./PropBlock";
 import { PropGroup } from "./PropGroup";
 import { PropItem } from "./PropItem";
 import { PropValue } from "./PropValue";
+import { Solution } from "./Solution";
+import { SoftDelete } from "../config/soft-delete";
 
+@SoftDelete()
 @Entity()
 export class Component extends BaseEntity {
 
@@ -18,6 +21,9 @@ export class Component extends BaseEntity {
 
   @Property({ length: 20, comment: '组件名' })
   componentName: string;
+
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'solutionId' })
+  solution: Solution
 
   /**
    * 改组件最新版本
@@ -67,4 +73,10 @@ export class Component extends BaseEntity {
    */
   @Property({ persist: false })
   activeVersionId?: number;
+
+  @Property({ persist: false })
+  parentComponentVersionId?: number
+
+  @Property({ persist: false })
+  parentComponentId?: number
 }

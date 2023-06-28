@@ -18,6 +18,7 @@ import { SolutionComponent } from "../entities/SolutionComponent";
 export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project) => {
   // 创建组件
   const btnComponent = em.create(Component, {
+    solution,
     name: '按钮',
     packageName: 'antd',
     componentName: 'Button',

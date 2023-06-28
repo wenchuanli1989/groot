@@ -16,6 +16,7 @@ import { SolutionComponent } from "../entities/SolutionComponent";
 export const create = async (em: EntityManager, solution: Solution, release: Release) => {
   // 创建组件
   const avatarComponent = em.create(Component, {
+    solution,
     name: '头像',
     packageName: 'antd',
     componentName: 'Avatar',
@@ -106,6 +107,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
 
   // 创建组件
   const profileComponent = em.create(Component, {
+    solution,
     name: '个人资料',
     packageName: 'app',
     componentName: 'Profile',
