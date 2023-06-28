@@ -1,4 +1,4 @@
-import { RequestContext } from '@mikro-orm/core';
+import { EntityManager, RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { pick, PropValueType } from '@grootio/common';
 
@@ -12,6 +12,7 @@ import { PropBlockService } from './prop-block.service';
 import { PropGroupService } from './prop-group.service';
 import { PropItemService } from './prop-item.service';
 import { SolutionComponent } from 'entities/SolutionComponent';
+import { SolutionVersion } from 'entities/SolutionVersion';
 
 const tempIdData = {
   itemId: 1,
@@ -200,6 +201,54 @@ export class ComponentVersionService {
     )
 
     return solutionComponent?.componentVersion
+  }
+
+  async remove(componentVersionId: number, solutionVersionId: number, parentEm?: EntityManager) {
+    let em = parentEm || RequestContext.getEntityManager();
+
+    LogicException.assertParamEmpty(solutionVersionId, 'solutionVersionId')
+    LogicException.assertParamEmpty(componentVersionId, 'componentVersionId')
+
+    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId)
+    LogicException.assertNotFound(solutionVersion, 'SolutionVersion', solutionVersionId);
+
+    const componentVersion = await em.findOne(ComponentVersion, componentVersionId)
+    LogicException.assertNotFound(solutionVersion, 'ComponentVersion', componentVersionId);
+
+    const versionCount = await em.count(ComponentVersion, {
+      component: componentVersion.component,
+    })
+    if (versionCount <= 1) {// 只是删除多余版本，不应该导致组件下一个版本都没有，说明操作异常
+      throw new LogicException(`改组件版本是组件唯一版本，不能删除`, LogicExceptionCode.UnExpect)
+    }
+
+    const solutionCompoentCount = await em.count(SolutionComponent, {
+      solutionVersion: solutionVersionId,
+      componentVersion: componentVersionId
+    })
+
+    if (solutionCompoentCount > 0) {
+      throw new LogicException(`组件版本属于某个解决方案，不能删除`, LogicExceptionCode.UnExpect)
+    }
+
+    let parentCtx = parentEm ? em.getTransactionContext() : undefined;
+    await em.begin()
+    try {
+      componentVersion.deletedAt = new Date()
+
+      // todo 递归删除关联 PropItem PropGroup PropBlock ExtensionInstance 
+      // 避免存在关联 ComponentInstance 否则不应删除组件版本
+      await em.flush()
+
+      await em.commit()
+    } catch (e) {
+      await em.rollback();
+      throw e;
+    } finally {
+      if (parentCtx) {
+        em.setTransactionContext(parentCtx);
+      }
+    }
   }
 }
 

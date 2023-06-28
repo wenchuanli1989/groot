@@ -65,22 +65,6 @@ export class SolutionVersionService {
     return newSolutionVersion
   }
 
-  async removeComponentVersion(solutionVersionId: number, componentVersionId: number) {
-    const em = RequestContext.getEntityManager();
-
-    LogicException.assertParamEmpty(solutionVersionId, 'solutionVersionId')
-    LogicException.assertParamEmpty(componentVersionId, 'componentVersionId')
-
-    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId)
-    LogicException.assertNotFound(solutionVersion, 'SolutionVersion', solutionVersionId);
-
-    const componentVersion = await em.findOne(ComponentVersion, componentVersionId)
-    LogicException.assertNotFound(solutionVersion, 'ComponentVersion', componentVersionId);
-
-    await em.nativeDelete(SolutionComponent, { solutionVersion, componentVersion })
-
-    await em.flush()
-  }
 }
 
 

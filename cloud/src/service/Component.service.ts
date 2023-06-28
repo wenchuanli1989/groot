@@ -16,19 +16,10 @@ import { SolutionVersion } from 'entities/SolutionVersion';
 @Injectable()
 export class ComponentService {
 
-  async componentDetailByComponentVersionId(componentVersionId: number, solutionVersionId: number) {
+  async componentDetailByComponentVersionId(componentVersionId: number) {
     const em = RequestContext.getEntityManager();
 
     LogicException.assertParamEmpty(componentVersionId, 'componentVersionId');
-    LogicException.assertParamEmpty(solutionVersionId, 'solutionVersionId');
-
-    const solutionVersion = await em.findOne(SolutionVersion, solutionVersionId);
-    LogicException.assertNotFound(solutionVersion, 'SolutionVersion', solutionVersionId);
-
-    const hitSolutionComponent = await em.findOne(SolutionComponent, { solutionVersion: solutionVersionId, componentVersion: componentVersionId })
-    if (!hitSolutionComponent) {
-      throw new LogicException(`组件{componentVersionId: ${componentVersionId}} 不在解决方案中`, LogicExceptionCode.UnExpect)
-    }
 
     const version = await em.findOne(ComponentVersion, componentVersionId);
     LogicException.assertNotFound(version, 'ComponentVersion', componentVersionId);
@@ -59,7 +50,34 @@ export class ComponentService {
     const solutionVersion = await em.findOne(SolutionVersion, rawComponent.solutionVersionId)
     LogicException.assertNotFound(solutionVersion, 'SolutionVersion', rawComponent.solutionVersionId);
 
-    const newComponent = em.create(Component, pick(rawComponent, ['name', 'componentName', 'packageName']));
+    // const sameComponentNameCount = await em.count(Component, {
+    //   name: rawComponent.name,
+    //   solution: solutionVersion.solution
+    // })
+    // if (sameComponentNameCount > 0) {
+    //   throw new LogicException(`名称重复`, LogicExceptionCode.NotUnique)
+    // }
+
+    const sameComponentCount = await em.count(Component, {
+      componentName: rawComponent.componentName,
+      packageName: rawComponent.packageName,
+      solution: solutionVersion.solution
+    })
+
+
+    if (sameComponentCount > 0) {
+      throw new LogicException(`组件名称和包名重复`, LogicExceptionCode.NotUnique)
+    }
+
+    let parentComponentVersion
+    if (rawComponent.parentComponentVersionId) {
+      parentComponentVersion = await em.findOne(ComponentVersion, rawComponent.parentComponentVersionId)
+      LogicException.assertNotFound(parentComponentVersion, 'ComponentVersion', rawComponent.parentComponentVersionId);
+    }
+
+    const newComponent = em.create(Component, pick(rawComponent, ['name', 'componentName', 'packageName'], {
+      solution: solutionVersion.solution
+    }));
 
     await em.begin();
     try {
@@ -73,14 +91,15 @@ export class ComponentService {
       });
       await em.flush();
 
+      em.create(SolutionComponent, {
+        solutionVersion,
+        componentVersion: newVersion,
+        parent: parentComponentVersion
+      })
+
       // 更新组件版本
       newComponent.recentVersion = newVersion;
       await em.flush();
-
-      em.create(SolutionComponent, {
-        solutionVersion,
-        componentVersion: newVersion
-      })
 
       // 创建默认配置组
       const newGroup = em.create(PropGroup, {
