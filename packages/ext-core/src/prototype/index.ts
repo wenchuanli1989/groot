@@ -107,8 +107,7 @@ const openComponent = (componentVersionId: number) => {
 }
 
 const loadComponent = (componentVersionId: number) => {
-  const solutionVersionId = +getContext().params.solutionVersionId
-  return getContext().request(APIPath.component_detailByComponentVersionIdAndSolutionVersionId, { componentVersionId, solutionVersionId }).then(({ data: component }) => {
+  return getContext().request(APIPath.component_detailByComponentVersionId, { componentVersionId }).then(({ data: component }) => {
     const { executeCommand } = grootManager.command
 
     const { blockList, itemList } = component;

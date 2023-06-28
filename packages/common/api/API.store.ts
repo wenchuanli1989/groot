@@ -15,7 +15,7 @@ export type APIStore = {
   [APIPath.solution_detailBySolutionVersionId]: [{ solutionVersionId: number }, API.Response<Solution>]
   [APIPath.move_position]: [{ originId: number, targetId: number, type: 'group' | 'block' | 'item' }];
   [APIPath.componentInstance_addChild]: [ComponentInstance, API.Response<ComponentInstance>];
-  [APIPath.component_detailByComponentVersionIdAndSolutionVersionId]: [{ componentVersionId: number, solutionVersionId: number }, API.Response<Component>];
+  [APIPath.component_detailByComponentVersionId]: [{ componentVersionId: number }, API.Response<Component>];
   [APIPath.org_detail_orgId]: [{ orgId: number }, API.Response<Organization>];
   [APIPath.component_add]: [Component, API.Response<Component>];
   [APIPath.componentVersion_add]: [ComponentVersion, API.Response<ComponentVersion>];
@@ -79,14 +79,14 @@ export type APIStore = {
 
   [APIPath.resource_remove_resourceId]: [{ resourceId: number, type: 'app' | 'instance' | 'project' }],
 
-  [APIPath.solutionComponent_list_solutionVersionId]: [{ solutionVersionId: number, all?: boolean, allVersion?: boolean }, API.Response<Component[]>],
+  [APIPath.solutionComponent_list_solutionVersionId]: [{ solutionVersionId: number, entry?: 'all' | 'true' | 'false', allVersion?: boolean }, API.Response<Component[]>],
 
   [APIPath.application_releaseList_appId]: [{ appId: number }, API.Response<Release[]>],
 
   [APIPath.secretCore]: [{ mode: StudioMode, releaseId: string, solutionVersionId: string }, API.Response<ExtensionInstance>],
   [APIPath.componentVersion_getBySolutionVersionIdAndComponentId]: [{ solutionVersionId: number, componentId: number }, API.Response<ComponentVersion>],
   [APIPath.solutionVersion_add]: [{ imageVersionId: number, name: string }, API.Response<SolutionVersion>]
-  [APIPath.solutionVersion_removeComponentVersion]: [{ solutionVersionId: number, componentVersionId: number }, API.Response<void>]
+  [APIPath.componentVersion_remove]: [{ solutionVersionId: number, componentVersionId: number }, API.Response<void>]
 };
 
 

@@ -143,9 +143,9 @@ export class WorkbenchController {
     return this.orgService.getDetail(orgId);
   }
 
-  @Get('/component/detail-by-componentVersionId-and-solutionVersionId')
-  async componentDetailByComponentVersionId(@Query('componentVersionId') componentVersionId: number, @Query('solutionVersionId') solutionVersionId: number) {
-    return this.componentService.componentDetailByComponentVersionId(+componentVersionId, +solutionVersionId);
+  @Get('/component/detail-by-componentVersionId')
+  async componentDetailByComponentVersionId(@Query('componentVersionId') componentVersionId: number) {
+    return this.componentService.componentDetailByComponentVersionId(+componentVersionId);
   }
 
   @Get('/application/detail-by-releaseId/:releaseId')
@@ -273,8 +273,8 @@ export class WorkbenchController {
 
   // todo 添加解决方案实现
   @Get('/solution-component/list/:solutionVersionId')
-  async solutionCompoentList(@Param('solutionVersionId') solutionVersionId: number, @Query('all') all: string, @Query('allVersion') allVersion: string) {
-    return await this.solutionComponentService.list(solutionVersionId, all === 'true', allVersion === 'true');
+  async solutionCompoentList(@Param('solutionVersionId') solutionVersionId: number, @Query('entry') entry: string, @Query('allVersion') allVersion: string) {
+    return await this.solutionComponentService.list(solutionVersionId, allVersion === 'true', entry !== 'all' ? (entry === 'true') : undefined);
   }
 
 
@@ -299,8 +299,8 @@ export class WorkbenchController {
     return await this.solutionVersionService.add(imageVersionId, name)
   }
 
-  @Post('/solution-version/remove-component-version')
-  async solutionVersionRemoveComponentVersion(@Body('solutionVersionId') solutionVersionId: number, @Body('componentVersionId') componentVersionId: number) {
-    return await this.solutionVersionService.removeComponentVersion(solutionVersionId, componentVersionId)
+  @Post('/component-version/remove')
+  async componentVersionServiceRemove(@Body('solutionVersionId') solutionVersionId: number, @Body('componentVersionId') componentVersionId: number) {
+    return await this.componentVersionService.remove(componentVersionId, solutionVersionId)
   }
 }
