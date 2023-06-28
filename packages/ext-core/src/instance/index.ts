@@ -190,8 +190,8 @@ const loadEntry = (entryId: number) => {
     });
 
     const solutionInstanceListSort = [
-      solutionInstanceList.find(item => !!item.primary),
-      ...solutionInstanceList.filter(item => !item.primary)
+      solutionInstanceList.find(item => !!item.solutionEntry),
+      ...solutionInstanceList.filter(item => !item.solutionEntry)
     ]
 
     // 顺序不能错
