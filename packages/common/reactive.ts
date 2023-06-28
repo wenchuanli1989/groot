@@ -38,6 +38,11 @@ export function wrapperState(target: any, listener: Function, originWatch = true
       }
 
       ++setCount;
+      if (Array.isArray(value)) {
+        value = value.map(item => {
+          return wrapperState(item, listener, false)[0]
+        })
+      }
       const result = Reflect.set(target, key, value);
       listener(`set key ${key.toString()}`, originWatch);
       return result;
