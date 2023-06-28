@@ -5,7 +5,9 @@ import { Bundle } from "./Bundle";
 import { Release } from "./Release";
 import { Deploy } from "./Deploy";
 import { LargeText } from "./LargeText";
+import { SoftDelete } from "../config/soft-delete";
 
+@SoftDelete()
 @Entity()
 export class DeployManifest extends BaseEntity {
 

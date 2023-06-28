@@ -7,7 +7,9 @@ import { Release } from "./Release";
 import { AppResource } from "./AppResource";
 import { ResourceConfig } from "./ResourceConfig";
 import { ComponentInstance } from "./ComponentInstance";
+import { SoftDelete } from "../config/soft-delete";
 
+@SoftDelete()
 @Entity()
 export class Application extends BaseEntity {
 

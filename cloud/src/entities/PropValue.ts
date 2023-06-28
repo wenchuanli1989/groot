@@ -6,7 +6,9 @@ import { ComponentInstance } from "./ComponentInstance";
 import { Component } from "./Component";
 import { ComponentVersion } from "./ComponentVersion";
 import { PropItem } from "./PropItem";
+import { SoftDelete } from "../config/soft-delete";
 
+@SoftDelete()
 @Entity()
 export class PropValue extends BaseEntity {
 

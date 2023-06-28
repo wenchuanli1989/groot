@@ -2,7 +2,9 @@ import { Entity, ManyToOne, Property } from "@mikro-orm/core";
 
 import { BaseEntity } from "./BaseEntity";
 import { Organization } from "./Organization";
+import { SoftDelete } from "../config/soft-delete";
 
+@SoftDelete()
 @Entity()
 export class Project extends BaseEntity {
 

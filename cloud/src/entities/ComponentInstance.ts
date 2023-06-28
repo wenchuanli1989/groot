@@ -10,7 +10,9 @@ import { PropItem } from "./PropItem";
 import { PropValue } from "./PropValue";
 import { Release } from "./Release";
 import { SolutionInstance } from './SolutionInstance'
+import { SoftDelete } from "../config/soft-delete";
 
+@SoftDelete()
 @Entity()
 export class ComponentInstance extends BaseEntity {
 

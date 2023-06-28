@@ -4,7 +4,9 @@ import { BaseEntity } from "./BaseEntity";
 import { Bundle } from "./Bundle";
 import { ComponentInstance } from "./ComponentInstance";
 import { LargeText } from "./LargeText";
+import { SoftDelete } from "../config/soft-delete";
 
+@SoftDelete()
 @Entity()
 export class BundleAsset extends BaseEntity {
 

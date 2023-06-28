@@ -4,7 +4,9 @@ import { BaseEntity } from "./BaseEntity";
 import { ExtensionInstance } from "./ExtensionInstance";
 import { Organization } from "./Organization";
 import { SolutionVersion } from "./SolutionVersion";
+import { SoftDelete } from "../config/soft-delete";
 
+@SoftDelete()
 @Entity()
 export class Solution extends BaseEntity {
 

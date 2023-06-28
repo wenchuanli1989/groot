@@ -3,7 +3,9 @@ import { Application } from "./Application";
 import { Resource } from "./Resource";
 import { Release } from "./Release";
 import { ProjectResource } from "./ProjectResource";
+import { SoftDelete } from "../config/soft-delete";
 
+@SoftDelete()
 @Entity()
 export class AppResource extends Resource {
 

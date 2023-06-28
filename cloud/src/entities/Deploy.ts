@@ -5,7 +5,9 @@ import { Application } from "./Application";
 import { BaseEntity } from "./BaseEntity";
 import { Bundle } from "./Bundle";
 import { Release } from "./Release";
+import { SoftDelete } from "../config/soft-delete";
 
+@SoftDelete()
 @Entity()
 export class Deploy extends BaseEntity {
 

@@ -3,7 +3,9 @@ import { Entity, ManyToOne, OneToOne, Property } from "@mikro-orm/core";
 import { BaseEntity } from "./BaseEntity";
 import { Extension } from "./Extension";
 import { LargeText } from "./LargeText";
+import { SoftDelete } from "../config/soft-delete";
 
+@SoftDelete()
 @Entity()
 export class ExtensionVersion extends BaseEntity {
 

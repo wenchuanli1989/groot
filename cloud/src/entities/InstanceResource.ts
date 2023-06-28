@@ -3,6 +3,9 @@ import { Release } from "./Release";
 import { Resource } from "./Resource";
 import { ComponentInstance } from "./ComponentInstance";
 import { ProjectResource } from "./ProjectResource";
+import { SoftDelete } from "../config/soft-delete";
+
+@SoftDelete()
 @Entity()
 export class InstanceResource extends Resource {
 
