@@ -12,6 +12,8 @@ export default class SolutionModel extends BaseModel {
   activeComponentId: number
   solutionVersionList: SolutionVersion[]
   currSolutionVersionId: number
+  parentComponentVersionId: number
+  parentComponentId: number
 
   public init() {
     this.solutionVersionList = grootManager.state.getState('gs.solution').versionList
@@ -30,6 +32,7 @@ export default class SolutionModel extends BaseModel {
     this.componentAddModalStatus = ModalStatus.Submit;
     getContext().request(APIPath.component_add, {
       ...rawComponent,
+      parentComponentVersionId: this.parentComponentVersionId,
       solutionVersionId: grootManager.state.getState('gs.solution').solutionVersion.id
     }).then(({ data }) => {
       this.componentAddModalStatus = ModalStatus.None;
@@ -37,14 +40,19 @@ export default class SolutionModel extends BaseModel {
       data.versionList = [data.componentVersion]
       data.currVersionId = data.componentVersion.id
       data.activeVersionId = data.componentVersion.id;
+      data.parentComponentId = this.parentComponentId
+      this.parentComponentVersionId = undefined
+      this.parentComponentId = undefined
 
       this.activeComponentId = data.id;
       grootManager.command.executeCommand('gc.openComponent', data.recentVersionId)
-    });
+    }).catch(() => {
+      this.componentAddModalStatus = ModalStatus.Error
+    })
   }
 
   public loadList() {
-    getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: this.currSolutionVersionId, all: true, allVersion: true }).then(({ data }) => {
+    getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: this.currSolutionVersionId, entry: 'all', allVersion: true }).then(({ data }) => {
       this.componentList = data;
       data.forEach(item => {
         item.currVersionId = item.activeVersionId
@@ -62,7 +70,9 @@ export default class SolutionModel extends BaseModel {
 
       this.activeComponentId = component.id
       grootManager.command.executeCommand('gc.openComponent', data.id)
-    });
+    }).catch(() => {
+      this.componentVersionAddModalStatus = ModalStatus.Init;
+    })
   }
 
   public publish(component: Component) {
@@ -80,13 +90,22 @@ export default class SolutionModel extends BaseModel {
 
   public removeComponentVersion(component: Component) {
     const solutionVersionId = +getContext().params.solutionVersionId
-    getContext().request(APIPath.solutionVersion_removeComponentVersion, { solutionVersionId, componentVersionId: component.activeVersionId }).then(() => {
-      this.componentList = this.componentList.filter(item => item.id !== component.id)
+    const data = { solutionVersionId, componentVersionId: component.currVersionId }
+    getContext().request(APIPath.componentVersion_remove, data).then(() => {
+      if (data.componentVersionId === component.activeVersionId) {
+        this.componentList = this.componentList.filter(item => item.id !== component.id)
 
-      if (this.activeComponentId === component.id) {
-        const newActiveComponent = this.componentList[0]
-        this.activeComponentId = newActiveComponent.id
-        grootManager.command.executeCommand('gc.openComponent', newActiveComponent.activeVersionId)
+        if (this.activeComponentId === component.id) {
+          const newActiveComponent = this.componentList[0]
+          this.activeComponentId = newActiveComponent.id
+          grootManager.command.executeCommand('gc.openComponent', newActiveComponent.currVersionId)
+        } else {
+          // ...
+        }
+      } else {
+        component.versionList = component.versionList.filter(item => item.id !== data.componentVersionId)
+        component.currVersionId = component.activeVersionId
+        grootManager.command.executeCommand('gc.openComponent', component.currVersionId)
       }
     })
   }

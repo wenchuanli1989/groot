@@ -9,7 +9,7 @@ const ComponentAddModal: React.FC = () => {
   const solutionModel = useModel(SolutionModel)
 
   useEffect(() => {
-    if (solutionModel.componentAddModalStatus !== ModalStatus.None) {
+    if (solutionModel.componentAddModalStatus === ModalStatus.Init) {
       form.resetFields();
     }
   }, [solutionModel.componentAddModalStatus])

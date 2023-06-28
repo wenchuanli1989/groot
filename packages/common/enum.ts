@@ -86,7 +86,8 @@ export enum StudioMode {
 export enum ModalStatus {
   None = 'none',
   Init = 'init',
-  Submit = 'submit'
+  Submit = 'submit',
+  Error = 'error'
 }
 
 export enum ViewportMode {
