@@ -9,7 +9,7 @@ export const prototypeBootstrap = () => {
   const { getState, setState } = grootManager.state
   const { executeCommand } = grootManager.command
 
-  layout.primarySidebarWidth = '220px'
+  layout.primarySidebarWidth = '250px'
 
   groot.onReady(() => {
     initUI()
