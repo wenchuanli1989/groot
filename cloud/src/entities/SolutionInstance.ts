@@ -6,11 +6,14 @@ import { ExtensionInstance } from "./ExtensionInstance";
 import { SolutionVersion } from "./SolutionVersion";
 import { SolutionComponent } from "./SolutionComponent";
 import { SoftDelete } from "../config/soft-delete";
+import { Solution } from "./Solution";
 
 @SoftDelete()
 @Entity()
 export class SolutionInstance extends BaseEntity {
 
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'solutionId' })
+  solution: Solution;
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'solutionVersionId' })
   solutionVersion: SolutionVersion;
@@ -31,4 +34,7 @@ export class SolutionInstance extends BaseEntity {
 
   @Property({ persist: false })
   solutionId: number
+
+  @Property({ persist: false })
+  solutionEntryId: number
 }

@@ -62,13 +62,6 @@ const InstanceAddModal: React.FC = () => {
         <Switch />
       </Form.Item>
 
-      <Form.Item label="空实例" name="empty" valuePropName="checked">
-        <Switch onChange={(event) => {
-          if (event) {
-            form.setFieldsValue({ componentId: null });
-          }
-        }} />
-      </Form.Item>
     </Form>
   </Modal>
 }

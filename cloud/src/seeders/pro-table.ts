@@ -208,6 +208,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
 
   // 创建入口解决方案实例
   const solutionInstance = em.create(SolutionInstance, {
+    solution: solution,
     solutionVersion: solution.recentVersion,
     entry: tableComponentInstance,
     solutionEntry: solutionComponentRelation

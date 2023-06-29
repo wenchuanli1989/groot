@@ -16,11 +16,8 @@ import { LargeText } from '../entities/LargeText';
 import { create as btnCreate } from './button';
 import { create as profileCreate } from './profile';
 import { create as proTableCreate } from './pro-table';
-import { create as containerCreate } from './groot-container';
-import { create as pageContainerCreate } from './groot-page-container';
 import { ProjectResource } from '../entities/ProjectResource';
 import { ResourceConfig } from '../entities/ResourceConfig';
-import { InstanceResource } from '../entities/InstanceResource';
 import { AppResource } from '../entities/AppResource';
 
 export class DatabaseSeeder extends Seeder {
@@ -282,9 +279,6 @@ export class DatabaseSeeder extends Seeder {
 
     await profileCreate(em, solution, release);
 
-    await containerCreate(em, solution);
-
-    await pageContainerCreate(em, solution);
   }
 }
 

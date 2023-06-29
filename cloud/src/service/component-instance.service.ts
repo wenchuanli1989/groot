@@ -1,5 +1,5 @@
-import { PropMetadataComponent, pick, PropValueType, ValueStruct, ExtensionRelationType } from '@grootio/common';
-import { EntityManager, RequestContext, wrap } from '@mikro-orm/core';
+import { pick, PropValueType, ExtensionRelationType } from '@grootio/common';
+import { EntityManager, RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 
 import { LogicException, LogicExceptionCode } from 'config/logic.exception';
@@ -28,29 +28,9 @@ export class ComponentInstanceService {
     LogicException.assertParamEmpty(rawInstance.name, 'name');
     LogicException.assertParamEmpty(rawInstance.releaseId, 'releaseId');
 
-    if (!rawInstance.componentId && !rawInstance.wrapper) {
-      throw new LogicException('componentId和wrapper不能同时为空', LogicExceptionCode.ParamError);
-    }
-
-    let wrapperRawInstance;
     rawInstance.entry = true
 
-    if (rawInstance.wrapper) {
-      const [packageName, componentName] = rawInstance.wrapper.split('/');
-      const wrapperComponent = await em.findOne(Component, { packageName, componentName });
-      LogicException.assertNotFound(wrapperComponent, 'Component');
-
-      wrapperRawInstance = pick(rawInstance, ['name', 'key', 'releaseId', 'mainEntry', 'entry']);
-      wrapperRawInstance.componentId = wrapperComponent.id;
-    }
-
-    if (rawInstance.wrapper && !rawInstance.componentId) {
-      return await this.add(wrapperRawInstance, em);
-    } else if (rawInstance.componentId && !rawInstance.wrapper) {
-      return await this.add(rawInstance, em);
-    } else {
-      return await this.addRootForWrapper(rawInstance, wrapperRawInstance, em);
-    }
+    return await this.add(rawInstance, em);
   }
 
   async add(rawInstance: ComponentInstance, parentEm?: EntityManager) {
@@ -339,78 +319,6 @@ export class ComponentInstanceService {
     await em.nativeUpdate(ComponentInstance, { id: { $in: removeIds } }, { deletedAt: new Date() });
   }
 
-  private async addRootForWrapper(rawInstance: ComponentInstance, wrapperRawInstance: ComponentInstance, em: EntityManager) {
-    let wrapperInstance, childInstance;
-
-    await em.begin();
-    try {
-      wrapperInstance = await this.add(wrapperRawInstance, em);
-
-      const childRawInstance = {
-        releaseId: rawInstance.releaseId,
-        componentId: rawInstance.componentId,
-        parentId: wrapperInstance.id,
-        rootId: wrapperInstance.id
-      } as ComponentInstance;
-      childInstance = await this.add(childRawInstance, em);
-
-      const rawContentValue = {
-        setting: {},
-        list: [{
-          instanceId: childInstance.id,
-          componentId: childInstance.component.id,
-          componentName: childInstance.component.name
-        }]
-      } as PropMetadataComponent;
-
-      const contentItem = await em.findOne(PropItem, {
-        component: wrapperInstance.component,
-        propKey: 'content'
-      })
-
-      const contentComponentValue = em.create(PropValue, {
-        propItem: contentItem,
-        component: wrapperInstance.component.id,
-        componentVersion: wrapperInstance.component.recentVersion.id,
-        componentInstance: wrapperInstance,
-        type: PropValueType.Instance,
-        valueStruct: ValueStruct.ChildComponentList,
-        value: JSON.stringify(rawContentValue)
-      });
-
-      const titleItem = await em.findOne(PropItem, {
-        component: wrapperInstance.component,
-        propKey: 'title'
-      })
-
-      const titleComponentValue = em.create(PropValue, {
-        propItem: titleItem,
-        component: wrapperInstance.component.id,
-        componentVersion: wrapperInstance.component.recentVersion.id,
-        componentInstance: wrapperInstance,
-        type: PropValueType.Instance,
-        value: `"${rawInstance.name}"`
-      });
-
-      await em.persistAndFlush([contentComponentValue, titleComponentValue]);
-
-      await em.commit();
-
-      return wrapperInstance;
-    } catch (e) {
-      await em.rollback();
-
-      if (wrapperInstance) {
-        await this.remove(wrapperInstance.id, em);
-      }
-
-      if (childInstance) {
-        await this.remove(childInstance.id, em);
-      }
-
-      throw e;
-    }
-  }
 }
 
 

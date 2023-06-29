@@ -82,9 +82,6 @@ export class ComponentInstance extends BaseEntity {
   rootId?: number;
 
   @Property({ persist: false })
-  wrapper?: string;
-
-  @Property({ persist: false })
   solutionInstanceId?: number;
 
   @Property({ persist: false })

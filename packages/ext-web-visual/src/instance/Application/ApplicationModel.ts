@@ -33,12 +33,6 @@ export default class ApplicationModel extends BaseModel {
 
   public addEntry(rawComponentInstance: ComponentInstance) {
     this.instanceAddModalStatus = ModalStatus.Submit;
-    if (rawComponentInstance.mainEntry) {
-      rawComponentInstance.wrapper = 'groot/PageContainer';
-    } else {
-      rawComponentInstance.wrapper = 'groot/Container';
-    }
-
     const releaseId = grootManager.state.getState('gs.release').id
     return getContext().request(APIPath.componentInstance_addEntry, {
       ...rawComponentInstance,
