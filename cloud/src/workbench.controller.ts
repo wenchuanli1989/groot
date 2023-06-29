@@ -27,6 +27,7 @@ import { AppResource } from 'entities/AppResource';
 import { ExtensionInstanceService } from 'service/extension-instance.service';
 import { SolutionVersionService } from 'service/solution-version.service';
 import { SolutionComponentService } from 'service/solution-component.service'
+import { SolutionComponent } from 'entities/SolutionComponent';
 
 @UseInterceptors(StandardResultInterceptor)
 @Controller('/workbench')
@@ -50,9 +51,9 @@ export class WorkbenchController {
     private readonly solutionComponentService: SolutionComponentService
   ) { }
 
-  @Post('/component/add')
-  async componentAdd(@Body() component: Component) {
-    return await this.componentService.add(component);
+  @Post('/solution-component/add-component')
+  async solutionComponentAddComponent(@Body() solutionComponent: SolutionComponent) {
+    return await this.solutionComponentService.addComponent(solutionComponent);
   }
 
   @Post('/group/add')
@@ -302,5 +303,10 @@ export class WorkbenchController {
   @Post('/component-version/remove')
   async componentVersionServiceRemove(@Body('solutionVersionId') solutionVersionId: number, @Body('componentVersionId') componentVersionId: number) {
     return await this.componentVersionService.remove(componentVersionId, solutionVersionId)
+  }
+
+  @Post('/solution-component/syncVersion')
+  async solutionComponentSyncVersion(@Body('solutionVersionId') solutionVersionId: number, @Body('newSolutionComponentList') newSolutionComponentList: SolutionComponent[]) {
+    return await this.solutionComponentService.syncVersion(solutionVersionId, newSolutionComponentList)
   }
 }

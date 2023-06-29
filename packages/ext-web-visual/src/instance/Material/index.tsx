@@ -10,7 +10,10 @@ export const Material = () => {
 
   useEffect(() => {
     getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: 1, entry: 'false' }).then(({ data }) => {
-      setComponentList(data);
+      setComponentList(data.map(item => {
+        item.component.componentVersionId = item.componentVersionId
+        return item.component
+      }));
     })
   }, []);
 

@@ -1,4 +1,4 @@
-import { Component, ComponentVersion, ModalStatus, useModel } from "@grootio/common";
+import { ComponentVersion, ModalStatus, SolutionComponent, useModel } from "@grootio/common";
 import { Form, Input, Modal, Select } from "antd";
 import { useEffect, useState } from "react";
 import SolutionModel from "../SolutionModel";
@@ -7,16 +7,16 @@ import SolutionModel from "../SolutionModel";
 const ComponentVersionAddModal: React.FC = () => {
   const [form] = Form.useForm();
   const solutionModel = useModel(SolutionModel)
-  const [currComponent, setCurrComponent] = useState<Component>()
+  const [currSolutionComponent, setCurrSolutionComponent] = useState<SolutionComponent>()
 
   useEffect(() => {
-    if (solutionModel.componentVersionAddModalStatus !== ModalStatus.None && solutionModel.componentIdForAddComponentVersion) {
-      const component = solutionModel.componentList.find(item => item.id === solutionModel.componentIdForAddComponentVersion)
+    if (solutionModel.componentVersionAddModalStatus !== ModalStatus.None) {
+      const solutionComponent = solutionModel.solutionComponentList.find(item => item.id === solutionModel.activeSolutionComponentId)
       form.resetFields();
-      form.setFieldValue('imageVersionId', component.currVersionId)
-      setCurrComponent(component)
+      form.setFieldValue('imageVersionId', solutionComponent.currVersionId)
+      setCurrSolutionComponent(solutionComponent)
     }
-  }, [solutionModel.componentVersionAddModalStatus, solutionModel.componentIdForAddComponentVersion])
+  }, [solutionModel.componentVersionAddModalStatus])
 
   const handleOk = async () => {
     const formData = await form.validateFields();
@@ -36,7 +36,7 @@ const ComponentVersionAddModal: React.FC = () => {
       </Form.Item>
 
       <Form.Item label="关联版本" name="imageVersionId" rules={[{ required: true }]} >
-        <Select options={currComponent?.versionList.map((item) => {
+        <Select options={currSolutionComponent?.component?.versionList.map((item) => {
           return { label: item.name, value: item.id }
         })} />
       </Form.Item>

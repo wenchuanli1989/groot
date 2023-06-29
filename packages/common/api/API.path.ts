@@ -11,7 +11,7 @@ export enum APIPath {
   componentInstance_addChild = 'POST component-instance/add-child',
   componentInstance_remove_instanceId = 'component-instance/remove/:instanceId',
   component_detailByComponentVersionId = 'component/detail-by-componentVersionId',
-  component_add = 'POST component/add',
+  solutionComponent_addComponent = 'POST solution-component/add-component',
   componentVersion_add = 'POST component-version/add',
   componentVersion_publish = 'POST component-version/publish',
   componentInstance_entryDetailByEntryIdAndReleaseId = 'component-instance/entry-detail-by-entryId-and-releaseId',
@@ -51,5 +51,7 @@ export enum APIPath {
   secretCore = 'secret-core',
   componentVersion_getBySolutionVersionIdAndComponentId = 'componentVersion/get-by-solutionVersionId-and-componentId',
   solutionVersion_add = 'POST solution-version/add',
-  componentVersion_remove = 'POST component-version/remove'
+  componentVersion_remove = 'POST component-version/remove',
+  solutionComponent_syncVersion = 'POST solution-component/syncVersion'
+
 }

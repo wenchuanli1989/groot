@@ -10,7 +10,7 @@ export const DragComponent: React.FC<{ component: Component }> = ({ component })
   const dragstart = (e) => {
     callHook('gh.component.dragStart')
     e.dataTransfer.setData('componentId', component.id);
-    e.dataTransfer.setData('componentVersionId', component.activeVersionId);
+    e.dataTransfer.setData('componentVersionId', component.componentVersionId);
   }
 
   const dragend = () => {

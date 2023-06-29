@@ -1,4 +1,4 @@
-import { Component, useRegisterModel } from "@grootio/common";
+import { SolutionComponent, useRegisterModel } from "@grootio/common";
 import { grootManager } from "context";
 import { useEffect } from "react";
 import ComponentAddModal from "./ComponentAddModal";
@@ -9,6 +9,7 @@ import SolutionModel from "./SolutionModel";
 import SolutionManager from "./SolutionManager";
 import SolutionVersionAddModal from "./SolutionVersionAddModal";
 import { Menu } from "antd";
+import { SubMenuType } from "antd/es/menu/hooks/useItems";
 
 export const Solution = () => {
   const solutionModel = useRegisterModel(SolutionModel)
@@ -17,47 +18,50 @@ export const Solution = () => {
     solutionModel.init()
   }, [])
 
-  const switchComponent = (component: Component) => {
-    if (solutionModel.activeComponentId === component.id) {
+  const switchSolutionComponent = (solutionComponent: SolutionComponent) => {
+    if (solutionModel.activeSolutionComponentId === solutionComponent.id) {
       return;
     }
-    solutionModel.activeComponentId = component.id
-    grootManager.command.executeCommand('gc.openComponent', component.currVersionId)
+    solutionModel.activeSolutionComponentId = solutionComponent.id
+    grootManager.command.executeCommand('gc.openComponent', solutionComponent.currVersionId)
   }
 
-  const genTreeData = (list: Component[]) => {
+  const genTreeData = (list: SolutionComponent[]) => {
 
-    const treeMap = list.reduce((pre, item) => {
+    const listMap = list.reduce((pre, item) => {
       pre.set(item.id, {
-        key: item.id,
-        label: <div onClick={() => {
-          switchComponent(item)
-        }}>
-          <ComponentItem component={item} />
-        </div>,
-        parentComponentId: item.parentComponentId,
+        item,
+        menu: {
+          key: item.id.toString(),
+          label: <div onClick={() => {
+            switchSolutionComponent(item)
+          }}>
+            <ComponentItem solutionComponent={item} />
+          </div>,
+          children: undefined
+        }
       })
       return pre;
-    }, new Map())
+    }, new Map<number, { item: SolutionComponent, menu: SubMenuType }>())
 
-    return [...treeMap.values()].filter(item => {
-      if (item.parentComponentId) {
-        let children = treeMap.get(item.parentComponentId).children
+    return [...listMap.values()].filter(({ item, menu }) => {
+      if (item.parentId) {
+        let children = listMap.get(item.parentId).menu.children
         if (!children) {
-          treeMap.get(item.parentComponentId).children = [item]
+          listMap.get(item.parentId).menu.children = [menu]
         } else {
-          children.push(item)
+          children.push(menu)
         }
         return false
       }
       return true
-    })
+    }).map(item => item.menu)
   }
 
   return <div >
     <SolutionManager />
     <div >
-      <Menu inlineIndent={0} selectedKeys={[solutionModel.activeComponentId?.toString()]} items={genTreeData(solutionModel.componentList)} mode="inline" />
+      <Menu inlineIndent={0} selectedKeys={[solutionModel.activeSolutionComponentId?.toString()]} items={genTreeData(solutionModel.solutionComponentList)} mode="inline" />
     </div>
 
     <ComponentAddModal />

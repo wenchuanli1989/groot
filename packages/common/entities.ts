@@ -89,12 +89,15 @@ export type ProjectResource = {
 } & Omit<import("../../cloud/src/entities/ProjectResource").ProjectResource, 'project'>;
 
 export type AppResource = {
+  app: Application,
+  release: Release,
 
   // ************************** 分割线已下是界面属性 **************************
 } & Omit<import("../../cloud/src/entities/AppResource").AppResource, 'app' | 'release'>;
 
 export type InstanceResource = {
-
+  release: Release,
+  componentInstance: ComponentInstance
   // ************************** 分割线已下是界面属性 **************************
 } & Omit<import("../../cloud/src/entities/InstanceResource").InstanceResource, 'release' | 'componentInstance'>;
 
@@ -125,10 +128,6 @@ export type Component = {
    */
   recentVersionId: number,
   // ************************** 分割线已下是界面属性 **************************
-  /**
-   * 仅UI相关
-   */
-  currVersionId: number,
   propTree: PropGroup[]
 } & Omit<import("../../cloud/src/entities/Component").Component, 'componentVersion' | 'groupList' | 'blockList' | 'itemList' | 'valueList' | 'versionList'>;
 
@@ -191,5 +190,13 @@ export type SolutionInstance = {
   extensionInstanceList: ExtensionRuntime[]
   // ************************** 分割线已下是界面属性 **************************
 } & Omit<import("../../cloud/src/entities/SolutionInstance").SolutionInstance, ''>;
+
+
+export type SolutionComponent = {
+
+  component: Component,
+  // ************************** 分割线已下是界面属性 **************************
+  currVersionId: number
+} & Omit<import("../../cloud/src/entities/SolutionComponent").SolutionComponent, 'component'>;
 
 

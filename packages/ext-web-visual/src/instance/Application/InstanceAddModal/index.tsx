@@ -14,7 +14,10 @@ const InstanceAddModal: React.FC = () => {
     if (applicationModel.instanceAddModalStatus === ModalStatus.Init) {
       form.resetFields();
       getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: 1, entry: 'true' }).then(({ data }) => {
-        setComponentList(data);
+        setComponentList(data.map(item => {
+          item.component.componentVersionId = item.componentVersionId
+          return item.component
+        }));
       })
     }
   }, [applicationModel.instanceAddModalStatus]);
@@ -47,7 +50,7 @@ const InstanceAddModal: React.FC = () => {
             <Select disabled={empty}>
               {
                 componentList.map((c) => {
-                  return <Select.Option key={c.activeVersionId} value={c.activeVersionId}>{c.name}</Select.Option>
+                  return <Select.Option key={c.componentVersionId} value={c.componentVersionId}>{c.name}</Select.Option>
                 })
               }
             </Select>

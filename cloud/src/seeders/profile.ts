@@ -36,6 +36,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   const solutionComponentRelation = em.create(SolutionComponent, {
     solutionVersion: solution.recentVersion,
     componentVersion: avatarComponentVersion,
+    component: avatarComponent
   })
   await em.persistAndFlush(solutionComponentRelation);
 
@@ -127,7 +128,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   const profileSolutionComponentRelation = em.create(SolutionComponent, {
     solutionVersion: solution.recentVersion,
     componentVersion: profileComponentVersion,
-    entry: true
+    entry: true,
+    component: profileComponent
   })
   await em.persistAndFlush(solutionComponentRelation);
 

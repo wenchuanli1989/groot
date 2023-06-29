@@ -1,4 +1,4 @@
-import { APIPath, BaseModel, Component, ComponentVersion, ModalStatus, SolutionVersion } from "@grootio/common";
+import { APIPath, BaseModel, Component, ComponentVersion, ModalStatus, SolutionComponent, SolutionVersion } from "@grootio/common";
 import { getContext, grootManager } from "context";
 
 export default class SolutionModel extends BaseModel {
@@ -7,106 +7,115 @@ export default class SolutionModel extends BaseModel {
   componentAddModalStatus: ModalStatus = ModalStatus.None
   componentVersionAddModalStatus: ModalStatus = ModalStatus.None
   solutionVersionAddModalStatus: ModalStatus = ModalStatus.None
-  componentList: Component[] = [];
-  componentIdForAddComponentVersion: number
-  activeComponentId: number
   solutionVersionList: SolutionVersion[]
-  currSolutionVersionId: number
-  parentComponentVersionId: number
-  parentComponentId: number
+  solutionComponentList: SolutionComponent[] = [];
+  currSolutionVersionId: number;
+  activeSolutionComponentId: number;
+  parentIdForAddComponent?: number;
+  syncVersionDoing = false
 
   public init() {
     this.solutionVersionList = grootManager.state.getState('gs.solution').versionList
     this.currSolutionVersionId = +getContext().params.solutionVersionId
 
-    grootManager.state.watchState('gs.component', (newComponent) => {
-      if (this.activeComponentId !== newComponent?.id) {
-        this.activeComponentId = newComponent.id
-      }
-    })
+    // grootManager.state.watchState('gs.component', (newComponent) => {
+    //   if (this.activeComponentId !== newComponent?.id) {
+    //     this.activeComponentId = newComponent.id
+    //   }
+    // })
 
     this.loadList()
   }
 
   public addComponent(rawComponent: Component) {
     this.componentAddModalStatus = ModalStatus.Submit;
-    getContext().request(APIPath.component_add, {
-      ...rawComponent,
-      parentComponentVersionId: this.parentComponentVersionId,
-      solutionVersionId: grootManager.state.getState('gs.solution').solutionVersion.id
-    }).then(({ data }) => {
-      this.componentAddModalStatus = ModalStatus.None;
-      this.componentList.push(data)
-      data.versionList = [data.componentVersion]
-      data.currVersionId = data.componentVersion.id
-      data.activeVersionId = data.componentVersion.id;
-      data.parentComponentId = this.parentComponentId
-      this.parentComponentVersionId = undefined
-      this.parentComponentId = undefined
 
-      this.activeComponentId = data.id;
-      grootManager.command.executeCommand('gc.openComponent', data.recentVersionId)
+    getContext().request(APIPath.solutionComponent_addComponent, {
+      component: {
+        ...rawComponent,
+        solutionVersionId: grootManager.state.getState('gs.solution').solutionVersion.id
+      },
+      parentId: this.parentIdForAddComponent
+    }).then(({ data: solutionComponent }) => {
+      this.componentAddModalStatus = ModalStatus.None;
+      this.solutionComponentList.push(solutionComponent)
+      solutionComponent.component.versionList = [solutionComponent.component.componentVersion]
+      solutionComponent.currVersionId = solutionComponent.componentVersionId
+      this.activeSolutionComponentId = solutionComponent.id;
+
+      grootManager.command.executeCommand('gc.openComponent', solutionComponent.currVersionId)
     }).catch(() => {
       this.componentAddModalStatus = ModalStatus.Error
     })
   }
 
   public loadList() {
-    getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: this.currSolutionVersionId, entry: 'all', allVersion: true }).then(({ data }) => {
-      this.componentList = data;
+    getContext().request(APIPath.solutionComponent_list_solutionVersionId, {
+      solutionVersionId: this.currSolutionVersionId,
+      entry: 'all', allVersion: true
+    }).then(({ data }) => {
+      this.solutionComponentList = data;
       data.forEach(item => {
-        item.currVersionId = item.activeVersionId
+        item.currVersionId = item.componentVersionId
       })
     })
   }
 
   public addComponentVersion(rawComponentVersion: ComponentVersion) {
     this.componentVersionAddModalStatus = ModalStatus.Submit;
-    getContext().request(APIPath.componentVersion_add, rawComponentVersion).then(({ data }) => {
+    getContext().request(APIPath.componentVersion_add, rawComponentVersion).then(({ data: componenttVersion }) => {
       this.componentVersionAddModalStatus = ModalStatus.None;
-      const component = this.componentList.find(item => item.id === this.componentIdForAddComponentVersion)
-      component.versionList = [...component.versionList, data]
-      component.currVersionId = data.id
+      const solutionComponent = this.solutionComponentList.find(item => item.id === this.activeSolutionComponentId)
+      solutionComponent.component.versionList = [...solutionComponent.component.versionList, componenttVersion]
+      solutionComponent.currVersionId = componenttVersion.id
 
-      this.activeComponentId = component.id
-      grootManager.command.executeCommand('gc.openComponent', data.id)
+      grootManager.command.executeCommand('gc.openComponent', componenttVersion.id)
     }).catch(() => {
       this.componentVersionAddModalStatus = ModalStatus.Init;
     })
   }
 
-  public publish(component: Component) {
-    const componentVersionId = component.currVersionId
+  public publish(solutionComponent: SolutionComponent) {
+    const componentVersionId = solutionComponent.currVersionId
     getContext().request(APIPath.componentVersion_publish, { componentVersionId }).then(() => {
-      component.recentVersionId = componentVersionId;
+      solutionComponent.componentVersionId = componentVersionId
     });
   }
 
   public addSolutionVersion(imageVersionId: number, name: string) {
     getContext().request(APIPath.solutionVersion_add, { imageVersionId, name }).then(({ data }) => {
-      grootManager.command.executeCommand('gc.navSolution', data.id, this.activeComponentId)
+      grootManager.command.executeCommand('gc.navSolution', data.id)
     })
   }
 
-  public removeComponentVersion(component: Component) {
+  public removeComponentVersion(solutionComponent: SolutionComponent) {
     const solutionVersionId = +getContext().params.solutionVersionId
-    const data = { solutionVersionId, componentVersionId: component.currVersionId }
+    const data = { solutionVersionId, componentVersionId: solutionComponent.currVersionId }
     getContext().request(APIPath.componentVersion_remove, data).then(() => {
-      if (data.componentVersionId === component.activeVersionId) {
-        this.componentList = this.componentList.filter(item => item.id !== component.id)
+      const { component } = solutionComponent
+      component.versionList = component.versionList.filter(item => item.id !== data.componentVersionId)
+      solutionComponent.currVersionId = solutionComponent.componentVersionId
+      grootManager.command.executeCommand('gc.openComponent', solutionComponent.currVersionId)
+    })
+  }
 
-        if (this.activeComponentId === component.id) {
-          const newActiveComponent = this.componentList[0]
-          this.activeComponentId = newActiveComponent.id
-          grootManager.command.executeCommand('gc.openComponent', newActiveComponent.currVersionId)
-        } else {
-          // ...
-        }
-      } else {
-        component.versionList = component.versionList.filter(item => item.id !== data.componentVersionId)
-        component.currVersionId = component.activeVersionId
-        grootManager.command.executeCommand('gc.openComponent', component.currVersionId)
-      }
+  public syncVersion() {
+    this.syncVersionDoing = true
+    const newSolutionComponentList = this.solutionComponentList.map(item => {
+      return {
+        id: item.id,
+        componentVersionId: item.currVersionId
+      } as SolutionComponent
+    })
+    getContext().request(APIPath.solutionComponent_syncVersion, {
+      solutionVersionId: +getContext().params.solutionVersionId,
+      newSolutionComponentList
+    }).then(() => {
+      this.solutionComponentList.forEach(item => {
+        item.componentVersionId = item.currVersionId
+      })
+    }).finally(() => {
+      this.syncVersionDoing = false
     })
   }
 }

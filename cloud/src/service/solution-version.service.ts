@@ -35,8 +35,12 @@ export class SolutionVersionService {
     const newSolutionVersion = em.create(SolutionVersion, _newSolutionVersion)
 
     const originSolutionComponentRelation = await em.find(SolutionComponent, { solutionVersion: originSolutionVersion })
+    const solutionComponentRelationMap = new Map<number, SolutionComponent>()
+    const newSolutionComponentRelation = []
     for (const item of originSolutionComponentRelation) {
-      em.create(SolutionComponent, pick(item, ['componentVersion', 'entry', 'parent'], { solutionVersion: newSolutionVersion }))
+      const newSolutionComponent = em.create(SolutionComponent, pick(item, ['componentVersion', 'entry', 'parent', 'component'], { solutionVersion: newSolutionVersion }))
+      solutionComponentRelationMap.set(item.id, newSolutionComponent)
+      newSolutionComponentRelation.push(newSolutionComponent)
     }
 
     const extInstanceList = await em.find(ExtensionInstance, {
@@ -47,6 +51,12 @@ export class SolutionVersionService {
     await em.begin();
     try {
       await em.flush()
+
+      for (const solutionComponent of newSolutionComponentRelation) {
+        if (solutionComponent.parent) {
+          solutionComponent.parent = solutionComponentRelationMap.get(solutionComponent.parent.id)
+        }
+      }
 
       for (const extInstance of extInstanceList) {
         const _extInstance = pick(extInstance, ['extension', 'extensionVersion', 'config', 'relationType', 'secret', 'open'])

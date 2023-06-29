@@ -37,7 +37,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   // 将组件和解决方案进行关联
   const solutionComponentRelation = em.create(SolutionComponent, {
     solutionVersion: solution.recentVersion,
-    componentVersion: btnComponentVersion
+    componentVersion: btnComponentVersion,
+    component: btnComponent
   })
   await em.persistAndFlush(solutionComponentRelation);
 

@@ -68,15 +68,7 @@ export class Component extends BaseEntity {
   @Property({ persist: false })
   solutionVersionId?: number;
 
-  /**
-   * 和解决方案关联版本
-   */
+  //************************已下是接口入参或者查询返回需要定义的属性************************
   @Property({ persist: false })
-  activeVersionId?: number;
-
-  @Property({ persist: false })
-  parentComponentVersionId?: number
-
-  @Property({ persist: false })
-  parentComponentId?: number
+  componentVersionId?: number;
 }

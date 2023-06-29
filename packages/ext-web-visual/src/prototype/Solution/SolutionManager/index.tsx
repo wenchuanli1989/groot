@@ -1,7 +1,7 @@
 import { ModalStatus, useModel } from '@grootio/common'
 import styles from './index.module.less'
 import SolutionModel from '../SolutionModel'
-import { BlockOutlined, CaretDownOutlined, PlusOutlined } from '@ant-design/icons'
+import { BlockOutlined, CaretDownOutlined, PlusOutlined, SyncOutlined } from '@ant-design/icons'
 import { Button, Select } from 'antd'
 import { grootManager } from 'context'
 
@@ -10,7 +10,7 @@ const SolutionManager = () => {
 
   const onSwitchVersion = (solutionVersionId: number) => {
     solutionModel.currSolutionVersionId = solutionVersionId;
-    grootManager.command.executeCommand('gc.navSolution', solutionVersionId, solutionModel.activeComponentId)
+    grootManager.command.executeCommand('gc.navSolution', solutionVersionId)
   }
 
   return <div className={styles.componentItemHeader}>
@@ -18,6 +18,10 @@ const SolutionManager = () => {
     <div >
       <Button icon={<PlusOutlined />} type="link" onClick={() => {
         solutionModel.componentAddModalStatus = ModalStatus.Init
+        solutionModel.parentIdForAddComponent = undefined
+      }} />
+      <Button icon={<SyncOutlined spin={solutionModel.syncVersionDoing} />} type="link" onClick={() => {
+        solutionModel.syncVersion()
       }} />
       <Button icon={<BlockOutlined />} type="link" onClick={() => {
         solutionModel.solutionVersionAddModalStatus = ModalStatus.Init

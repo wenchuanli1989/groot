@@ -1,24 +1,24 @@
 import { CaretDownOutlined, SettingOutlined } from "@ant-design/icons"
-import { Component, ModalStatus, useModel } from "@grootio/common"
-import { Dropdown, Modal, Popconfirm, Select, } from "antd"
+import { ModalStatus, SolutionComponent, useModel } from "@grootio/common"
+import { Dropdown, Modal, Popconfirm, Select, Space, } from "antd"
 import SolutionModel from "../SolutionModel"
 
 import styles from './index.module.less'
 import { grootManager } from "context"
 
-const ComponentItem: React.FC<{ component: Component }> = ({ component }) => {
+const ComponentItem: React.FC<{ solutionComponent: SolutionComponent }> = ({ solutionComponent }) => {
   const solutionModel = useModel(SolutionModel)
 
   const onSwitchVersion = (versionId) => {
-    component.currVersionId = versionId
-    solutionModel.activeComponentId = component.id;
+    solutionComponent.currVersionId = versionId
+    solutionModel.activeSolutionComponentId = solutionComponent.id;
     grootManager.command.executeCommand('gc.openComponent', versionId)
   }
 
   let versionStyle = '';
-  if (component.currVersionId !== component.activeVersionId) {
+  if (solutionComponent.currVersionId !== solutionComponent.componentVersionId) {
     versionStyle = styles.versionChange
-  } else if (component.activeVersionId !== component.recentVersionId) {
+  } else if (solutionComponent.componentVersionId !== solutionComponent.component.recentVersionId) {
     versionStyle = styles.versionFallBehind
   }
 
@@ -27,14 +27,13 @@ const ComponentItem: React.FC<{ component: Component }> = ({ component }) => {
       key: 'version',
       label: '添加版本',
       onClick: () => {
-        solutionModel.componentIdForAddComponentVersion = component.id;
         solutionModel.componentVersionAddModalStatus = ModalStatus.Init
       }
     }, {
       key: 'remove',
       label: <Popconfirm title="确定删除吗"
         onConfirm={() => {
-          solutionModel.removeComponentVersion(component)
+          solutionModel.removeComponentVersion(solutionComponent)
         }}
         okText="删除"
         cancelText="取消">
@@ -43,19 +42,18 @@ const ComponentItem: React.FC<{ component: Component }> = ({ component }) => {
     }
   ]
 
-  if (!component.parentComponentId) {
+  if (!solutionComponent.parentId) {
     dropMenus.push({
       key: 'add',
       label: '添加子组件',
       onClick: () => {
-        solutionModel.parentComponentVersionId = component.currVersionId
-        solutionModel.parentComponentId = component.id
         solutionModel.componentAddModalStatus = ModalStatus.Init
+        solutionModel.parentIdForAddComponent = solutionComponent.id
       }
     })
   }
 
-  if (component.currVersionId !== component.activeVersionId) {
+  if (solutionComponent.currVersionId !== solutionComponent.componentVersionId) {
     dropMenus.push({
       key: 'publish',
       label: '发布版本',
@@ -64,7 +62,7 @@ const ComponentItem: React.FC<{ component: Component }> = ({ component }) => {
           title: '确定发布版本',
           content: '发布之后版本无法更新',
           onOk: () => {
-            solutionModel.publish(component)
+            solutionModel.publish(solutionComponent)
           }
         })
       }
@@ -73,25 +71,30 @@ const ComponentItem: React.FC<{ component: Component }> = ({ component }) => {
 
   return <div className={`${styles.componentItem} `}>
     <div className={styles.componentItemName}>
-      {component.name}
+      <Space>
+        <span>{solutionComponent.component.name}</span>
+
+        {solutionModel.activeSolutionComponentId === solutionComponent.id && (
+          <Dropdown menu={{ items: dropMenus }} placement="bottomRight" >
+            <SettingOutlined />
+          </Dropdown>
+        )}
+      </Space>
+
     </div>
     <div className={styles.componentItemVersion} onClick={(e) => e.stopPropagation()}>
 
       <Select
         className={versionStyle}
         onChange={onSwitchVersion}
-        value={component.currVersionId}
+        value={solutionComponent.currVersionId}
         suffixIcon={<CaretDownOutlined />}
         dropdownMatchSelectWidth={false}
-        defaultValue={component.recentVersionId}
+        defaultValue={solutionComponent.component.recentVersionId}
         bordered={false}
         fieldNames={{ label: 'name', value: 'id' }}
-        options={component.versionList}
+        options={solutionComponent.component.versionList}
       />
-
-      <Dropdown menu={{ items: dropMenus }} placement="bottomRight" >
-        <SettingOutlined />
-      </Dropdown>
 
     </div>
 

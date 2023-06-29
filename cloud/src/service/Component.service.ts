@@ -1,5 +1,5 @@
 import { pick, PropValueType } from '@grootio/common';
-import { RequestContext, wrap } from '@mikro-orm/core';
+import { EntityManager, RequestContext, wrap } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 
 import { LogicException, LogicExceptionCode } from 'config/logic.exception';
@@ -9,7 +9,6 @@ import { PropBlock } from 'entities/PropBlock';
 import { PropGroup } from 'entities/PropGroup';
 import { PropItem } from 'entities/PropItem';
 import { PropValue } from 'entities/PropValue';
-import { SolutionComponent } from 'entities/SolutionComponent';
 import { SolutionVersion } from 'entities/SolutionVersion';
 
 
@@ -39,8 +38,8 @@ export class ComponentService {
     return component;
   }
 
-  async add(rawComponent: Component) {
-    const em = RequestContext.getEntityManager();
+  async add(rawComponent: Component, parentEm?: EntityManager) {
+    let em = parentEm || RequestContext.getEntityManager();
 
     if (!rawComponent.packageName || !rawComponent.componentName) {
       throw new LogicException('参数packageName和componentName不能同时为空', LogicExceptionCode.ParamEmpty);
@@ -49,14 +48,6 @@ export class ComponentService {
     LogicException.assertParamEmpty(rawComponent.solutionVersionId, 'solutionVersionId');
     const solutionVersion = await em.findOne(SolutionVersion, rawComponent.solutionVersionId)
     LogicException.assertNotFound(solutionVersion, 'SolutionVersion', rawComponent.solutionVersionId);
-
-    // const sameComponentNameCount = await em.count(Component, {
-    //   name: rawComponent.name,
-    //   solution: solutionVersion.solution
-    // })
-    // if (sameComponentNameCount > 0) {
-    //   throw new LogicException(`名称重复`, LogicExceptionCode.NotUnique)
-    // }
 
     const sameComponentCount = await em.count(Component, {
       componentName: rawComponent.componentName,
@@ -69,16 +60,11 @@ export class ComponentService {
       throw new LogicException(`组件名称和包名重复`, LogicExceptionCode.NotUnique)
     }
 
-    let parentComponentVersion
-    if (rawComponent.parentComponentVersionId) {
-      parentComponentVersion = await em.findOne(ComponentVersion, rawComponent.parentComponentVersionId)
-      LogicException.assertNotFound(parentComponentVersion, 'ComponentVersion', rawComponent.parentComponentVersionId);
-    }
-
     const newComponent = em.create(Component, pick(rawComponent, ['name', 'componentName', 'packageName'], {
       solution: solutionVersion.solution
     }));
 
+    const parentCtx = parentEm ? em.getTransactionContext() : undefined;
     await em.begin();
     try {
       // 创建组件
@@ -91,11 +77,11 @@ export class ComponentService {
       });
       await em.flush();
 
-      em.create(SolutionComponent, {
-        solutionVersion,
-        componentVersion: newVersion,
-        parent: parentComponentVersion
-      })
+      // em.create(SolutionComponent, {
+      //   solutionVersion,
+      //   componentVersion: newVersion,
+      //   parent: parentComponentVersion
+      // })
 
       // 更新组件版本
       newComponent.recentVersion = newVersion;
@@ -125,6 +111,10 @@ export class ComponentService {
     } catch (e) {
       await em.rollback();
       throw e;
+    } finally {
+      if (parentCtx) {
+        em.setTransactionContext(parentCtx);
+      }
     }
 
     return newComponent;
