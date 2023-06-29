@@ -120,7 +120,34 @@ export class ComponentService {
     return newComponent;
   }
 
+  public async remove(componentId: number, parentEm?: EntityManager) {
+    let em = parentEm || RequestContext.getEntityManager();
 
+    const component = await em.findOne(Component, componentId)
+    LogicException.assertNotFound(component, 'Component', componentId)
+
+    const parentCtx = parentEm ? em.getTransactionContext() : undefined;
+    await em.begin()
+    try {
+      // todo 校验关联引用 软删除不能用nativeDelete？？？
+      // await em.nativeDelete(ComponentVersion, { component }) 
+      // await em.nativeDelete(PropBlock, { component })
+      // await em.nativeDelete(PropGroup, { component })
+      // await em.nativeDelete(PropItem, { component })
+      component.deletedAt = new Date()
+
+      // await em.flush()
+
+      await em.commit()
+    } catch (e) {
+      await em.rollback();
+      throw e;
+    } finally {
+      if (parentCtx) {
+        em.setTransactionContext(parentCtx);
+      }
+    }
+  }
 }
 
 

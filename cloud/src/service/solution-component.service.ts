@@ -1,4 +1,4 @@
-import { RequestContext } from '@mikro-orm/core';
+import { EntityManager, RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { LogicException, LogicExceptionCode } from 'config/logic.exception';
 import { ComponentVersion } from 'entities/ComponentVersion';
@@ -108,6 +108,47 @@ export class SolutionComponentService {
     } catch (e) {
       await em.rollback();
       throw e;
+    }
+  }
+
+  async remove(solutionComponentId: number, parentEm?: EntityManager) {
+    let em = parentEm || RequestContext.getEntityManager();
+
+    LogicException.assertParamEmpty(solutionComponentId, 'solutionComponentId')
+    const solutionComponent = await em.findOne(SolutionComponent, solutionComponentId)
+    LogicException.assertNotFound(solutionComponent, 'SolutionComponent', solutionComponentId)
+
+    const children = await em.find(SolutionComponent, { parent: solutionComponent })
+
+
+    const parentCtx = parentEm ? em.getTransactionContext() : undefined;
+    await em.begin()
+    try {
+
+      if (children.length) {
+        for (const subSolutionComponent of children) {
+          await this.remove(subSolutionComponent.id, em)
+        }
+      }
+
+      solutionComponent.deletedAt = new Date()
+
+      await em.flush()
+
+      const total = await em.count(SolutionComponent, { component: solutionComponent.component })
+      if (total === 0) {
+        await this.componentService.remove(solutionComponent.component.id, em)
+      }
+
+      await em.commit()
+
+    } catch (e) {
+      await em.rollback();
+      throw e;
+    } finally {
+      if (parentCtx) {
+        em.setTransactionContext(parentCtx);
+      }
     }
   }
 }

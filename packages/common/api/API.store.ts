@@ -86,8 +86,9 @@ export type APIStore = {
   [APIPath.secretCore]: [{ mode: StudioMode, releaseId: string, solutionVersionId: string }, API.Response<ExtensionInstance>],
   [APIPath.componentVersion_getBySolutionVersionIdAndComponentId]: [{ solutionVersionId: number, componentId: number }, API.Response<ComponentVersion>],
   [APIPath.solutionVersion_add]: [{ imageVersionId: number, name: string }, API.Response<SolutionVersion>]
-  [APIPath.componentVersion_remove]: [{ solutionVersionId: number, componentVersionId: number }, API.Response<void>],
-  [APIPath.solutionComponent_syncVersion]: [{ solutionVersionId: number, newSolutionComponentList: SolutionComponent[] }]
+  [APIPath.componentVersion_remove]: [{ solutionVersionId: number, componentVersionId: number }],
+  [APIPath.solutionComponent_syncVersion]: [{ solutionVersionId: number, newSolutionComponentList: SolutionComponent[] }],
+  [APIPath.solutionComponent_remove]: [{ solutionComponentId: number }]
 };
 
 

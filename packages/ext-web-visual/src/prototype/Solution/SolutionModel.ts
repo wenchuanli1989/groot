@@ -99,6 +99,18 @@ export default class SolutionModel extends BaseModel {
     })
   }
 
+  public removeSolutionComponent(solutionComponentId: number) {
+    getContext().request(APIPath.solutionComponent_remove, { solutionComponentId }).then(() => {
+      const solutionComponentList = this.solutionComponentList.filter(item => item.parentId !== solutionComponentId && item.id !== solutionComponentId)
+      this.solutionComponentList = solutionComponentList
+      if (this.activeSolutionComponentId === solutionComponentId && solutionComponentList.length > 0) {
+        this.activeSolutionComponentId = solutionComponentList[0].id
+        grootManager.command.executeCommand('gc.openComponent', this.activeSolutionComponentId)
+      }
+    })
+  }
+
+
   public syncVersion() {
     this.syncVersionDoing = true
     const newSolutionComponentList = this.solutionComponentList.map(item => {

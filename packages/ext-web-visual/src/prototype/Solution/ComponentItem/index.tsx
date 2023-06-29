@@ -30,8 +30,8 @@ const ComponentItem: React.FC<{ solutionComponent: SolutionComponent }> = ({ sol
         solutionModel.componentVersionAddModalStatus = ModalStatus.Init
       }
     }, {
-      key: 'remove',
-      label: <Popconfirm title="确定删除吗"
+      key: 'removeComponentVersion',
+      label: <Popconfirm title="确定删除版本吗"
         onConfirm={() => {
           solutionModel.removeComponentVersion(solutionComponent)
         }}
@@ -39,6 +39,17 @@ const ComponentItem: React.FC<{ solutionComponent: SolutionComponent }> = ({ sol
         cancelText="取消">
         删除版本
       </Popconfirm>
+    }, {
+      key: 'remove',
+      label: <Popconfirm title="确定删除吗"
+        onConfirm={() => {
+          solutionModel.removeSolutionComponent(solutionComponent.id)
+        }}
+        okText="删除"
+        cancelText="取消">
+        删除
+      </Popconfirm>
+
     }
   ]
 

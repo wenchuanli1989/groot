@@ -309,4 +309,9 @@ export class WorkbenchController {
   async solutionComponentSyncVersion(@Body('solutionVersionId') solutionVersionId: number, @Body('newSolutionComponentList') newSolutionComponentList: SolutionComponent[]) {
     return await this.solutionComponentService.syncVersion(solutionVersionId, newSolutionComponentList)
   }
+
+  @Post('/solution-component/remove')
+  async solutionComponentRemove(@Body('solutionComponentId') solutionComponentId: number) {
+    return await this.solutionComponentService.remove(solutionComponentId)
+  }
 }
