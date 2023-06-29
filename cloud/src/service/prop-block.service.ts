@@ -118,7 +118,7 @@ export class PropBlockService {
         await this.propItemService.remove(item.id, em);
       }
 
-      await em.removeAndFlush(block);
+      block.deletedAt = new Date()
       await em.commit();
     } catch (e) {
       await em.rollback();

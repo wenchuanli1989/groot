@@ -145,16 +145,16 @@ export class PropItemService {
     const parentCtx = parentEm ? em.getTransactionContext() : undefined;
     await em.begin();
     try {
-      await em.removeAndFlush(propItem);
+      propItem.deletedAt = new Date()
 
       if (!!propItem.childGroup) {
         await this.propGroupService.remove(propItem.childGroup.id, em);
       }
 
-      await em.nativeDelete(PropValue, {
+      await em.nativeUpdate(PropValue, {
         abstractValueIdChain: { $like: `${propItem.id}` },
         type: PropValueType.Prototype
-      });
+      }, { deletedAt: new Date() });
 
       await em.commit();
     } catch (e) {
@@ -180,10 +180,10 @@ export class PropItemService {
       const typeChange = rawItem.viewType !== propItem.viewType
       if (typeChange) {
         propItem.versionTraceId = propItem.id;
-        await em.nativeDelete(PropValue, {
+        await em.nativeUpdate(PropValue, {
           abstractValueIdChain: { $like: `${propItem.id}` },
           type: PropValueType.Prototype
-        });
+        }, { deletedAt: new Date() });
       }
       pick(rawItem, ['label', 'propKey', 'rootPropKey', 'viewType', 'span', 'valueOptions'], propItem);
       if (typeChange) {

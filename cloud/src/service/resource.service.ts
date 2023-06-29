@@ -109,11 +109,11 @@ export class ResourceService {
     const em = RequestContext.getEntityManager();
 
     if (type === 'app') {
-      await em.nativeDelete(AppResource, { id: resourceId })
+      await em.nativeUpdate(AppResource, { id: resourceId }, { deletedAt: new Date() })
     } else if (type === 'instance') {
-      await em.nativeDelete(InstanceResource, { id: resourceId })
+      await em.nativeUpdate(InstanceResource, { id: resourceId }, { deletedAt: new Date() })
     } else {
-      await em.nativeDelete(ProjectResource, { id: resourceId })
+      await em.nativeUpdate(ProjectResource, { id: resourceId }, { deletedAt: new Date() })
     }
   }
 

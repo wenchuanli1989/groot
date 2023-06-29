@@ -99,7 +99,7 @@ export class PropGroupService {
         await this.propBlockService.remove(block.id, em);
       }
 
-      await em.removeAndFlush(group);
+      group.deletedAt = new Date()
       await em.commit();
     } catch (e) {
       await em.rollback();

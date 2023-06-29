@@ -47,12 +47,12 @@ export class PropValueService {
 
     await em.begin();
     try {
-      await em.nativeDelete(PropValue, {
+      await em.nativeUpdate(PropValue, {
         abstractValueIdChain: { $like: `${propValue.id}` },
         component: propValue.componentId,
         componentVersion: propValue.componentVersionId,
-      });
-      await em.removeAndFlush(propValue);
+      }, { deletedAt: new Date() });
+      propValue.deletedAt = new Date()
 
       await em.commit();
     } catch (e) {

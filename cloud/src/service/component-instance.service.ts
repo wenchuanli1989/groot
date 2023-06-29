@@ -336,7 +336,7 @@ export class ComponentInstanceService {
       } while (parentIds.length);
     }
 
-    await em.nativeDelete(ComponentInstance, { id: { $in: removeIds } });
+    await em.nativeUpdate(ComponentInstance, { id: { $in: removeIds } }, { deletedAt: new Date() });
   }
 
   private async addRootForWrapper(rawInstance: ComponentInstance, wrapperRawInstance: ComponentInstance, em: EntityManager) {
