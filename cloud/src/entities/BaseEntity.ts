@@ -16,5 +16,8 @@ export abstract class BaseEntity {
   @Property({ lazy: true })
   deletedAt?: Date
 
+  // 自动从会话中抓取
+  @Property({ lazy: true })
+  orgId?: number
   // todo 添加创建人和更新人，自动从会话中抓取
 }
