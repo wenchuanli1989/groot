@@ -22,7 +22,6 @@ export class ComponentInstanceService {
 
   // root key entry wrapper parserType
   async addEntry(rawInstance: ComponentInstance) {
-    let em = RequestContext.getEntityManager();
 
     LogicException.assertParamEmpty(rawInstance.key, 'key');
     LogicException.assertParamEmpty(rawInstance.name, 'name');
@@ -30,7 +29,7 @@ export class ComponentInstanceService {
 
     rawInstance.entry = true
 
-    return await this.add(rawInstance, em);
+    return await this.add(rawInstance);
   }
 
   async add(rawInstance: ComponentInstance, parentEm?: EntityManager) {

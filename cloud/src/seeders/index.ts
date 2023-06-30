@@ -137,32 +137,32 @@ export class DatabaseSeeder extends Seeder {
     await em.persistAndFlush(solution);
 
     // 解决方案关联扩展实例
-    const extWebVisualSolutionInstance = em.create(ExtensionInstance, {
+    const extWebVisualExtensionInstance = em.create(ExtensionInstance, {
       extension: extWebVisual,
       extensionVersion: extWebVisualVersion,
       config: '',
       relationType: ExtensionRelationType.Solution,
       relationId: solutionVersion.id,
     });
-    await em.persistAndFlush(extWebVisualSolutionInstance);
+    await em.persistAndFlush(extWebVisualExtensionInstance);
 
-    const extPropSetterSolutionInstance = em.create(ExtensionInstance, {
+    const extPropSetterExtensionInstance = em.create(ExtensionInstance, {
       extension: extPropSetter,
       extensionVersion: extPropSetterVersion,
       config: '',
       relationType: ExtensionRelationType.Solution,
       relationId: solutionVersion.id,
     });
-    await em.persistAndFlush(extPropSetterSolutionInstance);
+    await em.persistAndFlush(extPropSetterExtensionInstance);
 
-    const extWorkAreaSolutionInstance = em.create(ExtensionInstance, {
+    const extWorkAreaExtensionInstance = em.create(ExtensionInstance, {
       extension: extWorkArea,
       extensionVersion: extWorkAreaVersion,
       config: '',
       relationType: ExtensionRelationType.Solution,
       relationId: solutionVersion.id,
     });
-    await em.persistAndFlush(extWorkAreaSolutionInstance);
+    await em.persistAndFlush(extWorkAreaExtensionInstance);
 
     const extCoreInstance = em.create(ExtensionInstance, {
       extension: extCore,
