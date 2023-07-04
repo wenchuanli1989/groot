@@ -1,5 +1,4 @@
-import { Entity, ManyToOne } from "@mikro-orm/core";
-import { Project } from "./Project";
+import { Entity } from "@mikro-orm/core";
 import { Resource } from "./Resource";
 import { SoftDelete } from "../config/soft-delete";
 
@@ -7,8 +6,6 @@ import { SoftDelete } from "../config/soft-delete";
 @Entity()
 export class ProjectResource extends Resource {
 
-  @ManyToOne({ serializer: project => project?.id, serializedName: 'projectId' })
-  project: Project;
 
   //************************已下是接口入参或者查询返回需要定义的属性************************
 

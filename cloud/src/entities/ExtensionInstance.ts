@@ -11,9 +11,6 @@ import { SoftDelete } from "../config/soft-delete";
 export class ExtensionInstance extends BaseEntity {
 
   @ManyToOne()
-  extension: Extension;
-
-  @ManyToOne()
   extensionVersion: ExtensionVersion;
 
   // @todo 考虑去json，改为结构化
@@ -26,11 +23,20 @@ export class ExtensionInstance extends BaseEntity {
   @Property()
   relationId: number;
 
+  /**
+   * 是否是隐藏插件
+   */
   @Property()
   secret = false;
 
+  // todo
   @Property()
   open = true;
 
+  /**
+   * 必要领域归属字段
+   */
+  @ManyToOne()
+  extension: Extension;
   //************************已下是接口入参或者查询返回需要定义的属性************************
 }

@@ -15,12 +15,6 @@ export class ExtensionVersion extends BaseEntity {
   @Property()
   defaultConfig?: LargeText;
 
-  @Property({ length: 30, comment: 'webpack模块联邦包名' })
-  packageName = '';
-
-  @Property({ length: 30, comment: 'webpack模块联邦模块名' })
-  moduleName = '';
-
   // todo 保证扩展根据assetUrl全局唯一
   @Property({ length: 100, comment: 'webpack模块联邦暴露出来可访问js地址' })
   assetUrl = '';
@@ -37,6 +31,9 @@ export class ExtensionVersion extends BaseEntity {
   @OneToOne({ serializer: value => value?.text })
   resourcePipelineRaw?: LargeText
 
+  /**
+   * 必要领域归属字段
+   */
   @ManyToOne({ serializer: value => value?.id, serializedName: 'extensionId' })
   extension: Extension;
 

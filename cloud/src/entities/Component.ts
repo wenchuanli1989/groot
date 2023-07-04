@@ -22,11 +22,15 @@ export class Component extends BaseEntity {
   @Property({ length: 20, comment: '组件名' })
   componentName: string;
 
+  /**
+   * 必要领域归属字段
+   */
   @ManyToOne({ serializer: value => value?.id, serializedName: 'solutionId' })
   solution: Solution
 
   /**
-   * 改组件最新版本
+   * todo 有了solutionComponent 改字段意义正在弱化
+   * 组件的最新版本
    * 此处必须为可选，否则创建组建会引发recentVersion非空校验
    */
   @OneToOne({ serializer: value => value?.id, serializedName: 'recentVersionId', comment: '组件最新版本' })

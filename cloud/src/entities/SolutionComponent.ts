@@ -5,6 +5,7 @@ import { ComponentVersion } from "./ComponentVersion";
 import { SolutionVersion } from "./SolutionVersion";
 import { SoftDelete } from "../config/soft-delete";
 import { Component } from "./Component";
+import { Solution } from "./Solution";
 
 @SoftDelete()
 @Entity()
@@ -18,11 +19,20 @@ export class SolutionComponent extends BaseEntity {
   @ManyToOne()
   component: Component;
 
+  /**
+   * 组件是否可以作为view
+   */
   @Property()
-  entry = false
+  view = false
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'parentId' })
   parent?: SolutionComponent;
+
+  /**
+   * 必要领域归属字段
+   */
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'solutionId' })
+  solution: Solution;
   //************************已下是接口入参或者查询返回需要定义的属性************************
 
   @Property({ persist: false })

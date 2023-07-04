@@ -1,4 +1,4 @@
-import { SolutionInstance, Application, Component, ComponentInstance, ComponentVersion, Deploy, Organization, PropBlock, PropGroup, PropItem, PropValue, Release, Solution, ExtensionInstance, AppResource, InstanceResource, ResourceConfig, Resource, SolutionVersion, SolutionComponent } from '../entities';
+import { SolutionInstance, Application, Component, ComponentInstance, ComponentVersion, Deploy, Organization, PropBlock, PropGroup, PropItem, PropValue, Release, Solution, ExtensionInstance, AppResource, ViewResource, ResourceConfig, Resource, SolutionVersion, SolutionComponent, View } from '../entities';
 import { EnvType, StudioMode } from '../enum';
 import { ExtensionRuntime } from '../extension';
 import { API } from './API.common';
@@ -20,17 +20,17 @@ export type APIStore = {
   [APIPath.solutionComponent_addComponent]: [Partial<SolutionComponent>, API.Response<SolutionComponent>];
   [APIPath.componentVersion_add]: [ComponentVersion, API.Response<ComponentVersion>];
   [APIPath.componentVersion_publish]: [{ componentVersionId: number }];
-  [APIPath.componentInstance_entryDetailByEntryIdAndReleaseId]: [{ entryId: number, releaseId: number }, API.Response<{
-    children: ComponentInstance[],
-    root: ComponentInstance,
-    entryExtensionInstanceList: ExtensionRuntime[],
+  [APIPath.view_detailByViewIdAndReleaseId]: [{ viewId: number, releaseId: number }, API.Response<{
+    instanceList: ComponentInstance[],
+    viewExtensionInstanceList: ExtensionRuntime[],
     solutionInstanceList: SolutionInstance[],
     resourceList: Resource[],
     resourceConfigList: ResourceConfig[]
   }>];
-  [APIPath.componentInstance_addEntry]: [ComponentInstance, API.Response<ComponentInstance>];
+  [APIPath.view_add]: [View, API.Response<View>];
+  [APIPath.view_remove_viewId]: [{ viewId: number }]
   [APIPath.release_add]: [Release, API.Response<Release>],
-  [APIPath.componentInstance_reverseDetectId]: [Partial<ComponentInstance>, API.Response<number>],
+  // [APIPath.componentInstance_reverseDetectId]: [Partial<ComponentInstance>, API.Response<number>],
   [APIPath.asset_build]: [{ releaseId: number }, API.Response<number>],
   [APIPath.asset_publish]: [{ deployId: number }, API.Response<number>],
   [APIPath.asset_createDeploy]: [{ bundleId: number, env: EnvType }, API.Response<Deploy>],
@@ -73,13 +73,13 @@ export type APIStore = {
   [APIPath.componentInstance_remove_instanceId]: [{ instanceId: number }],
 
   [APIPath.resource_addAppResource]: [AppResource, API.Response<AppResource>],
-  [APIPath.resource_addInstanceResource]: [InstanceResource, API.Response<InstanceResource>],
+  [APIPath.resource_addViewResource]: [ViewResource, API.Response<ViewResource>],
   [APIPath.resource_updateAppResource]: [AppResource, API.Response<AppResource>],
-  [APIPath.resource_updateInstanceResource]: [InstanceResource, API.Response<InstanceResource>],
+  [APIPath.resource_updateViewResource]: [ViewResource, API.Response<ViewResource>],
 
   [APIPath.resource_remove_resourceId]: [{ resourceId: number, type: 'app' | 'instance' | 'project' }],
 
-  [APIPath.solutionComponent_list_solutionVersionId]: [{ solutionVersionId: number, entry?: 'all' | 'true' | 'false', allVersion?: boolean }, API.Response<SolutionComponent[]>],
+  [APIPath.solutionComponent_list_solutionVersionId]: [{ solutionVersionId: number, view?: 'all' | 'true' | 'false', allVersion?: boolean }, API.Response<SolutionComponent[]>],
 
   [APIPath.application_releaseList_appId]: [{ appId: number }, API.Response<Release[]>],
 

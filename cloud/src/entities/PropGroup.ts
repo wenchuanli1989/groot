@@ -1,11 +1,12 @@
 import { PropGroupStructType } from "@grootio/common";
-import { Entity, Enum, ManyToOne, Property } from "@mikro-orm/core";
+import { Entity, ManyToOne, Property } from "@mikro-orm/core";
 
 import { BaseEntity } from "./BaseEntity";
 import { Component } from "./Component";
 import { ComponentVersion } from "./ComponentVersion";
 import { PropItem } from "./PropItem";
 import { SoftDelete } from "../config/soft-delete";
+import { Solution } from "./Solution";
 
 @SoftDelete()
 @Entity()
@@ -34,6 +35,12 @@ export class PropGroup extends BaseEntity {
    */
   @ManyToOne({ serializer: value => value?.id, serializedName: 'parentItemId' })
   parentItem?: PropItem;
+
+  /**
+   * 必要领域归属字段
+   */
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'solutionId' })
+  solution: Solution
 
   //************************已下是接口入参或者查询返回需要定义的属性************************
 

@@ -6,6 +6,7 @@ import { BaseEntity } from "./BaseEntity";
 import { Bundle } from "./Bundle";
 import { Release } from "./Release";
 import { SoftDelete } from "../config/soft-delete";
+import { Project } from "./Project";
 
 @SoftDelete()
 @Entity()
@@ -13,9 +14,6 @@ export class Deploy extends BaseEntity {
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'releaseId' })
   release: Release;
-
-  @ManyToOne({ serializer: value => value?.id, serializedName: 'applicationId' })
-  application: Application;
 
   @Property({ type: 'tinyint' })
   env: EnvType;
@@ -26,6 +24,14 @@ export class Deploy extends BaseEntity {
   @ManyToOne({ serializer: value => value?.id, serializedName: 'bundleId' })
   bundle: Bundle;
 
+  /**
+   * 必要领域归属字段
+   */
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'appId' })
+  app: Application
+
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'projectId' })
+  project: Project;
   //************************已下是接口入参或者查询返回需要定义的属性************************
 
   // @Property({ persist: false })

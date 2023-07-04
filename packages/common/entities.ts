@@ -95,11 +95,15 @@ export type AppResource = {
   // ************************** 分割线已下是界面属性 **************************
 } & Omit<import("../../cloud/src/entities/AppResource").AppResource, 'app' | 'release'>;
 
-export type InstanceResource = {
+export type ViewResource = {
   release: Release,
-  componentInstance: ComponentInstance
+  view: View
   // ************************** 分割线已下是界面属性 **************************
-} & Omit<import("../../cloud/src/entities/InstanceResource").InstanceResource, 'release' | 'componentInstance'>;
+} & Omit<import("../../cloud/src/entities/ViewResource").ViewResource, 'release' | 'view'>;
+
+export type View = {
+  // ************************** 分割线已下是界面属性 **************************
+} & Omit<import("../../cloud/src/entities/View").View, ''>;
 
 export type Resource = {
   resourceConfig: ResourceConfig,
@@ -134,14 +138,14 @@ export type Component = {
 export type Application = {
   extensionInstanceList: ExtensionRuntime[],
   release: Release,
-  entryList: ComponentInstance[],
+  viewList: View[],
   resourceList: Resource[],
   resourceConfigList: ResourceConfig[],
 
   // ************************** 分割线已下是界面属性 **************************
 
 
-} & Omit<import("../../cloud/src/entities/Application").Application, ''>;
+} & Omit<import("../../cloud/src/entities/Application").Application, 'extensionInstanceList' | 'release' | 'viewList' | 'resourceList' | 'resourceConfigList'>;
 
 export type Organization = {
 

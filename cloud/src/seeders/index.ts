@@ -30,16 +30,36 @@ export class DatabaseSeeder extends Seeder {
     await em.persistAndFlush(org);
 
     // 创建插件
-    const extWebVisual = em.create(Extension, { name: '@groot/ext-web-visual', org });
+    const extWebVisual = em.create(Extension, {
+      name: '@groot/ext-web-visual',
+      packageName: '_ext_web_visual',
+      moduleName: 'Main',
+      org
+    });
     await em.persistAndFlush(extWebVisual);
 
-    const extPropSetter = em.create(Extension, { name: '@groot/ext-prop-setter', org });
+    const extPropSetter = em.create(Extension, {
+      name: '@groot/ext-prop-setter',
+      packageName: '_ext_prop_setter',
+      moduleName: 'Main',
+      org
+    });
     await em.persistAndFlush(extPropSetter);
 
-    const extWorkArea = em.create(Extension, { name: '@groot/ext-work-area', org });
+    const extWorkArea = em.create(Extension, {
+      name: '@groot/ext-work-area',
+      packageName: '_ext_work_area',
+      moduleName: 'Main',
+      org
+    });
     await em.persistAndFlush(extWorkArea);
 
-    const extCore = em.create(Extension, { name: '@groot/ext-core', org });
+    const extCore = em.create(Extension, {
+      name: '@groot/ext-core',
+      packageName: '_ext_core',
+      moduleName: 'Main',
+      org
+    });
     await em.persistAndFlush(extCore);
 
 
@@ -67,8 +87,6 @@ export class DatabaseSeeder extends Seeder {
     // 创建插件版本
     const extWebVisualVersion = em.create(ExtensionVersion, {
       name: '0.0.1',
-      packageName: '_ext_web_visual',
-      moduleName: 'Main',
       assetUrl: 'http://groot-local.com:20000/ext-web-visual/index.js',
       extension: extWebVisual
     })
@@ -79,8 +97,6 @@ export class DatabaseSeeder extends Seeder {
 
     const extPropSetterVersion = em.create(ExtensionVersion, {
       name: '0.0.1',
-      packageName: '_ext_prop_setter',
-      moduleName: 'Main',
       assetUrl: 'http://groot-local.com:21000/ext-prop-setter/index.js',
       extension: extPropSetter,
       propItemPipeline: propPipelineCode,
@@ -95,8 +111,6 @@ export class DatabaseSeeder extends Seeder {
 
     const extWorkAreaVersion = em.create(ExtensionVersion, {
       name: '0.0.1',
-      packageName: '_ext_work_area',
-      moduleName: 'Main',
       assetUrl: 'http://groot-local.com:22000/ext-work-area/index.js',
       extension: extWorkArea
     })
@@ -107,8 +121,6 @@ export class DatabaseSeeder extends Seeder {
 
     const extCoreVersion = em.create(ExtensionVersion, {
       name: '0.0.1',
-      packageName: '_ext_core',
-      moduleName: 'Main',
       assetUrl: 'http://groot-local.com:12000/ext-core/index.js',
       extension: extCore
     })
@@ -182,26 +194,27 @@ export class DatabaseSeeder extends Seeder {
     await em.persistAndFlush(project);
 
     // 创建应用
-    const application = em.create(Application, {
+    const app = em.create(Application, {
       key: 'demo',
       name: '管理端应用',
       playgroundPath: '/layout/groot/playground',
       debugBaseUrl: 'http://groot-local.com:11000',
       project,
     });
-    await em.persistAndFlush(application);
+    await em.persistAndFlush(app);
 
     // 创建迭代
     const release = em.create(Release, {
       name: 'v0.0.1',
-      application,
-      debugBaseUrl: application.debugBaseUrl,
-      playgroundPath: application.playgroundPath
+      app,
+      debugBaseUrl: app.debugBaseUrl,
+      playgroundPath: app.playgroundPath,
+      project
     });
-    application.devRelease = release;
-    application.qaRelease = release;
-    application.plRelease = release;
-    application.onlineRelease = release;
+    app.devRelease = release;
+    app.qaRelease = release;
+    app.plRelease = release;
+    app.onlineRelease = release;
     await em.persistAndFlush(release);
 
     // 创建应用迭代级别扩展实例
@@ -246,7 +259,8 @@ export class DatabaseSeeder extends Seeder {
     const resourceConfig = em.create(ResourceConfig, {
       name: 'aaa',
       value: 'http://groot-local.com:10000/workbench/resource-demo',
-      type: 'www'
+      type: 'www',
+      project
     })
 
     await em.persistAndFlush(resourceConfig)
@@ -262,22 +276,23 @@ export class DatabaseSeeder extends Seeder {
     await em.persistAndFlush(projectResource)
 
     const appResource = em.create(AppResource, {
-      app: application,
+      app,
       release,
       name: 'demo1',
       value: '/demo1',
       namespace: 'dataSource',
-      resourceConfig
+      resourceConfig,
+      project
       // imageResource: projectResource
     })
     await em.persistAndFlush(appResource)
 
 
-    await proTableCreate(em, solution, release);
+    await proTableCreate(em, solution, release, project, app);
 
-    await btnCreate(em, solution, release, project);
+    await btnCreate(em, solution, release, project, app);
 
-    await profileCreate(em, solution, release);
+    await profileCreate(em, solution, release, project, app);
 
   }
 }

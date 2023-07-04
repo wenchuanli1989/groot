@@ -6,6 +6,7 @@ import { Component } from "./Component";
 import { ComponentVersion } from "./ComponentVersion";
 import { PropGroup } from "./PropGroup";
 import { SoftDelete } from "../config/soft-delete";
+import { Solution } from "./Solution";
 
 @SoftDelete()
 @Entity()
@@ -47,6 +48,13 @@ export class PropBlock extends BaseEntity {
    */
   @Property({ length: 20 })
   propKey = '';
+
+
+  /**
+   * 必要领域归属字段
+   */
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'solutionId' })
+  solution: Solution
 
   //************************已下是接口入参或者查询返回需要定义的属性************************
 

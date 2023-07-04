@@ -18,6 +18,9 @@ export class SolutionVersion extends BaseEntity {
   @Property({ length: 100, comment: '前端页面开发调试地址' })
   debugBaseUrl: string;
 
+  /**
+   * 必要领域归属字段
+   */
   @ManyToOne({ serializer: value => value?.id, serializedName: 'solutionId' })
   solution: Solution;
 

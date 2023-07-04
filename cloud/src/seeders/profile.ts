@@ -12,8 +12,11 @@ import { Release } from "../entities/Release";
 import { Solution } from "../entities/Solution";
 import { SolutionInstance } from "../entities/SolutionInstance";
 import { SolutionComponent } from "../entities/SolutionComponent";
+import { View } from "../entities/View";
+import { Project } from "../entities/Project";
+import { Application } from "../entities/Application";
 
-export const create = async (em: EntityManager, solution: Solution, release: Release) => {
+export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project, app: Application) => {
   // 创建组件
   const avatarComponent = em.create(Component, {
     solution,
@@ -27,7 +30,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   const avatarComponentVersion = em.create(ComponentVersion, {
     name: 'v0.0.1',
     component: avatarComponent,
-    publish: true
+    publish: true,
+    solution
   });
   avatarComponent.recentVersion = avatarComponentVersion;
   await em.persistAndFlush(avatarComponentVersion);
@@ -36,7 +40,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   const solutionComponentRelation = em.create(SolutionComponent, {
     solutionVersion: solution.recentVersion,
     componentVersion: avatarComponentVersion,
-    component: avatarComponent
+    component: avatarComponent,
+    solution
   })
   await em.persistAndFlush(solutionComponentRelation);
 
@@ -45,7 +50,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     name: '常用配置',
     order: 1000,
     componentVersion: avatarComponentVersion,
-    component: avatarComponentVersion
+    component: avatarComponentVersion,
+    solution
   });
   await em.persistAndFlush(avatarGroup);
 
@@ -56,7 +62,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     order: 1000,
     component: avatarComponent,
     layout: PropBlockLayout.Horizontal,
-    struct: PropBlockStructType.Default
+    struct: PropBlockStructType.Default,
+    solution
   })
   await em.persistAndFlush(avatarBlock);
 
@@ -69,7 +76,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     group: avatarGroup,
     componentVersion: avatarComponentVersion,
     order: 1000,
-    component: avatarComponent
+    component: avatarComponent,
+    solution
   });
 
   const avatarItem2 = em.create(PropItem, {
@@ -82,18 +90,55 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     group: avatarGroup,
     componentVersion: avatarComponentVersion,
     order: 2000,
-    component: avatarComponent
+    component: avatarComponent,
+    solution
   })
   await em.persistAndFlush([avatarItem1, avatarItem2]);
 
 
+  const profileView = em.create(View, {
+    name: '个人资料',
+    key: '/layout/groot/profile',
+    app,
+    project,
+    release
+  })
+  await em.persistAndFlush(profileView);
+
+  // 创建入口解决方案实例
+  const solutionInstance = em.create(SolutionInstance, {
+    solution: solution,
+    solutionVersion: solution.recentVersion,
+    view: profileView,
+    primary: true,
+    release,
+    project,
+    app
+  })
+  await em.persistAndFlush(solutionInstance);
+
+  const avatarSolutionComponent = em.create(SolutionComponent, {
+    solution,
+    solutionVersion: solution.recentVersion,
+    componentVersion: avatarComponentVersion,
+    component: avatarComponent,
+    view: false,
+  })
+
+  await em.persistAndFlush(avatarSolutionComponent)
+
   // 创建组件实例
   const avatarComponentInstance = em.create(ComponentInstance, {
-    name: '头像',
+    view: profileView,
     component: avatarComponent,
     componentVersion: avatarComponentVersion,
     release,
-    trackId: 0
+    trackId: 0,
+    app,
+    project,
+    solution,
+    solutionInstance,
+    solutionComponent: avatarSolutionComponent
   });
   await em.persistAndFlush(avatarComponentInstance);
 
@@ -119,7 +164,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   const profileComponentVersion = em.create(ComponentVersion, {
     name: 'v0.0.1',
     component: profileComponent,
-    publish: true
+    publish: true,
+    solution
   });
   profileComponent.recentVersion = profileComponentVersion;
   await em.persistAndFlush(profileComponentVersion);
@@ -128,8 +174,9 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   const profileSolutionComponentRelation = em.create(SolutionComponent, {
     solutionVersion: solution.recentVersion,
     componentVersion: profileComponentVersion,
-    entry: true,
-    component: profileComponent
+    view: true,
+    component: profileComponent,
+    solution
   })
   await em.persistAndFlush(solutionComponentRelation);
 
@@ -138,7 +185,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     name: '常用配置',
     order: 1000,
     componentVersion: profileComponentVersion,
-    component: profileComponent
+    component: profileComponent,
+    solution
   });
   await em.persistAndFlush(profileGroup);
 
@@ -149,7 +197,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     order: 1000,
     component: profileComponent,
     layout: PropBlockLayout.Horizontal,
-    struct: PropBlockStructType.Default
+    struct: PropBlockStructType.Default,
+    solution
   })
   await em.persistAndFlush(profileBlock);
 
@@ -162,7 +211,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     group: profileGroup,
     componentVersion: profileComponentVersion,
     order: 1000,
-    component: profileComponent
+    component: profileComponent,
+    solution
   });
 
   const profileItem2 = em.create(PropItem, {
@@ -174,7 +224,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     group: profileGroup,
     componentVersion: profileComponentVersion,
     order: 2000,
-    component: profileComponent
+    component: profileComponent,
+    solution
   })
 
   const profileItem3 = em.create(PropItem, {
@@ -186,7 +237,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     group: profileGroup,
     componentVersion: profileComponentVersion,
     order: 3000,
-    component: profileComponent
+    component: profileComponent,
+    solution
   })
 
   const profileItem4 = em.create(PropItem, {
@@ -197,35 +249,39 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     group: profileGroup,
     componentVersion: profileComponentVersion,
     order: 4000,
-    component: profileComponent
+    component: profileComponent,
+    solution
   })
   await em.persistAndFlush([profileItem1, profileItem2, profileItem3, profileItem4]);
 
+  const profileSolutionComponent = em.create(SolutionComponent, {
+    solution,
+    solutionVersion: solution.recentVersion,
+    componentVersion: profileComponentVersion,
+    component: profileComponent,
+    view: false,
+  })
+
+  await em.persistAndFlush(profileSolutionComponent)
+
   // 创建组件实例
   const profileComponentInstance = em.create(ComponentInstance, {
-    name: '个人资料',
-    key: '/layout/groot/profile',
-    entry: true,
-    mainEntry: true,
+    view: profileView,
     component: profileComponent,
     componentVersion: profileComponentVersion,
     release,
     trackId: 0,
+    app,
+    project,
+    solutionInstance,
+    solutionComponent: profileSolutionComponent,
+    solution
   });
   await em.persistAndFlush(profileComponentInstance);
 
   profileComponentInstance.trackId = profileComponentInstance.id;
   await em.persistAndFlush(profileComponentInstance);
 
-
-  // 创建入口解决方案实例
-  const solutionInstance = em.create(SolutionInstance, {
-    solution: solution,
-    solutionVersion: solution.recentVersion,
-    entry: profileComponentInstance,
-    solutionEntry: profileSolutionComponentRelation
-  })
-  await em.persistAndFlush(solutionInstance);
 
   // 更新组件实例关联解决方案实例
   profileComponentInstance.solutionInstance = solutionInstance
@@ -236,7 +292,6 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   await em.persistAndFlush(avatarComponentInstance);
 
   avatarComponentInstance.parent = profileComponentInstance;
-  avatarComponentInstance.root = profileComponentInstance;
 
   await em.persistAndFlush(avatarComponentInstance);
 
@@ -256,7 +311,10 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     componentVersion: profileComponentVersion,
     componentInstance: profileComponentInstance,
     type: PropValueType.Instance,
-    value: JSON.stringify(avatarValue)
+    value: JSON.stringify(avatarValue),
+    app,
+    project,
+    solution
   });
   await em.persistAndFlush(profileItem4Value);
 }

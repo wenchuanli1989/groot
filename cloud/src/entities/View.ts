@@ -1,25 +1,26 @@
 import { Entity, ManyToOne, Property } from "@mikro-orm/core";
 
 import { BaseEntity } from "./BaseEntity";
-import { Application } from "./Application";
 import { SoftDelete } from "../config/soft-delete";
 import { Project } from "./Project";
+import { Application } from "./Application";
+import { Release } from "./Release";
 
 @SoftDelete()
 @Entity()
-export class Release extends BaseEntity {
+export class View extends BaseEntity {
+
+  @Property({ length: 100, comment: '实例英文名，值为组件对应页面访问地址' })
+  key = '';
 
   @Property({ length: 20 })
   name: string;
 
-  @Property({ comment: '迭代版本是否归档，并限制组件实例修改' })
-  archive = false;
+  @Property({ comment: '是否是页面级实例' })
+  primaryView: boolean = false;
 
-  @Property({ length: 100, comment: '迭代对应前端页面开发调试地址' })
-  debugBaseUrl: string;
-
-  @Property({ length: 100, comment: ' 调试功能的演练场页面地址，可以接受外部窗口传来调试参数' })
-  playgroundPath: string;
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'releaseId' })
+  release: Release;
 
   /**
    * 必要领域归属字段
@@ -29,9 +30,11 @@ export class Release extends BaseEntity {
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'appId' })
   app: Application;
-
   //************************已下是接口入参或者查询返回需要定义的属性************************
 
   @Property({ persist: false })
-  imageReleaseId: number;
+  releaseId: number
+
+  @Property({ persist: false })
+  solutionComponentId: number
 }

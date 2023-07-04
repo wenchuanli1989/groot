@@ -11,11 +11,14 @@ import { Release } from "../entities/Release";
 import { Solution } from "../entities/Solution";
 import { ResourceConfig } from "../entities/ResourceConfig";
 import { ProjectResource } from "../entities/ProjectResource";
-import { InstanceResource } from "../entities/InstanceResource";
+import { ViewResource } from "../entities/ViewResource";
 import { Project } from "../entities/Project";
 import { SolutionComponent } from "../entities/SolutionComponent";
+import { View } from "../entities/View";
+import { Application } from "../entities/Application";
+import { SolutionInstance } from "../entities/SolutionInstance";
 
-export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project) => {
+export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project, app: Application) => {
   // 创建组件
   const btnComponent = em.create(Component, {
     solution,
@@ -27,6 +30,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
 
   // 创建组件版本
   const btnComponentVersion = em.create(ComponentVersion, {
+    solution,
     name: 'v0.0.1',
     component: btnComponent,
     publish: true
@@ -38,7 +42,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   const solutionComponentRelation = em.create(SolutionComponent, {
     solutionVersion: solution.recentVersion,
     componentVersion: btnComponentVersion,
-    component: btnComponent
+    component: btnComponent,
+    solution
   })
   await em.persistAndFlush(solutionComponentRelation);
 
@@ -47,7 +52,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     name: '常用配置',
     order: 1000,
     componentVersion: btnComponentVersion,
-    component: btnComponent
+    component: btnComponent,
+    solution
   });
   await em.persistAndFlush(btnGroup);
 
@@ -58,7 +64,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     order: 1000,
     component: btnComponent,
     layout: PropBlockLayout.Horizontal,
-    struct: PropBlockStructType.Default
+    struct: PropBlockStructType.Default,
+    solution
   })
   await em.persistAndFlush(btnBlock);
 
@@ -71,7 +78,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     group: btnGroup,
     componentVersion: btnComponentVersion,
     order: 1000,
-    component: btnComponent
+    component: btnComponent,
+    solution
   });
 
   const btnItem2 = em.create(PropItem, {
@@ -84,7 +92,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     group: btnGroup,
     componentVersion: btnComponentVersion,
     order: 2000,
-    component: btnComponent
+    component: btnComponent,
+    solution
   })
 
   const btnItem3 = em.create(PropItem, {
@@ -96,21 +105,55 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     group: btnGroup,
     componentVersion: btnComponentVersion,
     order: 3000,
-    component: btnComponent
+    component: btnComponent,
+    solution
   })
 
   await em.persistAndFlush([btnItem1, btnItem2, btnItem3]);
 
-  // 创建组件实例
-  const btnComponentInstance = em.create(ComponentInstance, {
+  const btnView = em.create(View, {
     name: '按钮',
     key: '/layout/groot/button',
-    entry: true,
-    mainEntry: false,
+    app,
+    project,
+    release
+  })
+  await em.persistAndFlush(btnView);
+
+  const solutionComponent = em.create(SolutionComponent, {
+    solution,
+    solutionVersion: solution.recentVersion,
+    componentVersion: btnComponentVersion,
+    component: btnComponent,
+    view: false,
+  })
+
+  await em.persistAndFlush(solutionComponent)
+
+  // 创建入口解决方案实例
+  const solutionInstance = em.create(SolutionInstance, {
+    solution: solution,
+    solutionVersion: solution.recentVersion,
+    view: btnView,
+    primary: true,
+    release,
+    app,
+    project
+  })
+  await em.persistAndFlush(solutionInstance);
+
+  // 创建组件实例
+  const btnComponentInstance = em.create(ComponentInstance, {
     component: btnComponent,
     componentVersion: btnComponentVersion,
     release,
     trackId: 0,
+    view: btnView,
+    app,
+    project,
+    solution,
+    solutionInstance,
+    solutionComponent
   });
   await em.persistAndFlush(btnComponentInstance);
 
@@ -122,7 +165,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   const resourceConfig = em.create(ResourceConfig, {
     name: 'aaa',
     value: 'http://groot-local.com:10000/workbench/resource-demo',
-    type: 'www'
+    type: 'www',
+    project
   })
 
   await em.persistAndFlush(resourceConfig)
@@ -137,15 +181,17 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
 
   await em.persistAndFlush(projectResource)
 
-  const instanceResource = em.create(InstanceResource, {
-    componentInstance: btnComponentInstance,
+  const viewResource = em.create(ViewResource, {
+    view: btnView,
     release,
     name: 'demo2',
     value: '/demo2',
     namespace: 'dataSource',
-    resourceConfig
+    resourceConfig,
+    app,
+    project,
     // imageResource: projectResource
   })
-  await em.persistAndFlush(instanceResource)
+  await em.persistAndFlush(viewResource)
 
 }

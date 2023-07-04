@@ -111,14 +111,14 @@ export enum ExtensionPipelineLevel {
 }
 
 export enum ExtensionLevel {
-  Entry = 'entry',
+  View = 'view',
   Application = 'application',
   Solution = 'solution'
 }
 
 export enum ExtensionRelationType {
   Application = 1,
-  Entry = 2,
+  View = 2,
   Solution = 3,
 }
 
