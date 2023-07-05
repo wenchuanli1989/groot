@@ -406,7 +406,7 @@ export default class PropPersistModel extends BaseModel {
         paramData.type = PropValueType.Prototype;
       } else {
         const componentInstance = grootManager.state.getState('gs.activeComponentInstance')
-        const { root, children } = grootManager.state.getState('gs.entry')
+        const { root, children } = grootManager.state.getState('gs.view')
         paramData.type = PropValueType.Instance;
         paramData.releaseId = grootManager.state.getState('gs.release').id
         paramData.componentInstanceId = componentInstance.id;
@@ -440,7 +440,7 @@ export default class PropPersistModel extends BaseModel {
   public removeChildInstance(instanceId: number, itemId: number, abstractValueIdChain?: string) {
 
     return this.request(APIPath.componentInstance_remove_instanceId, { instanceId }).then(() => {
-      const { root, children } = grootManager.state.getState('gs.entry')
+      const { root, children } = grootManager.state.getState('gs.view')
       const list = [root, ...children]
 
       let propItem;

@@ -11,22 +11,22 @@ export const instanceBootstrap = () => {
   registerState('gs.propSetting.breadcrumbList', [], true)
 
   registerCommand('gc.pushMetadata', (_, instanceId) => {
-    const entryId = grootManager.state.getState('gs.entry').root.id
-    const data = executeCommand('gc.createMetadata', entryId)
-    const entry = getState('gs.entryList').find(item => item.id === entryId)
+    const viewId = grootManager.state.getState('gs.view').viewId
+    const data = executeCommand('gc.createMetadata', viewId)
+    const view = getState('gs.viewList').find(item => item.id === viewId)
     callHook(PostMessageType.OuterUpdateComponent, {
       ...data,
-      viewKey: entry.key,
+      viewKey: view.key,
     })
   })
 
-  registerCommand('gc.pushResource', (_, entryId) => {
-    const data = executeCommand('gc.createResource', entryId)
+  registerCommand('gc.pushResource', (_, viewId) => {
+    const data = executeCommand('gc.createResource', viewId)
     let viewKey;
 
-    if (entryId) {
-      const entry = getState('gs.entryList').find(item => item.id === entryId)
-      viewKey = entry.key
+    if (viewId) {
+      const view = getState('gs.viewList').find(item => item.id === viewId)
+      viewKey = view.key
     }
     callHook(PostMessageType.OuterUpdateResource, {
       ...data,
@@ -42,14 +42,14 @@ export const instanceBootstrap = () => {
 
 const updateBreadcrumbList = (newInstance: ComponentInstance) => {
   const { getState } = grootManager.state
-  const { root, children } = getState('gs.entry')
+  const { root, children } = getState('gs.view')
   const list = [root, ...children]
   const breadcrumbList = grootManager.state.getState('gs.propSetting.breadcrumbList')
   breadcrumbList.length = 0;
 
   let ctxInstance = newInstance;
   do {
-    breadcrumbList.push({ id: ctxInstance.id, name: ctxInstance.name });
+    breadcrumbList.push({ id: ctxInstance.id, name: ctxInstance.component.name });
     ctxInstance = list.find((item) => item.id === ctxInstance.parentId);
   } while (ctxInstance);
   breadcrumbList.reverse();

@@ -1,4 +1,4 @@
-import { APIPath, BaseModel, ComponentInstance, Deploy, DeployStatusType, ModalStatus, Release } from "@grootio/common";
+import { APIPath, BaseModel, Deploy, DeployStatusType, ModalStatus, Release, View } from "@grootio/common";
 import { message } from "antd";
 import { getContext, grootManager, } from "context";
 
@@ -10,8 +10,8 @@ export default class ApplicationModel extends BaseModel {
   assetBuildModalStatus: ModalStatus = ModalStatus.None
   assetDeployModalStatus: ModalStatus = ModalStatus.None
   assetBuildStatus: 'init' | 'analyseOver' | 'building' | 'buildOver' | 'approve' = 'init';
-  mainEntryInstanceList: ComponentInstance[] = [];
-  entryInstanceList: ComponentInstance[] = [];
+  primaryViewList: View[] = [];
+  noPrimaryViewList: View[] = [];
   releaseList: Release[] = [];
   deployBundleId: number
 
@@ -21,33 +21,30 @@ export default class ApplicationModel extends BaseModel {
       this.releaseList = data;
     })
 
-    const entryList = grootManager.state.getState('gs.entryList')
-    entryList.forEach(item => {
-      if (item.mainEntry) {
-        this.mainEntryInstanceList.push(item)
+    const viewList = grootManager.state.getState('gs.viewList')
+    viewList.forEach(item => {
+      if (item.primaryView) {
+        this.primaryViewList.push(item)
       } else {
-        this.entryInstanceList.push(item)
+        this.noPrimaryViewList.push(item)
       }
     })
   }
 
-  public addEntry(rawComponentInstance: ComponentInstance) {
+  public addView(view: View) {
     this.instanceAddModalStatus = ModalStatus.Submit;
-    const releaseId = grootManager.state.getState('gs.release').id
-    return getContext().request(APIPath.componentInstance_addEntry, {
-      ...rawComponentInstance,
-      releaseId
-    }).then(({ data }) => {
-      if (rawComponentInstance.mainEntry) {
-        this.mainEntryInstanceList.push(data)
+    view.releaseId = grootManager.state.getState('gs.release').id
+    return getContext().request(APIPath.view_add, view).then(({ data }) => {
+      if (view.primaryView) {
+        this.primaryViewList.push(data)
       } else {
-        this.entryInstanceList.push(data)
+        this.noPrimaryViewList.push(data)
       }
 
       const { executeCommand } = grootManager.command
-      executeCommand('gc.loadEntry', data.id).then((viewParams) => {
-        const entry = grootManager.state.getState('gs.entryList').find(item => item.id === data.id)
-        executeCommand('gc.stageRefresh', entry.key, viewParams)
+      executeCommand('gc.loadView', data.id).then((viewParams) => {
+        const view = grootManager.state.getState('gs.viewList').find(item => item.id === data.id)
+        executeCommand('gc.stageRefresh', view.key, viewParams)
         executeCommand('gc.switchIstance', data.id, data.id)
       })
     }).finally(() => {
@@ -60,35 +57,31 @@ export default class ApplicationModel extends BaseModel {
     this.releaseAddModalStatus = ModalStatus.Submit;
     return getContext().request(APIPath.release_add, rawRelease).then(({ data }) => {
       this.releaseList.push(data);
-
-      const currInstance = grootManager.state.getState('gs.activeComponentInstance')
-      const rootInstanceId = currInstance.rootId || currInstance.id
-
-      return this.switchRelease(data.id, rootInstanceId);
+      return this.switchRelease(data.id);
     }).finally(() => {
       this.releaseAddModalStatus = ModalStatus.None;
     })
   }
 
 
-  public switchRelease(releaseId: number, trackId?: number) {
+  public switchRelease(releaseId: number) {
     const release = this.releaseList.find(item => item.id === releaseId)
     grootManager.state.setState('gs.release', release)
 
-    if (trackId) {
-      getContext().request(APIPath.componentInstance_reverseDetectId, { releaseId, trackId }).then(({ data: releaseId }) => {
-        if (releaseId) {
+    // if (trackId) {
+    //   getContext().request(APIPath.componentInstance_reverseDetectId, { releaseId, trackId }).then(({ data: releaseId }) => {
+    //     if (releaseId) {
 
-          // grootManager.command.executeCommand('gc.fetch.release', { releaseId })
-        } else {
-          const firstInstance = this.mainEntryInstanceList[0]
-          // grootManager.command.executeCommand('gc.fetch.release', { relatedEntryId: firstInstance.id })
-        }
-      })
-    } else {
-      const firstInstance = this.entryInstanceList[0]
-      // grootManager.command.executeCommand('gc.fetch.release', { relatedEntryId: firstInstance.id })
-    }
+    //       // grootManager.command.executeCommand('gc.fetch.release', { releaseId })
+    //     } else {
+    //       const firstInstance = this.primaryViewList[0]
+    //       // grootManager.command.executeCommand('gc.fetch.release', { relatedEntryId: firstInstance.id })
+    //     }
+    //   })
+    // } else {
+    const firstInstance = this.noPrimaryViewList[0]
+    // grootManager.command.executeCommand('gc.fetch.release', { relatedEntryId: firstInstance.id })
+    // }
   }
 
 

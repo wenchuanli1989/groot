@@ -52,7 +52,7 @@ export default class SolutionModel extends BaseModel {
   public loadList() {
     getContext().request(APIPath.solutionComponent_list_solutionVersionId, {
       solutionVersionId: this.currSolutionVersionId,
-      entry: 'all', allVersion: true
+      view: 'all', allVersion: true
     }).then(({ data }) => {
       this.solutionComponentList = data;
       data.forEach(item => {

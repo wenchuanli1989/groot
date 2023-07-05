@@ -1,6 +1,5 @@
-import { APIPath, ModalStatus, Release, useModel } from "@grootio/common";
+import { ModalStatus, Release, useModel } from "@grootio/common";
 import { Form, Input, Modal, Select } from "antd";
-import { getContext } from "context";
 import { useEffect } from "react";
 import ApplicationModel from "../ApplicationModel";
 

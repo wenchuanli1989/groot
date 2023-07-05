@@ -1,4 +1,4 @@
-import { APIPath, Component, ComponentInstance, ModalStatus, useModel } from "@grootio/common";
+import { APIPath, Component, ModalStatus, useModel } from "@grootio/common";
 import { Form, Input, Modal, Select, Switch } from "antd";
 import { getContext } from "context";
 import { useEffect, useState } from "react";
@@ -13,7 +13,7 @@ const InstanceAddModal: React.FC = () => {
   useEffect(() => {
     if (applicationModel.instanceAddModalStatus === ModalStatus.Init) {
       form.resetFields();
-      getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: 1, entry: 'true' }).then(({ data }) => {
+      getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: 1, view: 'true' }).then(({ data }) => {
         setComponentList(data.map(item => {
           item.component.componentVersionId = item.componentVersionId
           return item.component
@@ -24,7 +24,7 @@ const InstanceAddModal: React.FC = () => {
 
   const handleOk = async () => {
     const formData = await form.validateFields();
-    applicationModel.addEntry(formData as ComponentInstance)
+    applicationModel.addView(formData as any)
   }
 
   const handleCancel = () => {
@@ -46,7 +46,7 @@ const InstanceAddModal: React.FC = () => {
       <Form.Item noStyle dependencies={['empty']}>
         {() => {
           const empty = form.getFieldValue('empty');
-          return (<Form.Item label="原型" name="componentVersionId" rules={[{ required: !empty }]}>
+          return (<Form.Item label="原型" name="solutionComponentId" rules={[{ required: !empty }]}>
             <Select disabled={empty}>
               {
                 componentList.map((c) => {
@@ -58,7 +58,7 @@ const InstanceAddModal: React.FC = () => {
         }}
       </Form.Item>
 
-      <Form.Item label="主入口" name="mainEntry">
+      <Form.Item label="主入口" name="primaryView">
         <Switch />
       </Form.Item>
 

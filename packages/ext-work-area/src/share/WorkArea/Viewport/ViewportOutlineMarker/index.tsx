@@ -61,7 +61,7 @@ const ViewportOutlineMarker: React.FC = () => {
     updateEle(selectedRef.current, data, true);
     selectedCacheRef.current = data;
 
-    executeCommand('gc.switchIstance', data.instanceId, data.rootInstanceId)
+    executeCommand('gc.switchIstance', data.instanceId, data.viewId)
   }
 
   function onUpdate({ selected, hover }: { selected: ComponentAnchor, hover: ComponentAnchor }) {
@@ -101,7 +101,7 @@ const ViewportOutlineMarker: React.FC = () => {
       toolbarEle.style.left = '0px';
 
       const selectParentEle = toolbarEle.querySelector('.select-parent') as HTMLDivElement;
-      if (data.parentInstanceId === data.rootInstanceId) {
+      if (!data.parentInstanceId) {
         selectParentEle.style.display = 'none';
       } else {
         selectParentEle.style.display = 'inline-block';

@@ -9,7 +9,7 @@ import PrimarySidebar from "./PrimarySidebar";
 import SecondarySidebar from "./SecondarySidebar";
 import Stage from "./Stage";
 import StatusBar from "./StatusBar";
-import { ApplicationData, PostMessageType } from "@grootio/common";
+import { ApplicationData, PostMessageType, ViewData } from "@grootio/common";
 
 export const startup = () => {
   const { registerCommand } = grootManager.command
@@ -65,11 +65,11 @@ const buildApplicationData = () => {
       resourceConfigList: []
     } as ApplicationData
   } else {
-    const viewList = grootManager.state.getState('gs.entryList').map(item => {
+    const viewList = grootManager.state.getState('gs.viewList').map(item => {
       return {
         key: item.key,
-        mainEntry: item.mainEntry
-      }
+        primaryView: item.primaryView
+      } as ViewData
     })
     const { resourceList, resourceTaskList, resourceConfigList } = grootManager.command.executeCommand('gc.createResource')
 

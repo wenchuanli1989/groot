@@ -15,8 +15,8 @@ export const instanceBootstrap = () => {
 
   groot.onReady(() => {
     initUI()
-    if (+params.instanceId) {
-      executeCommand('gc.openEntry', +params.instanceId)
+    if (+params.viewId) {
+      executeCommand('gc.openView', +params.viewId)
     }
   })
 

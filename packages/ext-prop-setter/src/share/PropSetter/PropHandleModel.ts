@@ -281,7 +281,7 @@ export default class PropHandleModel extends BaseModel {
     } as ComponentInstance;
 
     this.propPersist.addChildComponentInstance(rawInstance).then((instanceData) => {
-      grootManager.state.getState('gs.entry').children.push(instanceData)
+      grootManager.state.getState('gs.view').children.push(instanceData)
 
       const propItem = this.getItemById(data.propItemId, data.parentInstanceId);
       const propValue = propItem.valueList.filter(v => v.type === PropValueType.Instance).find(value => {
@@ -335,23 +335,17 @@ export default class PropHandleModel extends BaseModel {
 
   public removeChild(instanceId: number, itemId: number, abstractValueIdChain?: string) {
     this.propPersist.removeChildInstance(instanceId, itemId, abstractValueIdChain).then(() => {
-      const { children } = grootManager.state.getState('gs.entry');
+      const { children } = grootManager.state.getState('gs.view');
       const componentInstance = grootManager.state.getState('gs.activeComponentInstance');
 
       const instanceIndex = children.findIndex(i => i.id === instanceId);
       const instance = children[instanceIndex];
       children.splice(instanceIndex, 1);
 
-      if (instance.parentId && instance.parentId !== instance.rootId) {
-        if (componentInstance.id === instanceId) {
-          grootManager.hook.callHook(PostMessageType.OuterComponentSelect, instance.parentId)
-        }
-        grootManager.command.executeCommand('gc.pushMetadata');
-      } else {// 父级为根组件实例
-        grootManager.command.executeCommand('gc.switchIstance', instance.parentId)
-        grootManager.hook.callHook(PostMessageType.OuterOutlineReset)
-        grootManager.command.executeCommand('gc.pushMetadata');
+      if (componentInstance.id === instanceId) {
+        grootManager.hook.callHook(PostMessageType.OuterComponentSelect, instance.parentId)
       }
+      grootManager.command.executeCommand('gc.pushMetadata');
 
       // this.forceUpdateFormKey++;
     })
@@ -370,7 +364,7 @@ export default class PropHandleModel extends BaseModel {
   }
 
   private getItemById(propItemId: number, instanceId: number) {
-    const { root, children } = grootManager.state.getState('gs.entry');
+    const { root, children } = grootManager.state.getState('gs.view');
     const instance = [root, ...children].find(item => item.id === instanceId);
 
     if (!instance) {
