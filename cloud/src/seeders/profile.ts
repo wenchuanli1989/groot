@@ -36,14 +36,6 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   avatarComponent.recentVersion = avatarComponentVersion;
   await em.persistAndFlush(avatarComponentVersion);
 
-  // 将组件和解决方案进行关联
-  const solutionComponentRelation = em.create(SolutionComponent, {
-    solutionVersion: solution.recentVersion,
-    componentVersion: avatarComponentVersion,
-    component: avatarComponent,
-    solution
-  })
-  await em.persistAndFlush(solutionComponentRelation);
 
   // 创建组件配置项
   const avatarGroup = em.create(PropGroup, {
@@ -117,40 +109,6 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   })
   await em.persistAndFlush(solutionInstance);
 
-  const avatarSolutionComponent = em.create(SolutionComponent, {
-    solution,
-    solutionVersion: solution.recentVersion,
-    componentVersion: avatarComponentVersion,
-    component: avatarComponent,
-    view: false,
-  })
-
-  await em.persistAndFlush(avatarSolutionComponent)
-
-  // 创建组件实例
-  const avatarComponentInstance = em.create(ComponentInstance, {
-    view: profileView,
-    component: avatarComponent,
-    componentVersion: avatarComponentVersion,
-    release,
-    trackId: 0,
-    app,
-    project,
-    solution,
-    solutionInstance,
-    solutionComponent: avatarSolutionComponent
-  });
-  await em.persistAndFlush(avatarComponentInstance);
-
-  avatarComponentInstance.trackId = avatarComponentInstance.id;
-  await em.persistAndFlush(avatarComponentInstance);
-
-
-
-
-
-
-
   // 创建组件
   const profileComponent = em.create(Component, {
     solution,
@@ -170,15 +128,6 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   profileComponent.recentVersion = profileComponentVersion;
   await em.persistAndFlush(profileComponentVersion);
 
-  // 将组件和解决方案进行关联
-  const profileSolutionComponentRelation = em.create(SolutionComponent, {
-    solutionVersion: solution.recentVersion,
-    componentVersion: profileComponentVersion,
-    view: true,
-    component: profileComponent,
-    solution
-  })
-  await em.persistAndFlush(solutionComponentRelation);
 
   // 创建组件配置项
   const profileGroup = em.create(PropGroup, {
@@ -264,6 +213,17 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
 
   await em.persistAndFlush(profileSolutionComponent)
 
+  const avatarSolutionComponent = em.create(SolutionComponent, {
+    solution,
+    solutionVersion: solution.recentVersion,
+    componentVersion: avatarComponentVersion,
+    component: avatarComponent,
+    view: false,
+    parent: profileSolutionComponent
+  })
+
+  await em.persistAndFlush(avatarSolutionComponent)
+
   // 创建组件实例
   const profileComponentInstance = em.create(ComponentInstance, {
     view: profileView,
@@ -286,6 +246,24 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   // 更新组件实例关联解决方案实例
   profileComponentInstance.solutionInstance = solutionInstance
   await em.persistAndFlush(profileComponentInstance);
+
+  // 创建组件实例
+  const avatarComponentInstance = em.create(ComponentInstance, {
+    view: profileView,
+    component: avatarComponent,
+    componentVersion: avatarComponentVersion,
+    release,
+    trackId: 0,
+    app,
+    project,
+    solution,
+    solutionInstance,
+    solutionComponent: avatarSolutionComponent
+  });
+  await em.persistAndFlush(avatarComponentInstance);
+
+  avatarComponentInstance.trackId = avatarComponentInstance.id;
+  await em.persistAndFlush(avatarComponentInstance);
 
   // 更新组件实例关联解决方案实例
   avatarComponentInstance.solutionInstance = solutionInstance

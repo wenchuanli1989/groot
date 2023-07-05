@@ -38,14 +38,6 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   btnComponent.recentVersion = btnComponentVersion;
   await em.persistAndFlush(btnComponentVersion);
 
-  // 将组件和解决方案进行关联
-  const solutionComponentRelation = em.create(SolutionComponent, {
-    solutionVersion: solution.recentVersion,
-    componentVersion: btnComponentVersion,
-    component: btnComponent,
-    solution
-  })
-  await em.persistAndFlush(solutionComponentRelation);
 
   // 创建组件配置项
   const btnGroup = em.create(PropGroup, {

@@ -37,15 +37,6 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   tableComponent.recentVersion = tableComponentVersion;
   await em.persistAndFlush(tableComponent);
 
-  // 将组件和解决方案进行关联
-  const solutionComponentRelation = em.create(SolutionComponent, {
-    solutionVersion: solution.recentVersion,
-    componentVersion: tableComponentVersion,
-    component: tableComponent,
-    view: true,
-    solution
-  })
-  await em.persistAndFlush(solutionComponentRelation);
 
   // 创建组件配置项
   const commonGroup = em.create(PropGroup, {
