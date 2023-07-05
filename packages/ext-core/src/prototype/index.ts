@@ -77,7 +77,7 @@ const createFullMetadata = (component: Component) => {
     pipelineExec<PropItemPipelineParams>({
       appExtList: propItemPipelineModuleList,
       solutionExtList: [],
-      entryExtList: [],
+      viewExtList: [],
       params: {
         ...params,
         appendTask: propAppendTask(params.metadata, propTaskList, params.propKeyChain)

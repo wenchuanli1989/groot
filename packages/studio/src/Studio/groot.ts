@@ -21,13 +21,14 @@ export const setRegistorReady = (ready: boolean) => {
   registorReady = ready
 }
 
-export const loadExtension = ({ remoteExtensionList, extLevel, entryId, solutionId }: { remoteExtensionList: ExtensionRuntime[], extLevel: ExtensionLevel, entryId?: number, solutionId?: number }) => {
+export const loadExtension = ({ remoteExtensionList, extLevel, viewId, solutionId }: { remoteExtensionList: ExtensionRuntime[], extLevel: ExtensionLevel, viewId?: number, solutionId?: number }) => {
   remoteExtensionList.forEach(extInstance => {
-    extHandler.install({ extInstance, level: extLevel, solutionId, entryId, extId: extInstance.extension.id, extAssetUrl: extInstance.extensionVersion.assetUrl })
+    extHandler.install({ extInstance, level: extLevel, solutionId, viewId, extId: extInstance.extension.id, extAssetUrl: extInstance.extensionVersion.assetUrl })
   })
   return Promise.all(remoteExtensionList.map(extInstance => {
     if (extInstance.status === ExtensionStatus.Active && extInstance.extensionVersion.assetUrl) {
-      const { assetUrl, packageName, moduleName } = extInstance.extensionVersion
+      const { packageName, moduleName } = extInstance.extension
+      const { assetUrl } = extInstance.extensionVersion
       return loadRemoteModule(packageName, moduleName, assetUrl)
     } else {
       return Promise.resolve()
@@ -53,7 +54,8 @@ export const launchExtension = (remoteExtensionList: ExtensionRuntime[], level: 
     if (extInstance.main) {
       const requestClone = request.clone((type) => {
         if (type === 'request') {
-          const { name, packageName, moduleName } = extInstance.extensionVersion
+          const { packageName, moduleName } = extInstance.extension
+          const { name } = extInstance.extensionVersion
           console.log(`[ext: ${name} ${packageName}/${moduleName} request]`);
         }
       });

@@ -5,8 +5,8 @@ import { ExtensionHandler } from './extension'
 export const createExtensionHandler = () => {
   const dataStore = {
     appExt: new Map<number, { instance: ExtensionInstance, extId: number, extAssetUrl: string }>(),// extInstanceId: extInstance
-    solutionExt: new Map<number, Map<number, Map<number, { instance: ExtensionInstance, extId: number, extAssetUrl: string }>>>(),// entryId: {solutionId: {extInstanceId: extInstance}}
-    entryExt: new Map<number, Map<number, { instance: ExtensionInstance, extId: number, extAssetUrl: string }>>(),// entryId: {extInstanceId: extInstance}
+    solutionExt: new Map<number, Map<number, Map<number, { instance: ExtensionInstance, extId: number, extAssetUrl: string }>>>(),// viewId: {solutionId: {extInstanceId: extInstance}}
+    viewExt: new Map<number, Map<number, { instance: ExtensionInstance, extId: number, extAssetUrl: string }>>(),// viewId: {extInstanceId: extInstance}
 
     runtime: {
       extByIdMap: new Map<number, { referCount: number, extInstance: ExtensionInstance, extId: number }>(),// extId: ...
@@ -16,7 +16,7 @@ export const createExtensionHandler = () => {
 
   // 单个层级不允许出现相同的插件实例
   // 出现重复插件，只有第一个插件状态是Active，否则状态为Conflict
-  const install = ({ extInstance, level, solutionId, entryId, extId, extAssetUrl }: { extInstance: ExtensionInstance, level: ExtensionLevel, extId: number, extAssetUrl: string, solutionId?: number, entryId?: number }) => {
+  const install = ({ extInstance, level, solutionId, viewId, extId, extAssetUrl }: { extInstance: ExtensionInstance, level: ExtensionLevel, extId: number, extAssetUrl: string, solutionId?: number, viewId?: number }) => {
 
     if (level === ExtensionLevel.Application) {
       if (dataStore.appExt.has(extInstance.id)) {
@@ -25,48 +25,48 @@ export const createExtensionHandler = () => {
       } else {
         dataStore.appExt.set(extInstance.id, { instance: extInstance, extId, extAssetUrl })
       }
-    } else if (level === ExtensionLevel.Entry) {
-      if (!entryId) {
-        throw new Error('参数entryId不能为空')
+    } else if (level === ExtensionLevel.View) {
+      if (!viewId) {
+        throw new Error('参数viewId不能为空')
       }
 
-      if (!dataStore.entryExt.has(entryId)) {
-        dataStore.entryExt.set(entryId, new Map())
+      if (!dataStore.viewExt.has(viewId)) {
+        dataStore.viewExt.set(viewId, new Map())
       }
 
-      const map = dataStore.entryExt.get(entryId!)!
+      const map = dataStore.viewExt.get(viewId!)!
       if (map.has(extInstance.id)) {
         extInstance.status = ExtensionStatus.Padding
-        throw new Error('entry级别扩展实例重复加载')
+        throw new Error('view级别扩展实例重复加载')
       } else {
         map.set(extInstance.id, { instance: extInstance, extId, extAssetUrl })
       }
     } else {
-      if (!entryId) {
-        throw new Error('参数entryId不能为空')
+      if (!viewId) {
+        throw new Error('参数viewId不能为空')
       } else if (!solutionId) {
         throw new Error('参数solutionId不能为空')
       }
 
-      // if (!dataStore.entrySolution.has(entryId)) {
-      //   dataStore.entrySolution.set(entryId, new Set())
+      // if (!dataStore.entrySolution.has(viewId)) {
+      //   dataStore.entrySolution.set(viewId, new Set())
       // }
 
-      if (!dataStore.solutionExt.has(entryId)) {
-        dataStore.solutionExt.set(entryId, new Map())
+      if (!dataStore.solutionExt.has(viewId)) {
+        dataStore.solutionExt.set(viewId, new Map())
       }
 
-      if (!dataStore.solutionExt.get(entryId).has(solutionId)) {
-        dataStore.solutionExt.get(entryId).set(solutionId, new Map())
+      if (!dataStore.solutionExt.get(viewId).has(solutionId)) {
+        dataStore.solutionExt.get(viewId).set(solutionId, new Map())
       }
 
-      const map = dataStore.solutionExt.get(entryId).get(solutionId)
+      const map = dataStore.solutionExt.get(viewId).get(solutionId)
       if (map.has(extInstance.id)) {
         extInstance.status = ExtensionStatus.Padding
         console.log('解决方案级别扩展实例重复加载')
       } else {
         map.set(extInstance.id, { instance: extInstance, extId, extAssetUrl })
-        // dataStore.entrySolution.get(entryId).add(solutionId)
+        // dataStore.entrySolution.get(viewId).add(solutionId)
       }
     }
 
@@ -97,14 +97,14 @@ export const createExtensionHandler = () => {
       //     dataStore.runtime.solutionByIdMap.set(solutionId, new Set())
       //   }
 
-      //   dataStore.runtime.solutionByIdMap.get(solutionId).add(entryId)
+      //   dataStore.runtime.solutionByIdMap.get(solutionId).add(viewId)
       // }
     }
 
     return extInstance.status === ExtensionStatus.Active
   }
 
-  const uninstall = ({ extInstanceId, level, entryId, solutionId }: { extInstanceId: number, level: ExtensionLevel, entryId?: number, solutionId?: number }) => {
+  const uninstall = ({ extInstanceId, level, viewId, solutionId }: { extInstanceId: number, level: ExtensionLevel, viewId?: number, solutionId?: number }) => {
 
     if (level === ExtensionLevel.Application) {
       if (dataStore.appExt.has(extInstanceId)) {
@@ -116,29 +116,29 @@ export const createExtensionHandler = () => {
         }
         return result
       }
-    } else if (level === ExtensionLevel.Entry) {
-      if (!entryId) {
-        throw new Error('参数entryId不能为空')
+    } else if (level === ExtensionLevel.View) {
+      if (!viewId) {
+        throw new Error('参数viewId不能为空')
       }
 
-      if (dataStore.entryExt.get(entryId)?.has(extInstanceId)) {
-        const { instance: extInstance, extId } = dataStore.entryExt.get(entryId).get(extInstanceId)
+      if (dataStore.viewExt.get(viewId)?.has(extInstanceId)) {
+        const { instance: extInstance, extId } = dataStore.viewExt.get(viewId).get(extInstanceId)
 
         const result = destory(extInstance, extId)
         if (extInstance.status === ExtensionStatus.Destroy) {
-          dataStore.entryExt.get(entryId).delete(extInstanceId)
+          dataStore.viewExt.get(viewId).delete(extInstanceId)
         }
         return result
       }
     } else {
-      if (!entryId) {
-        throw new Error('参数entryId不能为空')
+      if (!viewId) {
+        throw new Error('参数viewId不能为空')
       } else if (!solutionId) {
         throw new Error('参数solutionId不能为空')
       }
 
-      if (dataStore.solutionExt.get(entryId)?.get(solutionId)?.has(extInstanceId)) {
-        const map = dataStore.solutionExt.get(entryId).get(solutionId)
+      if (dataStore.solutionExt.get(viewId)?.get(solutionId)?.has(extInstanceId)) {
+        const map = dataStore.solutionExt.get(viewId).get(solutionId)
         const { instance: extInstance, extId } = map.get(extInstanceId)
 
         const result = destory(extInstance, extId)
@@ -184,7 +184,7 @@ export const createExtensionHandler = () => {
     }
   }
 
-  const getPipeline = (type: 'propItem' | 'resource', level: ExtensionLevel, entryId?: number, solutionId?: number) => {
+  const getPipeline = (type: 'propItem' | 'resource', level: ExtensionLevel, viewId?: number, solutionId?: number) => {
     const pipeline = (instance: ExtensionInstance) => {
       return type === 'propItem' ? instance.propItemPipeline : instance.resourcePipeline
     }
@@ -193,17 +193,17 @@ export const createExtensionHandler = () => {
       return [...(dataStore.appExt.values() || [])]
         .filter(({ instance }) => instance.status === ExtensionStatus.Active && !!pipeline(instance)?.id)
         .map(({ instance }) => pipeline(instance))
-    } else if (level === ExtensionLevel.Entry) {
-      return [...(dataStore.entryExt.get(entryId)?.values() || [])]
+    } else if (level === ExtensionLevel.View) {
+      return [...(dataStore.viewExt.get(viewId)?.values() || [])]
         .filter(({ instance }) => instance.status === ExtensionStatus.Active && !!pipeline(instance)?.id)
         .map(({ instance }) => pipeline(instance))
     } else if (level === ExtensionLevel.Solution) {
       if (solutionId) {
-        return [...(dataStore.solutionExt.get(entryId)?.get(solutionId)?.values() || [])]
+        return [...(dataStore.solutionExt.get(viewId)?.get(solutionId)?.values() || [])]
           .filter(({ instance }) => instance.status === ExtensionStatus.Active && !!pipeline(instance)?.id)
           .map(({ instance }) => pipeline(instance))
       } else {
-        return [...(dataStore.solutionExt.get(entryId)?.values() || [])].reduce((totalList, currSolutionExtMap) => {
+        return [...(dataStore.solutionExt.get(viewId)?.values() || [])].reduce((totalList, currSolutionExtMap) => {
           const currSolutionExtList = [...(currSolutionExtMap.values() || [])]
           currSolutionExtList.forEach(({ instance }) => {
             if (instance.status === ExtensionStatus.Active && pipeline(instance)?.id) {

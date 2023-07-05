@@ -59,7 +59,7 @@ export function outerSelected(instanceId: number) {
       tagName: `${metadata.packageName}/${metadata.componentName}`,
       instanceId,
       parentInstanceId: metadata.parentId,
-      rootInstanceId: metadata.rootId,
+      viewId: metadata.viewId,
       propItemId: metadata.$$runtime.propItemId,
       abstractValueIdChain: metadata.$$runtime.abstractValueIdChain
     } as ComponentAnchor
@@ -82,7 +82,7 @@ export function updateActiveRect() {
         tagName: `${selectedMetadata.packageName}/${selectedMetadata.componentName}`,
         instanceId: outlineSelectedInstanceId,
         parentInstanceId: selectedMetadata.parentId,
-        rootInstanceId: selectedMetadata.rootId,
+        viewId: selectedMetadata.viewId,
         propItemId: selectedMetadata.$$runtime.propItemId,
         abstractValueIdChain: selectedMetadata.$$runtime.abstractValueIdChain
       }
@@ -101,7 +101,7 @@ export function updateActiveRect() {
         tagName: `${hoverMetadata.packageName}/${hoverMetadata.componentName}`,
         instanceId: outlineHoverInstanceId,
         parentInstanceId: hoverMetadata.parentId,
-        rootInstanceId: hoverMetadata.rootId,
+        viewId: hoverMetadata.viewId,
         propItemId: hoverMetadata.$$runtime.propItemId,
         abstractValueIdChain: hoverMetadata.$$runtime.abstractValueIdChain
       }
@@ -230,7 +230,7 @@ function outlineHoverAction({ clientX, clientY }: MouseEvent) {
         tagName: `${metadata.packageName}/${metadata.componentName}`,
         instanceId,
         parentInstanceId: metadata.parentId,
-        rootInstanceId: metadata.rootId,
+        viewId: metadata.viewId,
         propItemId: metadata.$$runtime.propItemId,
         abstractValueIdChain: metadata.$$runtime.abstractValueIdChain
       } as ComponentAnchor
@@ -259,7 +259,7 @@ function outlineMousedownAction() {
       tagName: `${metadata.packageName}/${metadata.componentName}`,
       instanceId: outlineSelectedInstanceId,
       parentInstanceId: metadata.parentId,
-      rootInstanceId: metadata.rootId,
+      viewId: metadata.viewId,
       propItemId: metadata.$$runtime.propItemId,
       abstractValueIdChain: metadata.$$runtime.abstractValueIdChain
     } as ComponentAnchor

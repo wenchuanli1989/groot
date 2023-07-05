@@ -34,7 +34,7 @@ let iframeApplicationLoadResolve: (info: ApplicationData) => void;
 let iframeDebuggerConfig: IframeDebuggerConfig;
 // 当前激活的界面视图
 let activeViewMap: Map<string, View> = new Map()
-let activeMainEntryView: View;
+let activePrimaryView: View;
 // 包含所有界面视图
 const allViewMap = new Map<string, View>();
 const loadingViewMap = new Map<string, Promise<any>>()
@@ -184,8 +184,8 @@ function loadView(key: string): Promise<View> | View {
     return Promise.reject(new Error('界面未找到'));
   } else if (view.status === 'finish') {
     activeViewMap.set(key, view)
-    if (view.mainEntry) {
-      activeMainEntryView = view
+    if (view.primaryView) {
+      activePrimaryView = view
     }
     return view;
   }
@@ -195,8 +195,8 @@ function loadView(key: string): Promise<View> | View {
   result.finally(() => {
     loadingViewMap.delete(key)
     activeViewMap.set(key, view)
-    if (view.mainEntry) {
-      activeMainEntryView = view
+    if (view.primaryView) {
+      activePrimaryView = view
     }
   })
   return result;
@@ -206,8 +206,8 @@ function unloadView(key: string) {
   const view = activeViewMap.get(key)
   view.destory()
   activeViewMap.delete(key)
-  if (view.mainEntry) {
-    activeMainEntryView = null
+  if (view.primaryView) {
+    activePrimaryView = null
   }
 }
 

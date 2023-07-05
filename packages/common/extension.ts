@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import React from "react";
 import { APIStore } from "./api/API.store";
-import { Application, Component, ComponentInstance, ExtensionInstance, PropGroup, PropItem, Release, Resource, ResourceConfig, Solution } from "./entities";
+import { Application, Component, ComponentInstance, ExtensionInstance, PropGroup, PropItem, Release, Resource, ResourceConfig, Solution, View } from "./entities";
 import { GridLayout } from "./GridLayout";
 import { ApplicationData, Metadata, ViewDataCore } from "./internal";
 import { ExtensionLevel, ExtensionPipelineLevel } from "./enum";
@@ -15,7 +15,7 @@ export type GrootContext = {
   stateManager: StateManager,
   hookManager: HookManager,
   extHandler: ExtensionHandler,
-  loadExtension: (params: { remoteExtensionList: ExtensionRuntime[], extLevel: ExtensionLevel, solutionId?: number, entryId?: number }) => Promise<void>,
+  loadExtension: (params: { remoteExtensionList: ExtensionRuntime[], extLevel: ExtensionLevel, solutionId?: number, viewId?: number }) => Promise<void>,
   launchExtension: (remoteExtensionList: ExtensionRuntime[], level: ExtensionLevel) => void,
   onReady: (callback: Function) => void;
 }
@@ -25,7 +25,7 @@ export type GrootContextParams = {
   mode: string,
   releaseId: string,
   solutionVersionId: string,
-  instanceId?: string,
+  viewId?: string,
   componentVersionId?: string,
 }
 
@@ -131,15 +131,15 @@ export type GrootCommandDict = {
   'gc.ui.render.panel': [[], ReactElement | null],
   'gc.ui.render.statusBar': [[], ReactElement | null],
 
-  'gc.openEntry': [[number, boolean] | [number], Promise<void>],
-  'gc.loadEntry': [[number], Promise<ViewDataCore>],
+  'gc.openView': [[number, boolean] | [number], Promise<void>],
+  'gc.loadView': [[number], Promise<ViewDataCore>],
   'gc.switchIstance': [[number, number] | [number], void],
   'gc.createMetadata': [[number] | [], { metadataList: Metadata[], propTaskList: PropTask[] }],
   'gc.createResource': [[number] | [], { resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[] }],
   'gc.pushMetadata': [[] | [number] | [], void],
   'gc.pushResource': [[number] | [], void],
   'gc.stageRefresh': [[string, ViewDataCore, Function] | [string, ViewDataCore], void],
-  'gc.unloadEntry': [[number], void],
+  'gc.unloadView': [[number], void],
 
   'gc.openComponent': [[number], Promise<void>],
   'gc.loadComponent': [[number], Promise<ViewDataCore>],
@@ -172,10 +172,10 @@ export type GrootStateDict = {
 
   'gs.app': [Application, false],
   'gs.release': [Release, false],
-  'gs.entryList': [ComponentInstance, true],
+  'gs.viewList': [View, true],
   'gs.globalResourceList': [Resource, true],
   'gs.globalResourceConfigList': [ResourceConfig, true],
-  'gs.entry': [{ root: ComponentInstance, children: ComponentInstance[] }, false],
+  'gs.view': [{ viewId: number, root: ComponentInstance, children: ComponentInstance[] }, false],
   'gs.localResourceList': [Resource, true],
   'gs.localResourceConfigList': [ResourceConfig, true],
   'gs.activeComponentInstance': [ComponentInstance, false],
@@ -327,7 +327,7 @@ export type ComponentAnchor = {
   tagName: string,
   instanceId: number,
   parentInstanceId?: number,
-  rootInstanceId: number,
+  viewId: number,
   propItemId?: number,
   abstractValueIdChain?: string
 }
@@ -360,13 +360,13 @@ export type ExtensionHandler = {
    */
   appExt: Map<number, { instance: ExtensionInstance, extId: number, extAssetUrl: string }>,
   /**
-   * entryId: {solutionId: {extInstanceId: extInstance}}
+   * viewId: {solutionId: {extInstanceId: extInstance}}
    */
   solutionExt: Map<number, Map<number, Map<number, { instance: ExtensionInstance, extId: number, extAssetUrl: string }>>>,
   /**
-   * entryId: {extInstanceId: extInstance}
+   * viewId: {extInstanceId: extInstance}
    */
-  entryExt: Map<number, Map<number, { instance: ExtensionInstance, extId: number, extAssetUrl: string }>>,
+  viewExt: Map<number, Map<number, { instance: ExtensionInstance, extId: number, extAssetUrl: string }>>,
 
   runtime: {
     /**
@@ -379,14 +379,14 @@ export type ExtensionHandler = {
     extByAssetUrlMap: Map<string, number>,
   },
   getPipeline: GetPipeline,
-  install: (params: { extInstance: ExtensionInstance, level: ExtensionLevel, extId: number, extAssetUrl: string, solutionId?: number, entryId?: number }) => boolean,
-  uninstall: (params: { extInstanceId: number, level: ExtensionLevel, solutionId?: number, entryId?: number }) => boolean
+  install: (params: { extInstance: ExtensionInstance, level: ExtensionLevel, extId: number, extAssetUrl: string, solutionId?: number, viewId?: number }) => boolean,
+  uninstall: (params: { extInstanceId: number, level: ExtensionLevel, solutionId?: number, viewId?: number }) => boolean
 }
 
 interface GetPipeline {
   (type: 'propItem' | 'resource', level: ExtensionLevel.Application): ExtScriptModule[];
-  (type: 'propItem' | 'resource', level: ExtensionLevel.Entry, entryId: number): ExtScriptModule[];
-  (type: 'propItem' | 'resource', level: ExtensionLevel.Solution, entryId: number, solutionId?: number): ExtScriptModule[];
+  (type: 'propItem' | 'resource', level: ExtensionLevel.View, viewId: number): ExtScriptModule[];
+  (type: 'propItem' | 'resource', level: ExtensionLevel.Solution, viewId: number, solutionId?: number): ExtScriptModule[];
 }
 
 export type FormItemRender = {

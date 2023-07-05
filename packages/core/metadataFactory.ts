@@ -15,7 +15,7 @@ export function metadataFactory(
     packageName: string,
     componentName: string,
     metadataId: number,
-    rootMetadataId?: number,
+    viewId?: number,
     parentMetadataId?: number,
     solutionInstanceId: number,
     componentVersionId: number
@@ -29,7 +29,7 @@ export function metadataFactory(
     advancedProps: [],
     postPropTasks: {},
     parentId: metadataInfo.parentMetadataId,
-    rootId: metadataInfo.rootMetadataId
+    viewId: metadataInfo.viewId
   } as Metadata;
   _pipeline = pipeline
   _studioMode = studioMode

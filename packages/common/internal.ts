@@ -14,7 +14,7 @@ export type ApplicationData = {
 export type ViewData = {
   // 仅供ApplicationData.viewList使用
   key: string;
-  mainEntry?: boolean;
+  primaryView?: boolean;
   // 加载view的地址，仅供ApplicationData.viewList使用
   url?: string;
 } & ViewDataCore
@@ -34,7 +34,7 @@ export type Metadata = {
   id: number,
   packageName: string,
   componentName: string,
-  rootId: number,
+  viewId: number,
   parentId?: number,
 
   advancedProps?: PropMetadata[],

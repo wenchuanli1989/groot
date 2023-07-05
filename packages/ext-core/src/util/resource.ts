@@ -2,23 +2,23 @@ import { ExtensionLevel, ExtensionStatus, Resource, ResourcePipelineParams, reso
 import { pipelineExec } from "@grootio/core"
 import { getContext } from "context"
 
-export const createResourceTaskList = (resourceList: Resource[], entryId?: number) => {
+export const createResourceTaskList = (resourceList: Resource[], viewId?: number) => {
   const { extHandler } = getContext().groot
-  let entryResourceExtScriptModuleList = []
+  let viewResourceExtScriptModuleList = []
   let solutionResourceExtScriptModuleList = []
 
   const appResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.Application)
 
-  if (entryId) {
-    entryResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.Entry, entryId)
+  if (viewId) {
+    viewResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.View, viewId)
 
-    solutionResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.Solution, entryId)
+    solutionResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.Solution, viewId)
   }
 
   const resourceTaskList = []
   resourceList.forEach(resource => {
     pipelineExec<ResourcePipelineParams>({
-      entryExtList: entryResourceExtScriptModuleList,
+      viewExtList: viewResourceExtScriptModuleList,
       solutionExtList: solutionResourceExtScriptModuleList,
       appExtList: appResourceExtScriptModuleList,
       params: {

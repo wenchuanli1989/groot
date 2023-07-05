@@ -23,7 +23,7 @@ export class View {
 
   rootComponent?: any;
   status: 'loading' | 'finish' | 'offline';
-  mainEntry: boolean;
+  primaryView: boolean;
   readonly controlMode: boolean;
   private rootMetadata: Metadata;
   private metadataPromise?: Promise<ParamsType>;
@@ -32,7 +32,7 @@ export class View {
   constructor(data: ViewData, controlMode: boolean) {
     this.key = data.key;
     this.url = data.url;
-    this.mainEntry = data.mainEntry;
+    this.primaryView = data.primaryView;
     this.metadataList = data.metadataList;
     this.resourceList = data.resourceList;
     this.propTaskList = data.propTaskList;

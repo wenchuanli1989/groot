@@ -1,7 +1,7 @@
 import { ExtensionPipelineLevel, ExtScriptModule } from '@grootio/common'
 
-export const pipelineExec = <P>({ entryExtList, appExtList, solutionExtList, params }: { entryExtList: ExtScriptModule<P>[], solutionExtList: ExtScriptModule<P>[], appExtList: ExtScriptModule<P>[], params: P }) => {
-  const entryExtMap = new Map<ExtensionPipelineLevel, ExtScriptModule<P>[]>()
+export const pipelineExec = <P>({ viewExtList, appExtList, solutionExtList, params }: { viewExtList: ExtScriptModule<P>[], solutionExtList: ExtScriptModule<P>[], appExtList: ExtScriptModule<P>[], params: P }) => {
+  const viewExtMap = new Map<ExtensionPipelineLevel, ExtScriptModule<P>[]>()
   const appExtMap = new Map<ExtensionPipelineLevel, ExtScriptModule<P>[]>()
   const solutionExtMap = new Map<ExtensionPipelineLevel, ExtScriptModule<P>[]>()
 
@@ -36,14 +36,14 @@ export const pipelineExec = <P>({ entryExtList, appExtList, solutionExtList, par
     }
   }
 
-  prePipeline(entryExtList, entryExtMap, params)
+  prePipeline(viewExtList, viewExtMap, params)
   prePipeline(appExtList, appExtMap, params)
   prePipeline(solutionExtList, solutionExtMap, params)
 
   pipeline([
-    ...(entryExtMap.get(ExtensionPipelineLevel.Hight) || []),
-    ...(entryExtMap.get(ExtensionPipelineLevel.Normal) || []),
-    ...(entryExtMap.get(ExtensionPipelineLevel.Low) || []),
+    ...(viewExtMap.get(ExtensionPipelineLevel.Hight) || []),
+    ...(viewExtMap.get(ExtensionPipelineLevel.Normal) || []),
+    ...(viewExtMap.get(ExtensionPipelineLevel.Low) || []),
 
     ...(appExtMap.get(ExtensionPipelineLevel.Hight) || []),
     ...(appExtMap.get(ExtensionPipelineLevel.Normal) || []),

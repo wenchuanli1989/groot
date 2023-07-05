@@ -22,7 +22,8 @@ const Studio: React.FC<{ params: Record<string, string> } & { account: any }> & 
       releaseId: props.params.releaseId,
       solutionVersionId: props.params.solutionVersionId
     }).then(({ data: extInstance }) => {
-      const { packageName, moduleName, assetUrl } = extInstance.extensionVersion
+      const { packageName, moduleName } = extInstance.extension
+      const { assetUrl } = extInstance.extensionVersion
       loadCoreExt(packageName, moduleName, assetUrl)
     })
   }, [])
