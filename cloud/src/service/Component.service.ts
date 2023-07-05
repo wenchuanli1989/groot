@@ -2,7 +2,7 @@ import { pick, PropValueType } from '@grootio/common';
 import { EntityManager, RequestContext, wrap } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 
-import { LogicException, LogicExceptionCode } from 'config/logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
 import { Component } from 'entities/Component';
 import { ComponentVersion } from 'entities/ComponentVersion';
 import { PropBlock } from 'entities/PropBlock';
@@ -15,7 +15,7 @@ import { SolutionVersion } from 'entities/SolutionVersion';
 @Injectable()
 export class ComponentService {
 
-  async componentDetailByComponentVersionId(componentVersionId: number) {
+  async getDetailByComponentVersionId(componentVersionId: number) {
     const em = RequestContext.getEntityManager();
 
     LogicException.assertParamEmpty(componentVersionId, 'componentVersionId');
@@ -74,6 +74,7 @@ export class ComponentService {
       const newVersion = em.create(ComponentVersion, {
         name: 'v0.0.1',
         component: newComponent,
+        solution: newComponent.solution
       });
       await em.flush();
 
@@ -92,7 +93,8 @@ export class ComponentService {
         name: '常用配置',
         order: 1000,
         componentVersion: newVersion,
-        component: newComponent
+        component: newComponent,
+        solution: newComponent.solution
       });
       await em.flush();
 
@@ -101,7 +103,8 @@ export class ComponentService {
         group: newGroup,
         order: 1000,
         componentVersion: newVersion,
-        component: newComponent
+        component: newComponent,
+        solution: newComponent.solution
       });
       await em.flush();
 

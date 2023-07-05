@@ -1,23 +1,24 @@
 import { pick } from '@grootio/common';
 import { RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { LogicException, LogicExceptionCode } from 'config/logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
 import { AppResource } from 'entities/AppResource';
 import { Application } from 'entities/Application';
 import { ComponentInstance } from 'entities/ComponentInstance';
-import { InstanceResource } from 'entities/InstanceResource';
+import { ViewResource } from 'entities/ViewResource';
 import { ProjectResource } from 'entities/ProjectResource';
 import { Release } from 'entities/Release';
 import { ResourceConfig } from 'entities/ResourceConfig';
+import { View } from 'entities/View';
 
 
 @Injectable()
 export class ResourceService {
 
-  async addInstanceResource(rawResource: InstanceResource) {
+  async addViewResource(rawResource: ViewResource) {
     const em = RequestContext.getEntityManager();
 
-    LogicException.assertParamEmpty(rawResource.componentInstanceId, 'componentInstanceId');
+    LogicException.assertParamEmpty(rawResource.viewId, 'viewId');
     LogicException.assertParamEmpty(rawResource.releaseId, 'releaseId');
     LogicException.assertParamEmpty(rawResource.namespace, 'namespace');
     LogicException.assertParamEmpty(rawResource.name, 'name');
@@ -25,14 +26,14 @@ export class ResourceService {
 
     const release = await em.findOne(ComponentInstance, rawResource.releaseId);
     LogicException.assertNotFound(release, 'Release', rawResource.releaseId);
-    const instance = await em.findOne(ComponentInstance, { id: rawResource.componentInstanceId, release });
-    LogicException.assertNotFound(instance, 'ComponentInstance', `id = ${rawResource.componentInstanceId} and releaseId = ${release.id}`);
+    const view = await em.findOne(View, { id: rawResource.viewId, release });
+    LogicException.assertNotFound(view, 'View', `id = ${rawResource.viewId} and releaseId = ${release.id}`);
 
-    const resourceUnique = await em.count(InstanceResource, {
+    const resourceUnique = await em.count(ViewResource, {
       name: rawResource.name,
       namespace: rawResource.namespace,
       release,
-      componentInstance: instance
+      view
     });
 
     if (resourceUnique > 0) {
@@ -47,12 +48,14 @@ export class ResourceService {
       imageResource = await em.findOne(ProjectResource, rawResource.imageResourceId)
     }
 
-    const newResource = em.create(InstanceResource, {
+    const newResource = em.create(ViewResource, {
       ...pick(rawResource, ['namespace', 'name', 'type', 'value']),
       release,
-      componentInstance: instance,
+      view,
       resourceConfig,
-      imageResource
+      imageResource,
+      app: view.app,
+      project: view.project
     });
 
     await em.flush();
@@ -97,7 +100,7 @@ export class ResourceService {
       app,
       release,
       resourceConfig,
-      imageResource
+      imageResource,
     });
 
     await em.flush();
@@ -111,28 +114,28 @@ export class ResourceService {
     if (type === 'app') {
       await em.nativeUpdate(AppResource, { id: resourceId }, { deletedAt: new Date() })
     } else if (type === 'instance') {
-      await em.nativeUpdate(InstanceResource, { id: resourceId }, { deletedAt: new Date() })
+      await em.nativeUpdate(ViewResource, { id: resourceId }, { deletedAt: new Date() })
     } else {
       await em.nativeUpdate(ProjectResource, { id: resourceId }, { deletedAt: new Date() })
     }
   }
 
-  async updateInstanceResource(rawResource: InstanceResource) {
+  async updateViewResource(rawResource: ViewResource) {
     const em = RequestContext.getEntityManager();
 
     LogicException.assertParamEmpty(rawResource.name, 'name');
     LogicException.assertParamEmpty(rawResource.value, 'value');
 
     LogicException.assertParamEmpty(rawResource.id, 'id');
-    const resource = await em.findOne(InstanceResource, rawResource.id);
-    LogicException.assertNotFound(resource, 'InstanceResource', rawResource.id);
+    const resource = await em.findOne(ViewResource, rawResource.id);
+    LogicException.assertNotFound(resource, 'ViewResource', rawResource.id);
 
     if (!!rawResource.name && rawResource.name !== resource.name) {
-      const resourceUnique = await em.count(InstanceResource, {
+      const resourceUnique = await em.count(ViewResource, {
         name: rawResource.name,
         namespace: resource.namespace,
         release: resource.release,
-        componentInstance: resource.componentInstance
+        view: resource.view
       });
 
       if (resourceUnique > 0) {

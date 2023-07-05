@@ -21,6 +21,7 @@ import { SolutionService } from 'service/solution.service';
 import { ExtensionInstanceService } from 'service/extension-instance.service';
 import { SolutionVersionService } from 'service/solution-version.service';
 import { SolutionComponentService } from 'service/solution-component.service';
+import { ViewService } from 'service/view.service';
 @Module({
   imports: [
     MikroOrmModule.forRoot(config)
@@ -43,7 +44,8 @@ import { SolutionComponentService } from 'service/solution-component.service';
     SolutionService,
     ExtensionInstanceService,
     SolutionVersionService,
-    SolutionComponentService
+    SolutionComponentService,
+    ViewService
   ],
 })
 export class AppModule { }

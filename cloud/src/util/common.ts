@@ -2,7 +2,7 @@ import { ExtScriptModule, ExtensionHandler, ExtensionLevel, ExtensionInstance as
 import { wrap } from "@mikro-orm/core";
 import { AppResource } from "entities/AppResource";
 import { ExtensionInstance } from "entities/ExtensionInstance";
-import { InstanceResource } from "entities/InstanceResource";
+import { ViewResource } from "entities/ViewResource";
 import { ResourceConfig } from "entities/ResourceConfig";
 import { NodeVM } from "vm2";
 
@@ -23,7 +23,7 @@ export function autoIncrementForName(names: string[]) {
   return nameSuffix;
 }
 
-export function parseResource(resource: AppResource | InstanceResource, resourceConfigMap: Map<number, ResourceConfig>) {
+export function parseResource(resource: AppResource | ViewResource, resourceConfigMap: Map<number, ResourceConfig>) {
   const _resource = resource.imageResource ? resource.imageResource : resource
 
   const resourceConfig = _resource.resourceConfig;
@@ -37,11 +37,11 @@ const vm2 = new NodeVM()
 
 // 创建ExtScriptModule模块赋值给插件
 export function installPipelineModule(
-  { list, level, extHandler, entryId, solutionId }: {
+  { list, level, extHandler, viewId, solutionId }: {
     list: ExtensionInstance[],
     level: ExtensionLevel,
     extHandler: ExtensionHandler,
-    entryId?: number,
+    viewId?: number,
     solutionId?: number
   }
 ) {
@@ -49,7 +49,7 @@ export function installPipelineModule(
     const extInstance = wrap(item).toObject() as IExtensionInstance
     // 一定要先加载安装在初始化 module
     const success = extHandler.install({
-      extInstance, level, solutionId, entryId,
+      extInstance, level, solutionId, viewId,
       extId: extInstance.extension.id,
       extAssetUrl: extInstance.extensionVersion.assetUrl
     })

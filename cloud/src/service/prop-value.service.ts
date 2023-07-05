@@ -2,7 +2,7 @@ import { PropValueType } from '@grootio/common';
 import { RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 
-import { LogicException } from 'config/logic.exception';
+import { LogicException } from 'config/Logic.exception';
 import { PropItem } from 'entities/PropItem';
 import { PropValue } from 'entities/PropValue';
 
@@ -25,7 +25,20 @@ export class PropValueService {
     } as any;
     if (rawPropValue.type === PropValueType.Instance) {
       LogicException.assertParamEmpty(rawPropValue.componentInstanceId, 'componentInstanceId');
+      LogicException.assertParamEmpty(rawPropValue.viewId, 'viewId');
+      LogicException.assertParamEmpty(rawPropValue.appId, 'appId');
+      LogicException.assertParamEmpty(rawPropValue.projectId, 'projectId');
+      LogicException.assertParamEmpty(rawPropValue.solutionId, 'solutionId');
+
       query.componentInstance = rawPropValue.componentInstanceId;
+      query.view = rawPropValue.viewId;
+      query.app = rawPropValue.appId;
+      query.project = rawPropValue.projectId;
+      query.solution = rawPropValue.solutionId;
+    } else {
+      LogicException.assertParamEmpty(rawPropValue.solutionId, 'solutionId');
+
+      query.solution = rawPropValue.solutionId;
     }
 
     const lastPropValue = await em.findOne(PropValue, query, { orderBy: { order: 'DESC' } });
@@ -77,6 +90,10 @@ export class PropValueService {
       LogicException.assertParamEmpty(rawPropValue.componentId, 'componentId');
       LogicException.assertParamEmpty(rawPropValue.componentVersionId, 'componentVersionId');
       LogicException.assertParamEmpty(rawPropValue.componentInstanceId, 'componentInstanceId');
+      LogicException.assertParamEmpty(rawPropValue.viewId, 'viewId');
+      LogicException.assertParamEmpty(rawPropValue.appId, 'appId');
+      LogicException.assertParamEmpty(rawPropValue.projectId, 'projectId');
+      LogicException.assertParamEmpty(rawPropValue.solutionId, 'solutionId');
 
       const newPropValue = em.create(PropValue, {
         propItem: rawPropValue.propItemId,
@@ -86,7 +103,11 @@ export class PropValueService {
         abstractValueIdChain: rawPropValue.abstractValueIdChain,
         componentInstance: rawPropValue.componentInstanceId,
         type: PropValueType.Instance,
-        valueStruct: rawPropValue.valueStruct
+        valueStruct: rawPropValue.valueStruct,
+        app: rawPropValue.appId,
+        viewId: rawPropValue.viewId,
+        project: rawPropValue.projectId,
+        solution: rawPropValue.solutionId
       });
       await em.flush();
       return newPropValue;
@@ -95,6 +116,7 @@ export class PropValueService {
         LogicException.assertParamEmpty(rawPropValue.propItemId, 'propItemId');
         LogicException.assertParamEmpty(rawPropValue.componentId, 'componentId');
         LogicException.assertParamEmpty(rawPropValue.componentVersionId, 'componentVersionId');
+        LogicException.assertParamEmpty(rawPropValue.solutionId, 'solutionId');
 
         const newPropValue = em.create(PropValue, {
           propItem: rawPropValue.propItemId,
@@ -103,7 +125,8 @@ export class PropValueService {
           componentVersion: rawPropValue.componentVersionId,
           value: rawPropValue.value,
           type: PropValueType.Prototype,
-          abstractValueIdChain: rawPropValue.abstractValueIdChain
+          abstractValueIdChain: rawPropValue.abstractValueIdChain,
+          solution: rawPropValue.solutionId
         });
 
         await em.flush();

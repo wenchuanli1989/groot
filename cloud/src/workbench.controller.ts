@@ -9,7 +9,6 @@ import { PropItemService } from 'service/prop-item.service';
 import { OrgService } from 'service/org.service';
 import { PropValueService } from 'service/prop-value.service';
 import { PropValue } from 'entities/PropValue';
-import { Component } from 'entities/Component';
 import { ComponentVersionService } from 'service/component-version.service';
 import { ComponentVersion } from 'entities/ComponentVersion';
 import { ComponentInstanceService } from 'service/component-instance.service';
@@ -22,12 +21,14 @@ import { ResourceService } from 'service/resource.service';
 import { EnvType, StudioMode } from '@grootio/common';
 import { SolutionService } from 'service/solution.service';
 import { ComponentService } from 'service/component.service';
-import { InstanceResource } from 'entities/InstanceResource';
+import { ViewResource } from 'entities/ViewResource';
 import { AppResource } from 'entities/AppResource';
 import { ExtensionInstanceService } from 'service/extension-instance.service';
 import { SolutionVersionService } from 'service/solution-version.service';
 import { SolutionComponentService } from 'service/solution-component.service'
 import { SolutionComponent } from 'entities/SolutionComponent';
+import { ViewService } from 'service/view.service';
+import { View } from 'entities/View';
 
 @UseInterceptors(StandardResultInterceptor)
 @Controller('/workbench')
@@ -48,7 +49,8 @@ export class WorkbenchController {
     private readonly solutionService: SolutionService,
     private readonly extensionInstanceService: ExtensionInstanceService,
     private readonly solutionVersionService: SolutionVersionService,
-    private readonly solutionComponentService: SolutionComponentService
+    private readonly solutionComponentService: SolutionComponentService,
+    private readonly viewService: ViewService
   ) { }
 
   @Post('/solution-component/add-component')
@@ -133,9 +135,9 @@ export class WorkbenchController {
     return await this.propValueService.update(rawPropValue);
   }
 
-  @Post('/component-instance/add-entry')
-  async componentInstanceAddEntry(@Body() componentInstance: ComponentInstance) {
-    return await this.componentInstanceService.addEntry(componentInstance);
+  @Post('/view/add')
+  async viewAdd(@Body() view: View) {
+    return await this.viewService.add(view);
   }
 
 
@@ -146,7 +148,7 @@ export class WorkbenchController {
 
   @Get('/component/detail-by-componentVersionId')
   async componentDetailByComponentVersionId(@Query('componentVersionId') componentVersionId: number) {
-    return this.componentService.componentDetailByComponentVersionId(+componentVersionId);
+    return this.componentService.getDetailByComponentVersionId(+componentVersionId);
   }
 
   @Get('/application/detail-by-releaseId/:releaseId')
@@ -154,9 +156,9 @@ export class WorkbenchController {
     return this.applicationService.getDetailByReleaseId(releaseId);
   }
 
-  @Get('/component-instance/entry-detail-by-entryId-and-releaseId')
-  async componentInstanceEntryDetailByEntryIdAndReleaseId(@Query('entryId') entryId: number, @Query('releaseId') releaseId: number) {
-    return this.componentInstanceService.getEntryDetailByEntryIdAndReleaseId(entryId, releaseId);
+  @Get('/view/detail-by-viewId-and-releaseId')
+  async viewDetailByViewIdAndReleaseId(@Query('viewId') viewId: number, @Query('releaseId') releaseId: number) {
+    return this.viewService.getDetailByViewIdAndReleaseId(viewId, releaseId);
   }
 
   @Post('/component-version/add')
@@ -171,10 +173,10 @@ export class WorkbenchController {
   }
 
 
-  @Get('/component-instance/reverse-detect-id')
-  async componentInstanceReverseDetectId(@Query('releaseId') releaseId: number, @Query('trackId') trackId: number) {
-    return await this.componentInstanceService.reverseDetectId(trackId, releaseId);
-  }
+  // @Get('/component-instance/reverse-detect-id')
+  // async componentInstanceReverseDetectId(@Query('releaseId') releaseId: number, @Query('trackId') trackId: number) {
+  //   return await this.componentInstanceService.reverseDetectId(trackId, releaseId);
+  // }
 
   @Post('/component-version/publish')
   async componentVersionPublish(@Body('componentVersionId') componentVersionId: number) {
@@ -208,13 +210,18 @@ export class WorkbenchController {
     return await this.componentInstanceService.remove(instanceId);
   }
 
-  @Post('/resource/add-instance-resource')
-  async addInstanceResource(@Body() rawResource: InstanceResource) {
-    return await this.resourceService.addInstanceResource(rawResource);
+  @Get('/view/remove/:viewId')
+  async viewRemove(@Param('viewId') viewId: number) {
+    return await this.viewService.remove(viewId);
+  }
+
+  @Post('/resource/add-view-resource')
+  async resourceAddViewResource(@Body() rawResource: ViewResource) {
+    return await this.resourceService.addViewResource(rawResource);
   }
 
   @Post('/resource/add-app-resource')
-  async addAppResource(@Body() rawResource: AppResource) {
+  async resourceAddAppResource(@Body() rawResource: AppResource) {
     return await this.resourceService.addAppResource(rawResource);
   }
 
@@ -224,13 +231,13 @@ export class WorkbenchController {
   }
 
   @Post('/resource/update-app-resource')
-  async updateAppResource(@Body() rawResource: AppResource) {
+  async resourceUpdateAppResource(@Body() rawResource: AppResource) {
     return await this.resourceService.updateAppResource(rawResource);
   }
 
-  @Post('/resource/update-instance-resource')
-  async updateInstanceResource(@Body() rawResource: InstanceResource) {
-    return await this.resourceService.updateInstanceResource(rawResource);
+  @Post('/resource/update-view-resource')
+  async resourceUpdateViewResource(@Body() rawResource: ViewResource) {
+    return await this.resourceService.updateViewResource(rawResource);
   }
 
   @Get('/demo')
@@ -274,8 +281,8 @@ export class WorkbenchController {
 
   // todo 添加解决方案实现
   @Get('/solution-component/list/:solutionVersionId')
-  async solutionCompoentList(@Param('solutionVersionId') solutionVersionId: number, @Query('entry') entry: string, @Query('allVersion') allVersion: string) {
-    return await this.solutionComponentService.list(solutionVersionId, allVersion === 'true', entry !== 'all' ? (entry === 'true') : undefined);
+  async solutionCompoentList(@Param('solutionVersionId') solutionVersionId: number, @Query('view') view: string, @Query('allVersion') allVersion: string) {
+    return await this.solutionComponentService.list(solutionVersionId, allVersion === 'true', view !== 'all' ? (view === 'true') : undefined);
   }
 
 

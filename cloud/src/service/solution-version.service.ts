@@ -1,8 +1,7 @@
 import { ExtensionRelationType, pick } from '@grootio/common';
 import { RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { LogicException, LogicExceptionCode } from 'config/logic.exception';
-import { ComponentVersion } from 'entities/ComponentVersion';
+import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
 import { SolutionComponent } from 'entities/SolutionComponent';
 import { SolutionVersion } from 'entities/SolutionVersion';
@@ -38,7 +37,7 @@ export class SolutionVersionService {
     const solutionComponentRelationMap = new Map<number, SolutionComponent>()
     const newSolutionComponentRelation = []
     for (const item of originSolutionComponentRelation) {
-      const newSolutionComponent = em.create(SolutionComponent, pick(item, ['componentVersion', 'entry', 'parent', 'component'], { solutionVersion: newSolutionVersion }))
+      const newSolutionComponent = em.create(SolutionComponent, pick(item, ['componentVersion', 'view', 'parent', 'component', 'solution'], { solutionVersion: newSolutionVersion }))
       solutionComponentRelationMap.set(item.id, newSolutionComponent)
       newSolutionComponentRelation.push(newSolutionComponent)
     }

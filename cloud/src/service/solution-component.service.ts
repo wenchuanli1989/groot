@@ -1,6 +1,6 @@
 import { EntityManager, RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { LogicException, LogicExceptionCode } from 'config/logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
 import { ComponentVersion } from 'entities/ComponentVersion';
 import { SolutionComponent } from 'entities/SolutionComponent';
 import { SolutionVersion } from 'entities/SolutionVersion';
@@ -13,7 +13,7 @@ export class SolutionComponentService {
     private componentService: ComponentService,
   ) { }
 
-  async list(solutionVersionId: number, allVersion = false, entry: boolean) {
+  async list(solutionVersionId: number, allVersion = false, view: boolean) {
     const em = RequestContext.getEntityManager();
 
     LogicException.assertParamEmpty(solutionVersionId, 'solutionVersionId')
@@ -21,8 +21,8 @@ export class SolutionComponentService {
       solutionVersion: solutionVersionId,
     } as any
 
-    if (entry !== undefined) {
-      queryData.entry = entry
+    if (view !== undefined) {
+      queryData.view = view
     }
     const solutionComponentList = await em.find(SolutionComponent, queryData, { populate: ['component'] })
 
@@ -96,8 +96,9 @@ export class SolutionComponentService {
         solutionVersion,
         componentVersion: component.componentVersion,
         component,
-        entry: !!parentSolutionComponent,
-        parent: parentSolutionComponent
+        view: !!parentSolutionComponent,
+        parent: parentSolutionComponent,
+        solution: solutionVersion.solution
       })
 
       await em.flush()

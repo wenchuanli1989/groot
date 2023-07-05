@@ -2,7 +2,7 @@ import { EntityManager, RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { pick, PropValueType } from '@grootio/common';
 
-import { LogicException, LogicExceptionCode } from 'config/logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
 import { ComponentVersion } from 'entities/ComponentVersion';
 import { PropBlock } from 'entities/PropBlock';
 import { PropGroup } from 'entities/PropGroup';
@@ -59,7 +59,8 @@ export class ComponentVersionService {
 
     const componentVersion = em.create(ComponentVersion, {
       name: rawComponentVersion.name,
-      component: imageComponentVersion.component
+      component: imageComponentVersion.component,
+      solution: imageComponentVersion.solution
     });
 
     await em.begin();
@@ -73,7 +74,8 @@ export class ComponentVersionService {
           ...pick(originGroup,
             ['name', 'propKey', 'order', 'component', 'struct']
           ),
-          componentVersion
+          componentVersion,
+          solution: componentVersion.solution
         }
         );
         groupMap.set(originGroup.id, group);
@@ -86,7 +88,8 @@ export class ComponentVersionService {
             ['name', 'rootPropKey', 'propKey', 'order', 'component', 'struct', 'layout']
           ),
           componentVersion,
-          group: tempIdData.groupId
+          group: tempIdData.groupId,
+          solution: componentVersion.solution
         }
         );
         blockMap.set(originBlock.id, block);
@@ -101,6 +104,7 @@ export class ComponentVersionService {
           componentVersion,
           block: tempIdData.blockId,
           group: tempIdData.groupId,
+          solution: componentVersion.solution
         });
         itemMap.set(originItem.id, item);
       }
@@ -109,10 +113,10 @@ export class ComponentVersionService {
         const originValue = originValueList[valueIndex];
         const value = em.create(PropValue, {
           ...pick(originValue,
-            ['value', 'abstractValueIdChain', 'component', 'type', 'order', 'valueStruct']
+            ['value', 'abstractValueIdChain', 'component', 'type', 'order', 'valueStruct', 'app', 'project', 'solution', 'view', 'componentInstance']
           ),
           componentVersion,
-          propItem: tempIdData.itemId
+          propItem: tempIdData.itemId,
         });
         valueMap.set(originValue.id, value);
       }

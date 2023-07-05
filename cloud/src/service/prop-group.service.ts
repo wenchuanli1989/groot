@@ -2,12 +2,13 @@ import { pick, PropGroupStructType } from '@grootio/common';
 import { EntityManager, RequestContext } from '@mikro-orm/core';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
-import { LogicException, LogicExceptionCode } from 'config/logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
 import { PropBlock } from 'entities/PropBlock';
 import { PropGroup } from 'entities/PropGroup';
 import { PropItem } from 'entities/PropItem';
 import { CommonService } from './common.service';
 import { PropBlockService } from './prop-block.service';
+import { ComponentVersion } from 'entities/ComponentVersion';
 
 
 @Injectable()
@@ -30,6 +31,10 @@ export class PropGroupService {
       }
     }
 
+    LogicException.assertParamEmpty(rawGroup.componentVersionId, 'componentVersionId');
+    const componentVersion = await em.findOne(ComponentVersion, rawGroup.componentVersionId);
+    LogicException.assertNotFound(componentVersion, 'ComponentVersion', rawGroup.componentVersionId);
+
     const preGroup = await em.findOne(PropGroup, {
       componentVersion: rawGroup.componentVersionId,
       component: rawGroup.componentId,
@@ -37,9 +42,10 @@ export class PropGroupService {
 
     const newGroup = em.create(PropGroup, {
       ...pick(rawGroup, ['name', 'propKey', 'struct']),
-      componentVersion: rawGroup.componentVersionId,
-      component: rawGroup.componentId,
-      order: (preGroup ? preGroup.order : 0) + 1000
+      componentVersion: componentVersion,
+      component: componentVersion.component,
+      order: (preGroup ? preGroup.order : 0) + 1000,
+      solution: componentVersion.solution
     });
 
     if (rawGroup.parentItemId) {

@@ -2,7 +2,7 @@ import { pick, PropBlockStructType, PropItemStruct } from '@grootio/common';
 import { EntityManager, RequestContext } from '@mikro-orm/core';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
-import { LogicException, LogicExceptionCode } from 'config/logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
 import { PropBlock } from 'entities/PropBlock';
 import { PropGroup } from 'entities/PropGroup';
 import { PropItem } from 'entities/PropItem';
@@ -50,7 +50,8 @@ export class PropBlockService {
       component: group.component,
       componentVersion: group.componentVersion,
       group,
-      order
+      order,
+      solution: group.solution
     });
 
     let result: { newBlock: PropBlock, extra?: { newItem?: PropItem, propValue?: PropValue, childGroup?: PropGroup } } = { newBlock };
