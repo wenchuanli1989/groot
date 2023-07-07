@@ -342,6 +342,7 @@ export default class PropPersistModel extends BaseModel {
       paramsData.appId = grootManager.state.getState('gs.app').id
       paramsData.viewId = grootManager.state.getState('gs.view').id
       paramsData.projectId = grootManager.state.getState('gs.app').projectId
+      paramsData.solutionId = componentInstance.solutionId
     }
 
     this.request(APIPath.value_abstractType_add, paramsData).then(({ data }) => {
@@ -415,6 +416,10 @@ export default class PropPersistModel extends BaseModel {
         paramData.type = PropValueType.Instance;
         paramData.releaseId = grootManager.state.getState('gs.release').id
         paramData.componentInstanceId = componentInstance.id;
+        paramData.appId = grootManager.state.getState('gs.app').id
+        paramData.viewId = grootManager.state.getState('gs.view').id
+        paramData.projectId = grootManager.state.getState('gs.app').projectId
+        paramData.solutionId = componentInstance.solutionId
 
         if (hostComponentInstanceId) {
           paramData.componentInstanceId = hostComponentInstanceId;
