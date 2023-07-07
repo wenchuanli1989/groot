@@ -238,10 +238,16 @@ export class ComponentVersionService {
     let parentCtx = parentEm ? em.getTransactionContext() : undefined;
     await em.begin()
     try {
-      componentVersion.deletedAt = new Date()
 
+      const groupList = await em.find(PropGroup, { componentVersion })
+      for (const { id: groupId } of groupList) {
+        await this.propGroupService.remove(groupId, em)
+      }
       // todo 递归删除关联 PropItem PropGroup PropBlock ExtensionInstance 
       // 避免存在关联 ComponentInstance 否则不应删除组件版本
+
+      componentVersion.deletedAt = new Date()
+
       await em.flush()
 
       await em.commit()
