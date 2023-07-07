@@ -1,17 +1,10 @@
-import { APIPath, ComponentInstance, ExtensionInstance, ExtensionLevel, PropBlockStructType, PropGroup, PropItemPipelineParams, Resource, ResourceConfig, SolutionInstance, propAppendTask } from "@grootio/common"
+import { APIPath, ExtensionLevel, PropBlockStructType, PropGroup, PropItemPipelineParams, View, propAppendTask } from "@grootio/common"
 import { metadataFactory, pipelineExec, propTreeFactory } from '@grootio/core'
 import { getContext, grootManager } from "context"
 import { parseOptions } from "../util"
 import { createResourceTaskList } from "util/resource"
 
-const viewCache = new Map<number, {
-  root: ComponentInstance,
-  children: ComponentInstance[],
-  solutionInstanceList: SolutionInstance[],
-  viewExtensionInstanceList: ExtensionInstance[],
-  resourceList: Resource[],
-  resourceConfigList: ResourceConfig[]
-}>()
+const viewCache = new Map<number, Partial<View>>()
 const activeViewIdSet = new Set<number>()
 let selectViewId: number
 
@@ -278,7 +271,7 @@ const switchComponentInstance = (instanceId: number, viewId?: number) => {
   const { setState } = grootManager.state
 
   if (!viewId) {
-    viewId = grootManager.state.getState('gs.view').viewId
+    viewId = grootManager.state.getState('gs.view').id
   }
   if (!viewCache.has(viewId)) {
     throw new Error(`未找到view: ${viewId}`)
@@ -286,13 +279,13 @@ const switchComponentInstance = (instanceId: number, viewId?: number) => {
 
   const view = viewCache.get(viewId)
   if (selectViewId !== viewId) {
-    const { root, children, resourceList, resourceConfigList } = view
+    const { resourceList, resourceConfigList } = view
 
     setState('gs.localResourceList', resourceList)
     setState('gs.localResourceConfigList', resourceConfigList)
 
     selectViewId = viewId
-    setState('gs.view', { viewId, root, children })
+    setState('gs.view', view as any)
   }
 
   const instance = [view.root, ...view.children].find(item => item.id === instanceId);

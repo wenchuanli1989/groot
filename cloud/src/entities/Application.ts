@@ -72,6 +72,9 @@ export class Application extends BaseEntity {
   @Property({ persist: false })
   viewList: View[];
 
+  @Property({ persist: false })
+  projectId: number
+
   // @Property({ persist: false })
   // release: Release;
 

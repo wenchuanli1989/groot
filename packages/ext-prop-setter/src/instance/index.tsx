@@ -11,7 +11,7 @@ export const instanceBootstrap = () => {
   registerState('gs.propSetting.breadcrumbList', [], true)
 
   registerCommand('gc.pushMetadata', (_, instanceId) => {
-    const viewId = grootManager.state.getState('gs.view').viewId
+    const viewId = grootManager.state.getState('gs.view').id
     const data = executeCommand('gc.createMetadata', viewId)
     const view = getState('gs.viewList').find(item => item.id === viewId)
     callHook(PostMessageType.OuterUpdateComponent, {

@@ -61,7 +61,7 @@ export const Application = () => {
         {
           applicationModel.noPrimaryViewList.map((view) => {
             return (<div key={view.id}
-              className={`${styles.componentItem} ${currView?.viewId === view.id ? styles.active : ''}`}
+              className={`${styles.componentItem} ${currView?.id === view.id ? styles.active : ''}`}
               onClick={() => openView(view)}>
               <ViewItem view={view} />
             </div>)
@@ -71,7 +71,7 @@ export const Application = () => {
         {
           applicationModel.primaryViewList.map((view) => {
             return (<div key={view.id}
-              className={`${styles.componentItem} ${currView?.viewId === view.id ? styles.active : ''}`}
+              className={`${styles.componentItem} ${currView?.id === view.id ? styles.active : ''}`}
               onClick={() => openView(view)}>
               <ViewItem view={view} />
             </div>)

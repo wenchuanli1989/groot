@@ -102,7 +102,14 @@ export type ViewResource = {
 } & Omit<import("../../cloud/src/entities/ViewResource").ViewResource, 'release' | 'view'>;
 
 export type View = {
+
   // ************************** 分割线已下是界面属性 **************************
+  root: ComponentInstance,
+  children: ComponentInstance[],
+  solutionInstanceList: SolutionInstance[],
+  viewExtensionInstanceList: ExtensionInstance[],
+  resourceList: Resource[],
+  resourceConfigList: ResourceConfig[]
 } & Omit<import("../../cloud/src/entities/View").View, ''>;
 
 export type Resource = {

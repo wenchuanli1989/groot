@@ -24,14 +24,14 @@ export default class ResourceModel extends BaseModel {
     const releaseId = grootManager.state.getState('gs.release').id
 
     if (this.isLocalResource) {
-      const viewId = grootManager.state.getState('gs.view').viewId
+      const viewId = grootManager.state.getState('gs.view').id
       const data = rawResource as ViewResource
       data.releaseId = releaseId
       data.viewId = viewId
       getContext().request(APIPath.resource_addViewResource, data).then((res) => {
         const localSttateList = grootManager.state.getState('gs.localResourceList');
         localSttateList.push(res.data as Resource);
-        const viewId = grootManager.state.getState('gs.view').viewId
+        const viewId = grootManager.state.getState('gs.view').id
         grootManager.command.executeCommand('gc.pushResource', viewId)
         this.hideForm();
       })
@@ -54,7 +54,7 @@ export default class ResourceModel extends BaseModel {
       const list = this.isLocalResource ? grootManager.state.getState('gs.localResourceList') : grootManager.state.getState('gs.globalResourceList') as any[];
       const originResource = list.find(item => item.id === this.currResource.id);
       Object.assign(originResource, pick(res.data, ['type', 'name', 'value']));
-      const viewId = this.isLocalResource ? grootManager.state.getState('gs.view').viewId : undefined
+      const viewId = this.isLocalResource ? grootManager.state.getState('gs.view').id : undefined
       grootManager.command.executeCommand('gc.pushResource', viewId)
       this.hideForm();
     });
@@ -69,7 +69,7 @@ export default class ResourceModel extends BaseModel {
       if (index !== -1) {
         list.splice(index, 1);
       }
-      const viewId = this.isLocalResource ? grootManager.state.getState('gs.view').viewId : undefined
+      const viewId = this.isLocalResource ? grootManager.state.getState('gs.view').id : undefined
       grootManager.command.executeCommand('gc.pushResource', viewId)
       this.hideForm();
     });
