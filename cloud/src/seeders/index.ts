@@ -298,15 +298,23 @@ export class DatabaseSeeder extends Seeder {
 }
 
 const defaultPropItemPipeline = `
-const exec = ({propItem,metadata,defaultFn,propKeyChain,appendTask}) => {
+const exec = ({propItem,defaultFn,appendTask,ctx,propKey,value}) => {
 
-  defaultFn()
+  if(propItem.viewType === 'datePicker' || propItem.viewType === 'timePicker'){
+    defaultFn()
+    appendTask('dateTime','_value = _shared.dayjs(_rawValue)')
+  }else if(propItem.viewType === 'switch'){
+    ctx[propKey] = value === '1'
+  }
 
-  appendTask('dateTime','_value = _shared.dayjs(_rawValue)')
 }
 
 const check = ({propItem}) => {
   if (propItem.viewType === 'datePicker' || propItem.viewType === 'timePicker') {
+    return 'low'
+  }
+
+  if (propItem.viewType === 'switch') {
     return 'low'
   }
 
