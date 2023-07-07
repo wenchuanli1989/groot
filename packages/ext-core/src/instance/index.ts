@@ -171,26 +171,24 @@ const createFullMetadata = (viewId: number) => {
 const loadView = (viewId: number) => {
   const { request, groot: { loadExtension, launchExtension }, params } = getContext();
   const releaseId = +params.releaseId
-  return request(APIPath.view_detailByViewIdAndReleaseId, { viewId, releaseId }).then(({ data: { instanceList, solutionInstanceList, viewExtensionInstanceList, resourceList, resourceConfigList } }) => {
+  return request(APIPath.view_detailByViewIdAndReleaseId, { viewId, releaseId }).then(({ data }) => {
     activeViewIdSet.add(viewId)
-    const root = instanceList.find(item => !item.parentId)
-    const children = instanceList.filter(item => !!item.parentId)
-    viewCache.set(viewId, {
-      children, root, solutionInstanceList, viewExtensionInstanceList, resourceList, resourceConfigList
-    });
+    const root = data.instanceList.find(item => !item.parentId)
+    const children = data.instanceList.filter(item => !!item.parentId)
+    viewCache.set(viewId, { ...data, root, children });
 
     [root, ...children].forEach((instance) => {
-      const solutionInstance = solutionInstanceList.find(item => item.id === instance.solutionInstanceId)
+      const solutionInstance = data.solutionInstanceList.find(item => item.id === instance.solutionInstanceId)
       instance.solutionId = solutionInstance.solutionId;
     });
 
     const solutionInstanceListSort = [
-      solutionInstanceList.find(item => !!item.primary),
-      ...solutionInstanceList.filter(item => !item.primary)
+      data.solutionInstanceList.find(item => !!item.primary),
+      ...data.solutionInstanceList.filter(item => !item.primary)
     ]
 
     // 顺序不能错
-    const viewExtPromise = loadExtension({ remoteExtensionList: viewExtensionInstanceList, extLevel: ExtensionLevel.View, viewId })
+    const viewExtPromise = loadExtension({ remoteExtensionList: data.viewExtensionInstanceList, extLevel: ExtensionLevel.View, viewId })
     const solutionExtPromiseList = solutionInstanceListSort.map(({ extensionInstanceList, solutionId }) => {
       return loadExtension({ remoteExtensionList: extensionInstanceList, extLevel: ExtensionLevel.Solution, solutionId, viewId })
     })
@@ -198,7 +196,7 @@ const loadView = (viewId: number) => {
     // 加载入口级扩展插件和解决方案级扩展插件
     Promise.all([viewExtPromise, ...solutionExtPromiseList]).then(() => {
 
-      launchExtension(viewExtensionInstanceList, ExtensionLevel.View)
+      launchExtension(data.viewExtensionInstanceList, ExtensionLevel.View)
 
       for (const { extensionInstanceList } of solutionInstanceListSort) {
         launchExtension(extensionInstanceList, ExtensionLevel.Solution)

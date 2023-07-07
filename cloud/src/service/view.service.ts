@@ -74,7 +74,7 @@ export class ViewService {
     })
     const resourceConfigList = [...resourceConfigMap.values()]
 
-    return { instanceList, resourceList, resourceConfigList, viewExtensionInstanceList, solutionInstanceList };
+    return { ...view, instanceList, resourceList, resourceConfigList, viewExtensionInstanceList, solutionInstanceList };
   }
 
   async add(rawView: View) {
