@@ -333,6 +333,7 @@ export default class PropPersistModel extends BaseModel {
 
     if (getContext().params.mode === StudioMode.Prototype) {
       paramsData.type = PropValueType.Prototype;
+      paramsData.solutionId = grootManager.state.getState('gs.solution').id
     } else {
       const componentInstance = grootManager.state.getState('gs.activeComponentInstance')
       paramsData.type = PropValueType.Instance;
@@ -404,6 +405,7 @@ export default class PropPersistModel extends BaseModel {
 
       if (isPrototypeMode) {
         paramData.type = PropValueType.Prototype;
+        paramData.solutionId = grootManager.state.getState('gs.solution').id
       } else {
         const componentInstance = grootManager.state.getState('gs.activeComponentInstance')
         const { root, children } = grootManager.state.getState('gs.view')
