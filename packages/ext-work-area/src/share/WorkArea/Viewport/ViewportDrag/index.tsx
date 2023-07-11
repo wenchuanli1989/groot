@@ -1,4 +1,4 @@
-import { ComponentDragAnchor, PostMessageType } from "@grootio/common";
+import { DragCursor, PostMessageType } from "@grootio/common";
 import { grootManager } from "context";
 import { useEffect, useRef } from "react";
 
@@ -18,18 +18,18 @@ const ViewportDrag: React.FC = () => {
     registerHook('gh.component.dragEnd', () => {
       containerRef.current.style.display = 'none';
     })
-    registerHook(PostMessageType.InnerUpdateDragAnchor, setDragAnchor)
+    registerHook(PostMessageType.InnerDragRefreshCursor, setDragAnchor)
   }, []);
 
   function onDragEnter() {
-    callHook(PostMessageType.OuterDragComponentEnter)
+    callHook(PostMessageType.OuterDragAddComponentEnter)
   }
 
   // 必须有监听dragover事件否则drop事件无法触发
   function onDragOver(event) {
     event.preventDefault();
     const rect = containerRef.current.getBoundingClientRect();
-    callHook(PostMessageType.OuterDragComponentOver, {
+    callHook(PostMessageType.OuterDragAddComponentOver, {
       positionX: event.pageX - rect.left,
       positionY: event.pageY - rect.top,
     })
@@ -38,21 +38,25 @@ const ViewportDrag: React.FC = () => {
   function onDrop(event) {
     const componentId = event.dataTransfer.getData('componentId');
     const componentVersionId = event.dataTransfer.getData('componentVersionId');
+    const solutionComponentId = event.dataTransfer.getData('solutionComponentId');
+    const solutionVersionId = event.dataTransfer.getData('solutionVersionId');
     const rect = containerRef.current.getBoundingClientRect();
-    callHook(PostMessageType.OuterDragComponentDrop, {
+    callHook(PostMessageType.OuterDragAddComponentDrop, {
       positionX: event.pageX - rect.left,
       positionY: event.pageY - rect.top,
       componentId,
-      componentVersionId
+      componentVersionId,
+      solutionComponentId,
+      solutionVersionId
     })
     containerRef.current.style.display = 'none';
   }
 
   function onDragLeave() {
-    callHook(PostMessageType.OuterDragComponentLeave)
+    callHook(PostMessageType.OuterDragAddComponentLeave)
   }
 
-  function setDragAnchor(data: ComponentDragAnchor) {
+  function setDragAnchor(data: DragCursor) {
     if (data) {
       let styles = dragAnchorRef.current.style;
       styles.display = 'inline-block';

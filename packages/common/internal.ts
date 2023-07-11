@@ -49,33 +49,35 @@ export type Metadata = {
 export type PropMetadata = {
   keyChain: string,
   type: string,
-  data?: any
+  data?: PropMetadataData
 }
 
 
-export type PropMetadataComponent = {
-  setting: PropMetadataComponentSetting,
-  list: PropMetadataComponentItem[],
+export type PropMetadataData = {
+  setting: PropMetadataDataSetting,
+  list: PropMetadataDataItem[],
 
-  $$runtime?: {
-    parentId: number,
-    propKeyChain: string,
-    propItemId: number,
-    abstractValueIdChain?: string,
-    solutionInstanceId: number,
-    componentVersionId: number
-  }
+  $$runtime?: PropMetadataDataRuntime
 }
 
-
-export type PropMetadataComponentItem = {
+export type PropMetadataDataItem = {
   instanceId: number,
   componentId: number,
   componentName: string,
   order: number
 }
 
-export type PropMetadataComponentSetting = {
+export type PropMetadataDataRuntime = {
+  parentId: number,
+  propKeyChain: string,
+  propItemId: number,
+  abstractValueIdChain?: string,
+  solutionInstanceId: number,
+  componentVersionId: number,
+  solutionComponentId: number
+}
+
+export type PropMetadataDataSetting = {
 }
 
 

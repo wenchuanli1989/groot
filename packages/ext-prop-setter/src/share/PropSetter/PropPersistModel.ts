@@ -1,4 +1,4 @@
-import { APIPath, BaseModel, ComponentInstance, PropBlock, PropGroup, PropItem, PropItemStruct, PropMetadataComponent, PropValue, PropValueType, StudioMode, ValueStruct } from "@grootio/common";
+import { APIPath, BaseModel, ComponentInstance, PropBlock, PropGroup, PropItem, PropItemStruct, PropMetadataData, PropValue, PropValueType, StudioMode, ValueStruct } from "@grootio/common";
 import { getContext, grootManager } from "context";
 import { getComponentVersionId } from "share";
 
@@ -477,7 +477,7 @@ export default class PropPersistModel extends BaseModel {
         return value.abstractValueIdChain === abstractValueIdChain || (!value.abstractValueIdChain && !abstractValueIdChain)
       });
 
-      const componentValue = JSON.parse(propValue.value) as PropMetadataComponent;
+      const componentValue = JSON.parse(propValue.value) as PropMetadataData;
       const index = componentValue.list.findIndex(i => i.instanceId === instanceId);
       componentValue.list.splice(index, 1);
 

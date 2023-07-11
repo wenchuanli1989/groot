@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { groot } from "@grootio/web-runtime";
-import { PropMetadataComponent } from "@grootio/common";
+import { PropMetadataData } from "@grootio/common";
 
 type PropType = {
-  children: React.ReactElement[] & { _groot?: PropMetadataComponent },
+  children: React.ReactElement[] & { _groot?: PropMetadataData },
   minHeight?: number,
   padding?: number
 }

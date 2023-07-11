@@ -1,4 +1,4 @@
-import { Metadata, PropBlockStructType, PropGroup, PropItem, PropItemPipelineParams, PropItemStruct, PropItemViewType, PropMetadataComponent, PropMetadataType, PropValue, interpolationRegExp } from '@grootio/common';
+import { Metadata, PropBlockStructType, PropGroup, PropItem, PropItemPipelineParams, PropItemStruct, PropItemViewType, PropMetadataData, PropMetadataType, PropValue, interpolationRegExp, PropMetadataDataRuntime } from '@grootio/common';
 
 import { fillPropChainGreed, fillPropChain } from './utils';
 
@@ -8,6 +8,7 @@ let _pipeline: (params: PropItemPipelineParams) => void
 let _studioMode: boolean
 let _solutionInstanceId: number
 let _componentVersionId: number
+let _solutionComponentId: number
 
 export function metadataFactory(
   rootGroupList: PropGroup[],
@@ -18,6 +19,7 @@ export function metadataFactory(
     viewId?: number,
     parentMetadataId?: number,
     solutionInstanceId: number,
+    solutionComponentId: number,
     componentVersionId: number
   }, pipeline?: (params: PropItemPipelineParams) => void, studioMode = false) {
 
@@ -35,6 +37,7 @@ export function metadataFactory(
   _studioMode = studioMode
   _solutionInstanceId = metadataInfo.solutionInstanceId
   _componentVersionId = metadataInfo.componentVersionId
+  _solutionComponentId = metadataInfo.solutionComponentId
 
   rootGroupList.forEach((group) => {
     if (group.propKey) {
@@ -187,7 +190,7 @@ function buildPropObjectForLeafItem(propItem: PropItem, ctx: Object, propKeyChai
     }
 
   } else if (propItem.struct === PropItemStruct.Component) {
-    const data = (!value ? { list: [] } : JSON.parse(value)) as PropMetadataComponent
+    const data = (!value ? { list: [] } : JSON.parse(value)) as PropMetadataData
 
     if (_studioMode) {
       data.$$runtime = {
@@ -196,8 +199,9 @@ function buildPropObjectForLeafItem(propItem: PropItem, ctx: Object, propKeyChai
         abstractValueIdChain: abstractValueIdChain,
         parentId: metadata.id,
         solutionInstanceId: _solutionInstanceId,
-        componentVersionId: _componentVersionId
-      }
+        componentVersionId: _componentVersionId,
+        solutionComponentId: _solutionComponentId
+      } as PropMetadataDataRuntime
     }
 
     metadata.advancedProps.push({

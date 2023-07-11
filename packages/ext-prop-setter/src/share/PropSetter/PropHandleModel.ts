@@ -1,4 +1,4 @@
-import { ComponentInstance, PropMetadataComponentItem, PropMetadataComponent, DragAddComponentEventData, PostMessageType, PropBlock, PropGroup, PropItem, PropValueType, ValueStruct, wrapperState, BaseModel, PropItemStruct, viewRender, FormItemRender } from "@grootio/common";
+import { ComponentInstance, PropMetadataDataItem, PropMetadataData, DragAddComponentPong, PostMessageType, PropBlock, PropGroup, PropItem, PropValueType, ValueStruct, wrapperState, BaseModel, PropItemStruct, viewRender, FormItemRender } from "@grootio/common";
 import { grootManager } from "context";
 import React from "react";
 
@@ -272,12 +272,11 @@ export default class PropHandleModel extends BaseModel {
   }
 
 
-  private addChildComponent(data: DragAddComponentEventData) {
+  private addChildComponent(data: DragAddComponentPong) {
     const rawInstance = {
-      id: data.parentInstanceId,
-      componentId: data.componentId,
+      parentId: data.parentInstanceId,
       solutionInstanceId: data.solutionInstanceId,
-      componentVersionId: data.componentVersionId
+      solutionComponentId: data.solutionComponentId
     } as ComponentInstance;
 
     this.propPersist.addChildComponentInstance(rawInstance).then((instanceData) => {
@@ -287,7 +286,7 @@ export default class PropHandleModel extends BaseModel {
       const propValue = propItem.valueList.filter(v => v.type === PropValueType.Instance).find(value => {
         return value.abstractValueIdChain === data.abstractValueIdChain || (!value.abstractValueIdChain && !data.abstractValueIdChain)
       });
-      const value = JSON.parse(propValue?.value || '{"setting": {},"list":[]}') as PropMetadataComponent;
+      const value = JSON.parse(propValue?.value || '{"setting": {},"list":[]}') as PropMetadataData;
 
       let order = 1000;
       if (data.currentInstanceId) {
@@ -312,7 +311,7 @@ export default class PropHandleModel extends BaseModel {
         componentName: instanceData.component.name,
         componentId: instanceData.component.id,
         order
-      } as PropMetadataComponentItem;
+      } as PropMetadataDataItem;
 
       value.list.push(newValueItem);
       value.list = value.list.sort((a, b) => a.order - b.order);

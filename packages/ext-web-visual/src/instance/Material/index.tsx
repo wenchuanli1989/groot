@@ -1,4 +1,4 @@
-import { APIPath, Component } from "@grootio/common";
+import { APIPath, SolutionComponent } from "@grootio/common";
 import { getContext } from "context";
 import { useEffect, useState } from "react";
 import { DragComponent } from "./DragComponent";
@@ -6,21 +6,18 @@ import { DragComponent } from "./DragComponent";
 import styles from './index.module.less'
 
 export const Material = () => {
-  const [componentList, setComponentList] = useState<Component[]>([]);
+  const [solutionComponentList, setSolutionComponentList] = useState<SolutionComponent[]>([]);
 
   useEffect(() => {
     getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: 1, view: 'false' }).then(({ data }) => {
-      setComponentList(data.map(item => {
-        item.component.componentVersionId = item.componentVersionId
-        return item.component
-      }));
+      setSolutionComponentList(data);
     })
   }, []);
 
   return <div className={styles.container}>
     {
-      componentList.map((component) => {
-        return <DragComponent component={component} key={component.id} />
+      solutionComponentList.map((solutionComponent) => {
+        return <DragComponent solutionComponent={solutionComponent} key={solutionComponent.id} />
       })
     }
   </div>

@@ -213,12 +213,12 @@ export type GrootHookDict = {
   [PostMessageType.OuterUpdateResource]: [[{ resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[], viewKey: string }], void],
   [PostMessageType.OuterUpdateComponent]: [[{ metadataList: Metadata[], propTaskList: PropTask[], viewKey: string }], void],
 
-  [PostMessageType.OuterDragComponentEnter]: [[], void],
-  [PostMessageType.OuterDragComponentOver]: [[{ positionX: number, positionY: number }], void],
-  [PostMessageType.InnerUpdateDragAnchor]: [[ComponentDragAnchor], void],
-  [PostMessageType.OuterDragComponentDrop]: [[{ positionX: number, positionY: number, componentId: number }], void],
-  [PostMessageType.InnerDragHitSlot]: [[DragAddComponentEventData], void],
-  [PostMessageType.OuterDragComponentLeave]: [[], void],
+  [PostMessageType.OuterDragAddComponentEnter]: [[], void],
+  [PostMessageType.OuterDragAddComponentOver]: [[{ positionX: number, positionY: number }], void],
+  [PostMessageType.InnerDragRefreshCursor]: [[DragCursor], void],
+  [PostMessageType.OuterDragAddComponentDrop]: [[DragAddComponentPing], void],
+  [PostMessageType.InnerDragHitSlot]: [[DragAddComponentPong], void],
+  [PostMessageType.OuterDragAddComponentLeave]: [[], void],
 
   [PostMessageType.InnerOutlineHover]: [[ComponentAnchor], void],
   [PostMessageType.InnerOutlineSelect]: [[ComponentAnchor], void],
@@ -283,12 +283,12 @@ export enum PostMessageType {
   OuterUpdateComponent = 'outer_update_component',
   OuterRefreshView = 'outer_refresh_view',
 
-  OuterDragComponentOver = 'outer_drag_component_over',
-  OuterDragComponentEnter = 'outer_drag_component_enter',
-  OuterDragComponentLeave = 'outer_drag_component_leave',
-  OuterDragComponentDrop = 'outer_drag_component_drop',
+  OuterDragAddComponentEnter = 'outer_drag_add_component_enter',
+  OuterDragAddComponentOver = 'outer_drag_add_component_over',
+  OuterDragAddComponentLeave = 'outer_drag_add_component_leave',
+  OuterDragAddComponentDrop = 'outer_drag_add_component_drop',
   InnerDragHitSlot = 'inner_drag_hit_slot',
-  InnerUpdateDragAnchor = 'inner_update_drag_anchor',
+  InnerDragRefreshCursor = 'inner_drag_refresh_cursor',
 
   InnerOutlineHover = 'inner_outline_hover',
   InnerOutlineSelect = 'inner_outline_Select',
@@ -308,10 +308,17 @@ export enum PostMessageType {
 
 
 
+export type DragAddComponentPing = {
+  positionX: number,
+  positionY: number,
+  componentId: number,
+  solutionComponentId: number,
+  componentVersionId: number,
+  solutionVersionId: number
+}
 
-
-// todo 需要和PropMetadataComponent.$$runtime 类型对齐
-export type DragAddComponentEventData = {
+// todo 需要和PropMetadataData.$$runtime 类型对齐
+export type DragAddComponentPong = {
   propItemId: number,
   abstractValueIdChain?: string,
   parentInstanceId: number
@@ -319,6 +326,7 @@ export type DragAddComponentEventData = {
   currentInstanceId?: number,
   solutionInstanceId: number,
   componentVersionId: number,
+  solutionComponentId: number,
   direction?: 'next' | 'pre'
 }
 
@@ -332,7 +340,7 @@ export type ComponentAnchor = {
   abstractValueIdChain?: string
 }
 
-export type ComponentDragAnchor = {
+export type DragCursor = {
   direction: 'bottom' | 'top',
   left: number,
   width: number,

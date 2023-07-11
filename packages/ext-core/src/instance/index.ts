@@ -147,7 +147,8 @@ const createFullMetadata = (viewId: number) => {
       viewId,
       parentMetadataId: instance.parentId,
       solutionInstanceId: instance.solutionInstanceId,
-      componentVersionId: instance.componentVersion.id
+      componentVersionId: instance.componentVersion.id,
+      solutionComponentId: instance.solutionComponentId
     }, (params) => {
       pipelineExec<PropItemPipelineParams>({
         viewExtList: viewPropItemPipelineModuleList,

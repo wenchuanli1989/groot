@@ -72,7 +72,8 @@ const createFullMetadata = (component: Component) => {
     componentName: component.componentName,
     metadataId: component.id,
     solutionInstanceId: null,
-    componentVersionId: null
+    componentVersionId: null,
+    solutionComponentId: null
   }, (params) => {
     pipelineExec<PropItemPipelineParams>({
       appExtList: propItemPipelineModuleList,

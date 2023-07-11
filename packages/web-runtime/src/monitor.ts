@@ -1,4 +1,4 @@
-import { DragAddComponentEventData, ComponentDragAnchor, ComponentAnchor, Metadata, PostMessageType, PropMetadataComponent, PropMetadataType } from "@grootio/common";
+import { DragAddComponentPong, DragCursor, ComponentAnchor, Metadata, PostMessageType, PropMetadataType, DragAddComponentPing } from "@grootio/common";
 import { controlMode } from "./config";
 
 let _viewEleMap: Map<number, HTMLElement>;
@@ -128,17 +128,17 @@ export function respondDragOver(positionX: number, positionY: number) {
   }
 
   if (!slotEle) {
-    window.parent.postMessage({ type: PostMessageType.InnerUpdateDragAnchor }, '*');
+    window.parent.postMessage({ type: PostMessageType.InnerDragRefreshCursor }, '*');
     return;
   }
 
   if (activeSlotEle.dataset.grootAllowHighlight) {
     activeSlotEle.highlight();
-    window.parent.postMessage({ type: PostMessageType.InnerUpdateDragAnchor }, '*');
+    window.parent.postMessage({ type: PostMessageType.InnerDragRefreshCursor }, '*');
   } else {
     const markerInfo = calcDragRect(positionX, positionY, slotEle);
     delete markerInfo.hitEle;
-    window.parent.postMessage({ type: PostMessageType.InnerUpdateDragAnchor, data: markerInfo }, '*');
+    window.parent.postMessage({ type: PostMessageType.InnerDragRefreshCursor, data: markerInfo }, '*');
   }
 }
 
@@ -148,12 +148,12 @@ export function respondDragEnter() {
 
 export function respondDragLeave() {
   activeSlotEle?.cancelHighlight();
-  window.parent.postMessage({ type: PostMessageType.InnerUpdateDragAnchor }, '*');
+  window.parent.postMessage({ type: PostMessageType.InnerDragRefreshCursor }, '*');
   activeSlotEle = null;
   draging = false;
 }
 
-export function respondDragDrop(positionX: number, positionY: number, componentId: number, componentVersionId: number) {
+export function respondDragDrop({ positionX, positionY, componentId, componentVersionId, solutionComponentId }: DragAddComponentPing) {
   if (!activeSlotEle) {
     return;
   }
@@ -175,8 +175,9 @@ export function respondDragDrop(positionX: number, positionY: number, componentI
         propItemId,
         abstractValueIdChain,
         solutionInstanceId,
-        componentVersionId
-      } as DragAddComponentEventData
+        componentVersionId,
+        solutionComponentId
+      } as DragAddComponentPong
     }, '*');
   } else {
     const markerInfo = calcDragRect(positionX, positionY, activeSlotEle);
@@ -193,8 +194,9 @@ export function respondDragDrop(positionX: number, positionY: number, componentI
         currentInstanceId,
         solutionInstanceId,
         componentVersionId,
+        solutionComponentId,
         direction: { top: 'pre', bottom: 'next' }[markerInfo.direction]
-      } as DragAddComponentEventData
+      } as DragAddComponentPong
     }, '*');
   }
   respondDragLeave();
@@ -281,7 +283,7 @@ function detectWrapperEle(positionX: number, positionY: number, datasetKey: stri
   return null;
 }
 
-function calcDragRect(positionX: number, positionY: number, slotEle: HTMLElement): ComponentDragAnchor {
+function calcDragRect(positionX: number, positionY: number, slotEle: HTMLElement): DragCursor {
   let hitEle = detectWrapperEle(positionX, positionY, 'grootSlotItem', slotEle);
   if (!hitEle) {
     const children = slotEle.querySelectorAll('[data-groot-slot-item]');

@@ -84,14 +84,14 @@ function onMessage(event: any) {
   }
 
 
-  else if (messageType === PostMessageType.OuterDragComponentOver) {
+  else if (messageType === PostMessageType.OuterDragAddComponentOver) {
     respondDragOver(event.data.data.positionX, event.data.data.positionY);
-  } else if (messageType === PostMessageType.OuterDragComponentEnter) {
+  } else if (messageType === PostMessageType.OuterDragAddComponentEnter) {
     respondDragEnter();
-  } else if (messageType === PostMessageType.OuterDragComponentLeave) {
+  } else if (messageType === PostMessageType.OuterDragAddComponentLeave) {
     respondDragLeave();
-  } else if (messageType === PostMessageType.OuterDragComponentDrop) {
-    respondDragDrop(event.data.data.positionX, event.data.data.positionY, event.data.data.componentId, event.data.data.componentVersionId);
+  } else if (messageType === PostMessageType.OuterDragAddComponentDrop) {
+    respondDragDrop(event.data.data);
   } else if (messageType === PostMessageType.OuterOutlineReset) {
     resetWatch(event.data.data)
   } else if (messageType === PostMessageType.OuterComponentSelect) {

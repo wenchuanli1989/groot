@@ -1,8 +1,8 @@
 import { List } from "antd";
-import { PostMessageType, PropMetadataComponent } from "@grootio/common";
+import { PostMessageType, PropMetadataData } from "@grootio/common";
 import { grootManager } from "context";
 
-const ComponentChildren: React.FC<{ value?: PropMetadataComponent }> = ({ value }) => {
+const ComponentChildren: React.FC<{ value?: PropMetadataData }> = ({ value }) => {
 
   return <List size="small" bordered dataSource={value?.list || []}
     renderItem={item => (
