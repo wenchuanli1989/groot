@@ -17,6 +17,8 @@ export class ComponentInstanceService {
   async add(rawInstance: Partial<ComponentInstance>, parentEm?: EntityManager) {
     let em = parentEm || RequestContext.getEntityManager();
 
+    LogicException.assertParamEmpty(rawInstance.solutionComponentId, 'solutionComponentId')
+    LogicException.assertParamEmpty(rawInstance.solutionInstanceId, 'solutionInstanceId')
     const solutionInstance = await em.findOne(SolutionInstance, rawInstance.solutionInstanceId, { populate: ['release', 'app', 'project', 'view'] })
     LogicException.assertNotFound(solutionInstance, 'SolutionInstance', rawInstance.solutionInstanceId);
 

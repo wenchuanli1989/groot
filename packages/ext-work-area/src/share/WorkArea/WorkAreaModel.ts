@@ -1,4 +1,4 @@
-import { BaseModel, IframeDebuggerConfig, iframeNamePrefix, Metadata, PostMessageType, PropTask, Resource, ResourceConfig, ResourceTask, ViewData, ViewDataCore } from "@grootio/common";
+import { BaseModel, IframeDebuggerConfig, iframeNamePrefix, PostMessageType, ViewDataCore } from "@grootio/common";
 
 import { commandBridge, getContext, grootManager } from "context";
 
@@ -40,7 +40,7 @@ export default class WorkAreaModel extends BaseModel {
       PostMessageType.InnerApplicationReady,
       PostMessageType.InnerFetchView,
       PostMessageType.InnerDragHitSlot,
-      PostMessageType.InnerUpdateDragAnchor,
+      PostMessageType.InnerDragRefreshCursor,
       PostMessageType.InnerOutlineHover,
       PostMessageType.InnerOutlineSelect,
       PostMessageType.InnerOutlineUpdate
@@ -63,7 +63,6 @@ export default class WorkAreaModel extends BaseModel {
     }
 
     const { registerHook, callHook } = grootManager.hook
-    const { executeCommand } = grootManager.command
 
     registerHook(PostMessageType.InnerReady, () => {
       this.iframeReady = true;
@@ -75,11 +74,6 @@ export default class WorkAreaModel extends BaseModel {
       guard();
       const messageData = config || this.iframeDebuggerConfig
       this.iframeEle.contentWindow.postMessage({ type: PostMessageType.OuterSetConfig, data: messageData }, '*');
-    })
-
-    registerHook(PostMessageType.OuterSetApplication, (data) => {
-      guard();
-      this.iframeEle.contentWindow.postMessage({ type: PostMessageType.OuterSetApplication, data }, '*');
     })
 
     registerHook(PostMessageType.InnerFetchView, (viewKey: string) => {
@@ -135,60 +129,28 @@ export default class WorkAreaModel extends BaseModel {
       }
     })
 
-    registerHook(PostMessageType.OuterRefreshView, (path) => {
-      guard()
-      this.iframeEle.contentWindow.postMessage({
-        type: PostMessageType.OuterRefreshView,
-        data: path
-      }, '*');
-    })
+    this.registerHooks([
+      PostMessageType.OuterSetView,
+      PostMessageType.OuterComponentSelect,
+      PostMessageType.OuterDragAddComponentDrop,
+      PostMessageType.OuterDragAddComponentLeave,
+      PostMessageType.OuterDragAddComponentOver,
+      PostMessageType.OuterDragAddComponentEnter,
+      PostMessageType.OuterRefreshView,
+      PostMessageType.OuterSetApplication
+    ], guard)
+  }
 
-    registerHook(PostMessageType.OuterDragComponentEnter, () => {
-      guard()
-      this.iframeEle.contentWindow.postMessage({
-        type: PostMessageType.OuterDragComponentEnter,
-      }, '*');
-    })
-
-    registerHook(PostMessageType.OuterDragComponentOver, (data) => {
-      guard()
-      this.iframeEle.contentWindow.postMessage({
-        type: PostMessageType.OuterDragComponentOver,
-        data
-      }, '*');
-    })
-
-    registerHook(PostMessageType.OuterDragComponentLeave, () => {
-      guard()
-      this.iframeEle.contentWindow.postMessage({
-        type: PostMessageType.OuterDragComponentLeave,
-      }, '*');
-    })
-
-    registerHook(PostMessageType.OuterDragComponentDrop, (data) => {
-      guard()
-      this.iframeEle.contentWindow.postMessage({
-        type: PostMessageType.OuterDragComponentDrop,
-        data
-      }, '*');
-    })
-
-    registerHook(PostMessageType.OuterComponentSelect, (data) => {
-      guard()
-      this.iframeEle.contentWindow.postMessage({
-        type: PostMessageType.OuterComponentSelect,
-        data
-      }, '*');
-    })
-
-    registerHook(PostMessageType.OuterSetView, (data) => {
-      guard()
-      this.iframeEle.contentWindow.postMessage({
-        type: PostMessageType.OuterSetView,
-        data
-      }, '*');
-    })
-
+  private registerHooks(hookNameList: any[], guard: Function) {
+    for (const hookName of hookNameList) {
+      grootManager.hook.registerHook(hookName, (data) => {
+        guard()
+        this.iframeEle.contentWindow.postMessage({
+          type: hookName,
+          data
+        }, '*');
+      })
+    }
   }
 
   private refresh = (viewKey: string, data: ViewDataCore, callback?: Function) => {
