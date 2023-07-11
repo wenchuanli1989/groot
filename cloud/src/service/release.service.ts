@@ -1,6 +1,6 @@
 import { RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { PropMetadataComponent, pick, PropValueType, ValueStruct, ExtensionRelationType } from '@grootio/common';
+import { PropMetadataData, pick, PropValueType, ValueStruct, ExtensionRelationType } from '@grootio/common';
 
 import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
 import { Release } from 'entities/Release';
@@ -40,8 +40,9 @@ export class ReleaseService {
 
     const originSolutionInstanceList = await em.find(SolutionInstance, { release: imageRelease })
     const originViewList = await em.find(View, { release: imageRelease })
-    const originAppExtInstanceList = await em.find(ExtensionInstance, { relationId: rawRelease.imageReleaseId, relationType: ExtensionRelationType.View })
+    const originAppExtInstanceList = await em.find(ExtensionInstance, { relationId: rawRelease.imageReleaseId, relationType: ExtensionRelationType.Application })
     const originAppResourceList = await em.find(AppResource, { release: imageRelease })
+    const originCoreExtInstance = await em.findOne(ExtensionInstance, { relationId: imageRelease.id, relationType: ExtensionRelationType.Application, secret: true });
 
     const originInstanceList = await em.find(ComponentInstance, { release: imageRelease });
     for (let originInstance of originInstanceList) {
@@ -74,6 +75,11 @@ export class ReleaseService {
           relationId: newRelease.id
         }))
       }
+
+      em.create(ExtensionInstance, pick(originCoreExtInstance, ['extensionVersion', 'config', 'relationType', 'extension', 'secret', 'open'], {
+        relationId: newRelease.id,
+        secret: true
+      }))
 
       // 创建应用级别资源
       for (const originAppResource of originAppResourceList) {
@@ -133,7 +139,7 @@ export class ReleaseService {
       for (const originInstance of originInstanceList) {
         const instance = em.create(ComponentInstance, {
           ...pick(originInstance, ['component', 'componentVersion', 'trackId', 'parent', 'parserType', 'solutionComponent', 'solution']),
-          solutionInstance: solutionInstanceMap.get(originInstance.id),
+          solutionInstance: solutionInstanceMap.get(originInstance.solutionInstance.id),
           release: newRelease,
           app,
           project,
@@ -170,26 +176,27 @@ export class ReleaseService {
       }
       await em.flush();
 
-      // 更新组件值的abstractValueIdChain
-      newValueList.forEach((newPropValue) => {
-        const abstractValueIdChain = (newPropValue.abstractValueIdChain || '').split(',').filter(id => !!id).map(valueId => {
-          const oldPropValue = valueMap.get(+valueId);
-          if (!oldPropValue) {
-            throw new LogicException(`找不到对应的propValue，id: ${valueId}`, LogicExceptionCode.UnExpect);
+      // 更新属性值
+      for (const newPropValue of newValueList) {
+        const abstractValueIdChain = (newPropValue.abstractValueIdChain || '').split(',').filter(id => !!id).map(originValueId => {
+          const propValue = valueMap.get(+originValueId);
+          if (!propValue) {
+            throw new LogicException(`找不到对应的propValue，id: ${originValueId}`, LogicExceptionCode.UnExpect);
           }
-          return oldPropValue.id;
+          return propValue.id;
         }).join(',');
 
+        newPropValue.abstractValueIdChain = abstractValueIdChain;
+
         if (newPropValue.valueStruct === ValueStruct.ChildComponentList) {
-          const componentValue = JSON.parse(newPropValue.value) as PropMetadataComponent;
+          const componentValue = JSON.parse(newPropValue.value) as PropMetadataData;
           componentValue.list.forEach(data => {
             data.instanceId = instanceMap.get(data.instanceId).id;
           });
           newPropValue.value = JSON.stringify(componentValue);
         }
 
-        newPropValue.abstractValueIdChain = abstractValueIdChain;
-      });
+      }
       await em.flush();
 
       await em.commit();
