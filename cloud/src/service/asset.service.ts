@@ -147,7 +147,11 @@ export class AssetService {
         relationType: ExtensionRelationType.View,
         secret: false
       }, { populate: ['extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw', 'extension'] })
-      installPipelineModule({ list: viewExtensionInstanceList, level: ExtensionLevel.View, extHandler })
+      installPipelineModule({
+        list: viewExtensionInstanceList,
+        level: ExtensionLevel.View,
+        extHandler, viewId: view.id
+      })
       const viewResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.View, view.id)
       const viewPropItemExtScriptModuleList = extHandler.getPipeline('propItem', ExtensionLevel.View, view.id)
 
@@ -211,15 +215,21 @@ export class AssetService {
       viewToViewDataMap.set(view, viewData);
 
       // 卸载解决方案级别插件
-      for (const [solutionId, map] of extHandler.solutionExt.get(view.id)) {
-        for (const { instance } of map.values()) {
-          extHandler.uninstall({ extInstanceId: instance.id, level: ExtensionLevel.Solution, solutionId, viewId: view.id })
+      const solutionExt = extHandler.solutionExt.get(view.id)
+      if (solutionExt) {
+        for (const [solutionId, map] of solutionExt) {
+          for (const { instance } of map.values()) {
+            extHandler.uninstall({ extInstanceId: instance.id, level: ExtensionLevel.Solution, solutionId, viewId: view.id })
+          }
         }
       }
 
       // 卸载实例级别插件
-      for (const { instance } of extHandler.viewExt.get(view.id).values()) {
-        extHandler.uninstall({ extInstanceId: instance.id, level: ExtensionLevel.View, viewId: view.id })
+      const viewExt = extHandler.viewExt.get(view.id)
+      if (viewExt) {
+        for (const { instance } of viewExt.values()) {
+          extHandler.uninstall({ extInstanceId: instance.id, level: ExtensionLevel.View, viewId: view.id })
+        }
       }
 
     }
@@ -404,7 +414,8 @@ export class AssetService {
       viewId: instance.view.id,
       parentMetadataId: instance.parentId,
       solutionInstanceId: instance.solutionInstance.id,
-      componentVersionId: instance.componentVersion.id
+      componentVersionId: instance.componentVersion.id,
+      solutionComponentId: instance.solutionComponent.id
     }, (params) => {
       pipelineExec<PropItemPipelineParams>(
         {
