@@ -1,4 +1,4 @@
-import { PropMetadataComponent, PropBlockLayout, PropBlockStructType, PropValueType, PropItemViewType, PropItemStruct } from "@grootio/common";
+import { PropMetadataData, PropBlockLayout, PropBlockStructType, PropValueType, PropItemViewType, PropItemStruct, ValueStruct } from "@grootio/common";
 import { EntityManager } from "@mikro-orm/core";
 
 import { PropValue } from "../entities/PropValue";
@@ -281,7 +281,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
       componentName: avatarComponent.name,
       order: 1000
     }]
-  } as PropMetadataComponent;
+  } as PropMetadataData;
 
   const profileItem4Value = em.create(PropValue, {
     propItem: profileItem4,
@@ -290,6 +290,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     componentInstance: profileComponentInstance,
     type: PropValueType.Instance,
     value: JSON.stringify(avatarValue),
+    valueStruct: ValueStruct.ChildComponentList,
     app,
     project,
     solution
