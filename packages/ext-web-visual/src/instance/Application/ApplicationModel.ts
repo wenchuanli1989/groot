@@ -21,8 +21,18 @@ export default class ApplicationModel extends BaseModel {
       this.releaseList = data;
     })
 
-    const viewList = grootManager.state.getState('gs.viewList')
-    viewList.forEach(item => {
+    grootManager.state.watchState('gs.viewList', (newValue) => {
+      this.syncViewList(newValue)
+    })
+
+    this.syncViewList(grootManager.state.getState('gs.viewList'))
+  }
+
+  private syncViewList(newList) {
+    this.primaryViewList = []
+    this.noPrimaryViewList = []
+
+    newList.forEach(item => {
       if (item.primaryView) {
         this.primaryViewList.push(item)
       } else {
@@ -35,18 +45,9 @@ export default class ApplicationModel extends BaseModel {
     this.instanceAddModalStatus = ModalStatus.Submit;
     view.releaseId = grootManager.state.getState('gs.release').id
     return getContext().request(APIPath.view_add, view).then(({ data }) => {
-      if (view.primaryView) {
-        this.primaryViewList.push(data)
-      } else {
-        this.noPrimaryViewList.push(data)
-      }
+      grootManager.state.getState('gs.viewList').push(data)
 
-      const { executeCommand } = grootManager.command
-      executeCommand('gc.loadView', data.id).then((viewParams) => {
-        const view = grootManager.state.getState('gs.viewList').find(item => item.id === data.id)
-        executeCommand('gc.stageRefresh', view.key, viewParams)
-        executeCommand('gc.switchIstance', data.id, data.id)
-      })
+      grootManager.command.executeCommand('gc.openView', data.id)
     }).finally(() => {
       this.instanceAddModalStatus = ModalStatus.None;
     })
@@ -56,7 +57,7 @@ export default class ApplicationModel extends BaseModel {
   public addRelease(rawRelease: Release) {
     this.releaseAddModalStatus = ModalStatus.Submit;
     return getContext().request(APIPath.release_add, rawRelease).then(({ data }) => {
-      this.releaseList.push(data);
+      // this.releaseList.push(data);
       return this.switchRelease(data.id);
     }).finally(() => {
       this.releaseAddModalStatus = ModalStatus.None;
@@ -65,8 +66,8 @@ export default class ApplicationModel extends BaseModel {
 
 
   public switchRelease(releaseId: number) {
-    const release = this.releaseList.find(item => item.id === releaseId)
-    grootManager.state.setState('gs.release', release)
+    // const release = this.releaseList.find(item => item.id === releaseId)
+    // grootManager.state.setState('gs.release', release)
     grootManager.command.executeCommand('gc.navRelease', releaseId)
   }
 
