@@ -141,10 +141,14 @@ export type GrootCommandDict = {
   'gc.stageRefresh': [[string, ViewDataCore, Function] | [string, ViewDataCore], void],
   'gc.unloadView': [[number], void],
   'gc.navRelease': [[number] | [number, number], void],
+  'gc.selectInstance': [[number], void],
 
   'gc.openComponent': [[number], Promise<void>],
   'gc.loadComponent': [[number], Promise<ViewDataCore>],
-  'gc.navSolution': [[number] | [number, number], void]
+  'gc.navSolution': [[number] | [number, number], void],
+
+  'gc.removeChildInstance': [[number, number, string | null], Promise<void>],
+  'gc.addChildInstance': [[DragAddComponentPong], Promise<void>]
 }
 
 export type GrootStateDict = {
@@ -202,7 +206,7 @@ export type GrootHookDict = {
   'gh.sidebar.dragEnd': [[], void],
   'gh.component.dragStart': [[], void],
   'gh.component.dragEnd': [[], void],
-  'gh.component.removeChild': [[number, number, string | null], void],
+
 
   [PostMessageType.InnerReady]: [[], void],
   [PostMessageType.OuterSetConfig]: [[IframeDebuggerConfig] | [], void],

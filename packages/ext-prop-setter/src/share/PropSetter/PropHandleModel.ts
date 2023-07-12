@@ -1,5 +1,5 @@
 import { ComponentInstance, PropMetadataDataItem, PropMetadataData, DragAddComponentPong, PostMessageType, PropBlock, PropGroup, PropItem, PropValueType, ValueStruct, wrapperState, BaseModel, PropItemStruct, viewRender, FormItemRender } from "@grootio/common";
-import { grootManager } from "context";
+import { commandBridge, grootManager } from "context";
 import React from "react";
 
 import PropPersistModel from "./PropPersistModel";
@@ -256,12 +256,12 @@ export default class PropHandleModel extends BaseModel {
   private init() {
 
     grootManager.hook.registerHook(PostMessageType.InnerDragHitSlot, (detail) => {
-      this.addChildComponent(detail);
+      this.addChildInstance(detail);
     })
 
-    grootManager.hook.registerHook('gh.component.removeChild', (instanceId, itemId, abstractValueIdChain) => {
-      this.removeChild(instanceId, itemId, abstractValueIdChain)
-    })
+
+    commandBridge.removeChildInstance = this.removeChildInstance
+    commandBridge.addChildInstance = this.addChildInstance
 
 
     const formItemRenderList = grootManager.state.getState('gs.propItem.formRenderList')
@@ -272,14 +272,14 @@ export default class PropHandleModel extends BaseModel {
   }
 
 
-  private addChildComponent(data: DragAddComponentPong) {
+  private addChildInstance(data: DragAddComponentPong) {
     const rawInstance = {
       parentId: data.parentInstanceId,
       solutionInstanceId: data.solutionInstanceId,
       solutionComponentId: data.solutionComponentId
     } as ComponentInstance;
 
-    this.propPersist.addChildComponentInstance(rawInstance).then((instanceData) => {
+    return this.propPersist.addChildComponentInstance(rawInstance).then((instanceData) => {
       grootManager.state.getState('gs.view').children.push(instanceData)
 
       const propItem = this.getItemById(data.propItemId, data.parentInstanceId);
@@ -332,19 +332,22 @@ export default class PropHandleModel extends BaseModel {
     })
   }
 
-  public removeChild(instanceId: number, itemId: number, abstractValueIdChain?: string) {
-    this.propPersist.removeChildInstance(instanceId, itemId, abstractValueIdChain).then(() => {
+  public removeChildInstance(instanceId: number, itemId: number, abstractValueIdChain?: string) {
+    return this.propPersist.removeChildInstance(instanceId, itemId, abstractValueIdChain).then(() => {
       const { children } = grootManager.state.getState('gs.view');
-      const componentInstance = grootManager.state.getState('gs.activeComponentInstance');
 
       const instanceIndex = children.findIndex(i => i.id === instanceId);
       const instance = children[instanceIndex];
       children.splice(instanceIndex, 1);
 
-      if (componentInstance.id === instanceId) {
-        grootManager.hook.callHook(PostMessageType.OuterComponentSelect, instance.parentId)
-      }
       grootManager.command.executeCommand('gc.pushMetadata');
+
+      setTimeout(() => {// 等待内嵌iframe页面视图更新完成
+        const componentInstance = grootManager.state.getState('gs.activeComponentInstance');
+        if (componentInstance.id === instanceId) {
+          grootManager.command.executeCommand('gc.selectInstance', instance.parentId)
+        }
+      }, 100)
 
       // this.forceUpdateFormKey++;
     })

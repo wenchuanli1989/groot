@@ -117,17 +117,11 @@ const ViewportOutlineMarker: React.FC = () => {
 
   function toolbarAction(type: 'hover' | 'selected', action: 'select-parent' | 'remove') {
     const ctx = type === 'hover' ? hoverCacheRef.current : selectedCacheRef.current;
+    const { executeCommand } = grootManager.command
     if (action === 'select-parent') {
-      const { root } = grootManager.state.getState('gs.view')
-      if (ctx.parentInstanceId === root.id) {
-        // 根组件不需要选择效果，直接切换，并清空标记
-        executeCommand('gc.switchIstance', root.id)
-        callHook(PostMessageType.OuterOutlineReset)
-      } else {
-        callHook(PostMessageType.OuterComponentSelect, ctx.parentInstanceId)
-      }
+      executeCommand('gc.selectInstance', ctx.parentInstanceId)
     } else if (action === 'remove') {
-      callHook('gh.component.removeChild', ctx.instanceId, ctx.propItemId, ctx.abstractValueIdChain)
+      executeCommand('gc.removeChildInstance', ctx.instanceId, ctx.propItemId, ctx.abstractValueIdChain)
     }
   }
 

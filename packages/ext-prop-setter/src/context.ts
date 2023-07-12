@@ -1,4 +1,4 @@
-import { ExtensionContext, PropItem, StudioMode } from "@grootio/common"
+import { DragAddComponentPong, ExtensionContext, PropItem, StudioMode } from "@grootio/common"
 
 let _context: ExtensionContext;
 
@@ -28,5 +28,11 @@ export const isPrototypeMode = () => {
 }
 
 export const commandBridge = {
+  removeChildInstance: (instanceId: number, itemId: number, abstractValueIdChain?: string): Promise<void> => {
+    throw new Error('方法未实现')
+  },
 
+  addChildInstance: (data: DragAddComponentPong): Promise<void> => {
+    throw new Error('方法未实现')
+  }
 }

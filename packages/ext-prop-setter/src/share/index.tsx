@@ -1,4 +1,4 @@
-import { getContext, grootManager, isPrototypeMode } from "context";
+import { commandBridge, getContext, grootManager, isPrototypeMode } from "context";
 import { PropSetter } from "./PropSetter";
 import FormRender from './FormRender'
 import { ViewsContainer } from "@grootio/common";
@@ -7,6 +7,7 @@ import { ViewsContainer } from "@grootio/common";
 export const shareBootstrap = () => {
   const { groot } = getContext();
   const { registerState, getState } = grootManager.state
+  const { registerCommand } = grootManager.command
 
   const propSetterViewContainer = {
     id: 'propSetter',
@@ -43,7 +44,13 @@ export const shareBootstrap = () => {
     ['function', { label: '函数' }],
   ]), false);
 
+  registerCommand('gc.removeChildInstance', (_, instanceId: number, itemId: number, abstractValueIdChain?: string) => {
+    return commandBridge.removeChildInstance(instanceId, itemId, abstractValueIdChain)
+  })
 
+  registerCommand('gc.addChildInstance', (_, data) => {
+    return commandBridge.addChildInstance(data)
+  })
 }
 
 
