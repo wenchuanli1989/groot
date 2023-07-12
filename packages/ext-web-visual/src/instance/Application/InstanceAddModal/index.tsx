@@ -58,7 +58,7 @@ const InstanceAddModal: React.FC = () => {
         }}
       </Form.Item>
 
-      <Form.Item label="主入口" name="primaryView">
+      <Form.Item label="主入口" name="primaryView" valuePropName="checked">
         <Switch />
       </Form.Item>
 
