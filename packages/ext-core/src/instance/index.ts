@@ -48,6 +48,10 @@ export const instanceBootstrap = () => {
     switchComponentInstance(instanceId, viewId)
   })
 
+  registerCommand('gc.navRelease', (_, releaseId) => {
+    switchRelease(releaseId)
+  })
+
   getContext().groot.onReady(onReady)
 
 }
@@ -292,4 +296,10 @@ const switchComponentInstance = (instanceId: number, viewId?: number) => {
   grootManager.state.setState('gs.propTree', instance.propTree)
   grootManager.state.setState('gs.activePropGroupId', instance.propTree[0].id)
   grootManager.state.setState('gs.component', instance.component);
+}
+
+const switchRelease = (releaseId: number, viewId?: number) => {
+  if (!viewId) {
+    location.href = `/studio?releaseId=${releaseId}`
+  }
 }

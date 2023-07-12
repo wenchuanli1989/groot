@@ -140,6 +140,7 @@ export type GrootCommandDict = {
   'gc.pushResource': [[number] | [], void],
   'gc.stageRefresh': [[string, ViewDataCore, Function] | [string, ViewDataCore], void],
   'gc.unloadView': [[number], void],
+  'gc.navRelease': [[number] | [number, number], void],
 
   'gc.openComponent': [[number], Promise<void>],
   'gc.loadComponent': [[number], Promise<ViewDataCore>],

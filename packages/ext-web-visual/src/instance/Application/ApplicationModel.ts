@@ -67,21 +67,7 @@ export default class ApplicationModel extends BaseModel {
   public switchRelease(releaseId: number) {
     const release = this.releaseList.find(item => item.id === releaseId)
     grootManager.state.setState('gs.release', release)
-
-    // if (trackId) {
-    //   getContext().request(APIPath.componentInstance_reverseDetectId, { releaseId, trackId }).then(({ data: releaseId }) => {
-    //     if (releaseId) {
-
-    //       // grootManager.command.executeCommand('gc.fetch.release', { releaseId })
-    //     } else {
-    //       const firstInstance = this.primaryViewList[0]
-    //       // grootManager.command.executeCommand('gc.fetch.release', { relatedEntryId: firstInstance.id })
-    //     }
-    //   })
-    // } else {
-    const firstInstance = this.noPrimaryViewList[0]
-    // grootManager.command.executeCommand('gc.fetch.release', { relatedEntryId: firstInstance.id })
-    // }
+    grootManager.command.executeCommand('gc.navRelease', releaseId)
   }
 
 
