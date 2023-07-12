@@ -15,12 +15,12 @@ export const instanceBootstrap = () => {
 
   registerState('gs.release', null, false)
   registerState('gs.app', null, false)
-  registerState('gs.viewList', null, true)
-  registerState('gs.globalResourceList', null, true)
-  registerState('gs.globalResourceConfigList', null, true)
+  registerState('gs.viewList', [], true)
+  registerState('gs.globalResourceList', [], true)
+  registerState('gs.globalResourceConfigList', [], true)
   registerState('gs.activeComponentInstance', null, false)
-  registerState('gs.localResourceList', null, true)
-  registerState('gs.localResourceConfigList', null, true)
+  registerState('gs.localResourceList', [], true)
+  registerState('gs.localResourceConfigList', [], true)
   registerState('gs.view', null, false)
 
 

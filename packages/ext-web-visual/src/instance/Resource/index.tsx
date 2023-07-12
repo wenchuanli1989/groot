@@ -47,7 +47,7 @@ const ResourceList = () => {
                 <Popover overlayClassName={styles.popoverOverlay} content={<ResourceForm />} trigger={['click']}
                   open={resourceModel.formVisible && resourceModel.isLocalResource === (data.key === 'page') && resourceModel.currResource?.id === item.id} placement="rightTop">
                   <Typography.Link className={styles.itemAction} hidden={item.readonly} disabled={resourceModel.formVisible} onClick={() => {
-                    resourceModel.showForm(!(item as any).appId, item)
+                    resourceModel.showForm(!!(item as any).viewId, item)
                   }} >
                     <EditOutlined />
                   </Typography.Link>

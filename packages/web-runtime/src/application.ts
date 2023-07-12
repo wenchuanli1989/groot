@@ -74,9 +74,15 @@ function onMessage(event: any) {
     window.location.reload();
   } else if (messageType === PostMessageType.OuterUpdateResource) {
     const { resourceList, resourceTaskList, resourceConfigList, viewKey } = event.data.data
-    buildResource(resourceList, viewKey, resourceTaskList, resourceConfigList)
+    buildResource(resourceList, viewKey || null, resourceTaskList, resourceConfigList)
     const activeView = activeViewMap.get(viewKey)
-    activeView.refresh()
+    if (activeView) {
+      activeView.refresh()
+    } else {
+      [...activeViewMap.values()].forEach((item) => {
+        item.refresh()
+      })
+    }
   } else if (messageType === PostMessageType.OuterSetView) {
     const { viewKey } = event.data.data
     const activeView = allViewMap.get(viewKey)

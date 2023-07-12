@@ -94,10 +94,13 @@ export default class WorkAreaModel extends BaseModel {
     })
 
     registerHook(PostMessageType.OuterUpdateResource, ({ resourceList, resourceTaskList, resourceConfigList, viewKey }) => {
+
       const viewData = this.viewDataMap.get(viewKey)
-      viewData.resourceList = resourceList
-      viewData.resourceTaskList = resourceTaskList
-      viewData.resourceConfigList = resourceConfigList
+      if (viewData) {
+        viewData.resourceList = resourceList
+        viewData.resourceTaskList = resourceTaskList
+        viewData.resourceConfigList = resourceConfigList
+      }
 
       if (this.iframeReady) {
         this.iframeEle.contentWindow.postMessage({

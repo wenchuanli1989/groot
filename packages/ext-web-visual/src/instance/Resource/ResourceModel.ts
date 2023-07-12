@@ -51,7 +51,11 @@ export default class ResourceModel extends BaseModel {
 
   updateResource(rawResource: Resource) {
     getContext().request(this.isLocalResource ? APIPath.resource_updateViewResource : APIPath.resource_updateAppResource, { id: this.currResource.id, ...rawResource } as any).then((res) => {
-      const list = this.isLocalResource ? grootManager.state.getState('gs.localResourceList') : grootManager.state.getState('gs.globalResourceList') as any[];
+      const localResourceList = grootManager.state.getState('gs.localResourceList')
+      const globalResourceList = grootManager.state.getState('gs.globalResourceList')
+
+      const list = this.isLocalResource ? localResourceList : globalResourceList;
+
       const originResource = list.find(item => item.id === this.currResource.id);
       Object.assign(originResource, pick(res.data, ['type', 'name', 'value']));
       const viewId = this.isLocalResource ? grootManager.state.getState('gs.view').id : undefined
