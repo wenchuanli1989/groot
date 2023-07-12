@@ -3,7 +3,7 @@ import { ViewsContainer } from "@grootio/common";
 import { getContext, grootManager } from "context";
 import { Application } from "./Application";
 import { Material } from "./Material";
-import ResourceList from "./Resource";
+import Resource from "./Resource";
 
 
 
@@ -71,7 +71,7 @@ export const instanceBootstrap = () => {
     const resourceView = {
       id: 'resource',
       name: '状态',
-      view: <ResourceList />,
+      view: <Resource />,
       parent: 'resource'
     }
 

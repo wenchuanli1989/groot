@@ -1,4 +1,4 @@
-import { ExtensionLevel, ExtensionStatus, Resource, ResourcePipelineParams, resourceAppendTask } from "@grootio/common"
+import { ExtensionLevel, Resource, ResourcePipelineParams, resourceAppendTask } from "@grootio/common"
 import { pipelineExec } from "@grootio/core"
 import { getContext } from "context"
 
