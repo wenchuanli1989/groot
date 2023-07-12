@@ -9,7 +9,7 @@ const SetPatchMethods = ['add', 'clear', 'delete']
 /**
  * 检测对象属性变化
  */
-export function wrapperState(target: any, listener: Function, originWatch = true) {
+export function wrapperState(originTarget: any, listener: Function, originWatch = true) {
   let terminate = false;
 
   const cancel = () => {
@@ -17,18 +17,18 @@ export function wrapperState(target: any, listener: Function, originWatch = true
   }
 
   // 避免不必要包装
-  if (isBaseType(target) || typeof target === 'function' || target.$$typeof) {
-    return [target, cancel];
+  if (isBaseType(originTarget) || typeof originTarget === 'function' || originTarget.$$typeof) {
+    return [originTarget, cancel];
   }
 
   // 防止递归时重复多余的包装
-  if (target.__groot_origin_listener === listener) {
-    return [target, cancel];
+  if (originTarget.__groot_origin_listener === listener) {
+    return [originTarget, cancel];
   }
 
   // 用于基准性能测试
   ++wrapCount
-  const proxyObj = new Proxy(target, {
+  const proxyObj = new Proxy(originTarget, {
     get(target, key, receiver) {
       return getHandler(target, key, receiver, terminate, listener, originWatch)
     },
@@ -104,8 +104,16 @@ const getHandler = (target, key, receiver, terminate, listener, originWatch) => 
         }
       }
 
-      // 在原始对象上执行方法，避免报错
-      return value.bind(getOrigin(target));
+      if (targetType === 'Array') {
+        const newTarget = getOrigin(target).map(item => {
+          return wrapperState(item, listener, false)[0]
+        })
+        return value.bind(newTarget);
+      } else {
+        // todo 有可能无法更新的问题
+        // 在原始对象上执行方法，避免报错
+        return value.bind(getOrigin(target));
+      }
     }
 
     // 确保方法执行时this上下文是代理对象
