@@ -101,6 +101,7 @@ export class ResourceService {
       release,
       resourceConfig,
       imageResource,
+      project: release.project
     });
 
     await em.flush();
