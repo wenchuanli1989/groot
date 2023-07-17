@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="mZ8nMjX21OkiOQxCXhl-" name="第 1 页">
-        <mxGraphModel dx="772" dy="394" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+        <mxGraphModel dx="681" dy="488" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -110,11 +110,46 @@
                 <mxCell id="55" value="Deploy2" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="900" y="320" width="120" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="59" value="DeployMannifest1" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="59" value="DeployManifest1" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="380" y="400" width="120" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="61" value="DeployMannifest2" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="61" value="DeployManifest2" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="900" y="400" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="78" style="edgeStyle=none;html=1;" edge="1" parent="1" source="71">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="800.0000000000002" y="520" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="79" style="edgeStyle=none;html=1;" edge="1" parent="1" source="71">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="800.0000000000002" y="636.25" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="80" style="edgeStyle=none;html=1;" edge="1" parent="1" source="71">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="800.0000000000002" y="760" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="71" value="DeployManifest" style="verticalLabelPosition=bottom;sketch=0;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.cache_server;" vertex="1" parent="1">
+                    <mxGeometry x="576" y="587.5" width="71" height="97.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="72" value="bundleAsset" style="verticalLabelPosition=bottom;sketch=0;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.browser;" vertex="1" parent="1">
+                    <mxGeometry x="816" y="480" width="47.5" height="72.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="74" value="bundleAsset" style="verticalLabelPosition=bottom;sketch=0;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.browser;" vertex="1" parent="1">
+                    <mxGeometry x="816" y="600" width="47.5" height="72.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="75" value="bundleAsset" style="verticalLabelPosition=bottom;sketch=0;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.browser;" vertex="1" parent="1">
+                    <mxGeometry x="816" y="720" width="47.5" height="72.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="77" style="edgeStyle=none;html=1;" edge="1" parent="1" source="76">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="570" y="641.75" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="76" value="&lt;span style=&quot;font-family: system-ui, &amp;quot;PingFang SC&amp;quot;, STHeiti, sans-serif; font-size: 14px; text-align: start; background-color: rgb(255, 255, 255);&quot;&gt;browser&lt;/span&gt;" style="verticalLabelPosition=bottom;sketch=0;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.laptop_2;" vertex="1" parent="1">
+                    <mxGeometry x="306" y="598.5" width="116" height="86.5" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
