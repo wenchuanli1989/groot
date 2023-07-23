@@ -1,6 +1,6 @@
 import { RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { LogicException } from 'config/logic.exception';
+import { LogicException } from 'config/Logic.exception';
 import { Organization } from 'entities/Organization';
 
 

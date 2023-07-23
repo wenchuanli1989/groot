@@ -1,7 +1,7 @@
 import { PropItemStruct } from '@grootio/common';
 import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { LogicException, LogicExceptionCode } from 'config/logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
 import { PropBlock } from 'entities/PropBlock';
 import { PropGroup } from 'entities/PropGroup';
 import { PropItem } from 'entities/PropItem';
