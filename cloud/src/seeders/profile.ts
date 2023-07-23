@@ -15,6 +15,7 @@ import { SolutionComponent } from "../entities/SolutionComponent";
 import { View } from "../entities/View";
 import { Project } from "../entities/Project";
 import { Application } from "../entities/Application";
+import { ViewVersion } from "../entities/ViewVersion";
 
 export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project, app: Application) => {
   // 创建组件
@@ -93,17 +94,24 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     key: '/layout/groot/profile',
     app,
     project,
-    release
   })
   await em.persistAndFlush(profileView);
+
+  const profileViewVersion = em.create(ViewVersion, {
+    name: 'v0.0.1',
+    view: profileView,
+    app,
+    project,
+  })
+  await em.persistAndFlush(profileViewVersion);
 
   // 创建入口解决方案实例
   const solutionInstance = em.create(SolutionInstance, {
     solution: solution,
     solutionVersion: solution.recentVersion,
     view: profileView,
+    viewVersion: profileViewVersion,
     primary: true,
-    release,
     project,
     app
   })
@@ -227,9 +235,9 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   // 创建组件实例
   const profileComponentInstance = em.create(ComponentInstance, {
     view: profileView,
+    viewVersion: profileViewVersion,
     component: profileComponent,
     componentVersion: profileComponentVersion,
-    release,
     trackId: 0,
     app,
     project,
@@ -250,9 +258,9 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   // 创建组件实例
   const avatarComponentInstance = em.create(ComponentInstance, {
     view: profileView,
+    viewVersion: profileViewVersion,
     component: avatarComponent,
     componentVersion: avatarComponentVersion,
-    release,
     trackId: 0,
     app,
     project,

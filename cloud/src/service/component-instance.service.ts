@@ -19,16 +19,16 @@ export class ComponentInstanceService {
 
     LogicException.assertParamEmpty(rawInstance.solutionComponentId, 'solutionComponentId')
     LogicException.assertParamEmpty(rawInstance.solutionInstanceId, 'solutionInstanceId')
-    const solutionInstance = await em.findOne(SolutionInstance, rawInstance.solutionInstanceId, { populate: ['release', 'app', 'project', 'view'] })
+    const solutionInstance = await em.findOne(SolutionInstance, rawInstance.solutionInstanceId)
     LogicException.assertNotFound(solutionInstance, 'SolutionInstance', rawInstance.solutionInstanceId);
 
     const solutionComponent = await em.findOne(SolutionComponent, {
-      solutionVersion: solutionInstance.solutionVersion.id, id: rawInstance.solutionComponentId
-    }, { populate: ['componentVersion.component', 'solution'] })
+      solutionVersion: solutionInstance.solutionVersion, id: rawInstance.solutionComponentId
+    }, { populate: ['componentVersion.component'] })
     LogicException.assertNotFound(solutionComponent, 'SolutionComponent', rawInstance.solutionComponentId);
 
     const { componentVersion, solution } = solutionComponent
-    const { app, project, view, release } = solutionInstance
+    const { app, project, view, viewVersion } = solutionInstance
 
     const valueMap = new Map<number, PropValue>();
     const newValueList = [];
@@ -41,10 +41,10 @@ export class ComponentInstanceService {
 
     const newInstance = em.create(ComponentInstance, {
       parent: rawInstance.parentId,
-      view: solutionInstance.view,
+      view,
+      viewVersion,
       component: componentVersion.component,
       componentVersion,
-      release,
       trackId: 0,
       solutionInstance,
       solutionComponent,
@@ -71,6 +71,7 @@ export class ComponentInstanceService {
           componentInstance: newInstance,
           type: PropValueType.Instance,
           view,
+          viewVersion,
           app,
           project
         });

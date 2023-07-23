@@ -15,6 +15,9 @@ import { ComponentInstanceService } from './component-instance.service';
 import { View } from 'entities/View';
 import { parseResource } from '../util/common';
 import { SolutionComponent } from 'entities/SolutionComponent';
+import { ViewVersion } from 'entities/ViewVersion';
+import { Application } from 'entities/Application';
+import { AppView } from 'entities/AppView';
 
 
 @Injectable()
@@ -37,13 +40,16 @@ export class ViewService {
     const view = await em.findOne(View, viewId)
     LogicException.assertNotFound(view, 'View', viewId);
 
+    const appView = await em.findOne(AppView, { view, release })
+    LogicException.assertNotFound(appView, 'AppView', `viewId: ${viewId} releaseId: ${releaseId}`);
+
     const viewExtensionInstanceList = await em.find(ExtensionInstance, {
-      relationId: viewId,
+      relationId: appView.viewVersion.id,
       relationType: ExtensionRelationType.View,
       secret: false
     }, { populate: ['extension', 'extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw',] })
 
-    const solutionInstanceList = await em.find(SolutionInstance, { view, release })
+    const solutionInstanceList = await em.find(SolutionInstance, { viewVersion: appView.viewVersion })
 
     for (const solutionInstance of solutionInstanceList) {
       solutionInstance.extensionInstanceList = await em.find(ExtensionInstance, {
@@ -53,7 +59,7 @@ export class ViewService {
       }, { populate: ['extension', 'extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw',] })
     }
 
-    const instanceList = await em.find(ComponentInstance, { view }, {
+    const instanceList = await em.find(ComponentInstance, { viewVersion: appView.viewVersion }, {
       populate: ['component', 'componentVersion'],
     });
 
@@ -66,7 +72,10 @@ export class ViewService {
       instance.valueList = await em.find(PropValue, { componentInstance: instance });
     }
 
-    let resourceList = await em.find(ViewResource, { view }, { populate: ['imageResource.resourceConfig', 'resourceConfig'] })
+    let resourceList = await em.find(ViewResource,
+      { viewVersion: appView.viewVersion },
+      { populate: ['imageResource.resourceConfig', 'resourceConfig'] }
+    )
 
     const resourceConfigMap = new Map()
     resourceList = resourceList.map(resource => {
@@ -82,35 +91,44 @@ export class ViewService {
 
     LogicException.assertParamEmpty(rawView.key, 'key');
     LogicException.assertParamEmpty(rawView.name, 'name');
-    LogicException.assertParamEmpty(rawView.releaseId, 'releaseId');
+    LogicException.assertParamEmpty(rawView.appId, 'appId');
     LogicException.assertParamEmpty(rawView.solutionComponentId, 'solutionComponentId');
 
-    const release = await em.findOne(Release, rawView.releaseId, { populate: ['app', 'project'] });
-    LogicException.assertNotFound(release, 'Release', rawView.releaseId);
+    const app = await em.findOne(Application, rawView.appId);
+    LogicException.assertNotFound(app, 'Application', rawView.appId);
 
     const solutionComponent = await em.findOne(SolutionComponent, rawView.solutionComponentId);
     LogicException.assertNotFound(solutionComponent, 'SolutionComponent', rawView.solutionComponentId);
 
-    const keySameCount = await em.count(View, { release, key: rawView.key })
+    const keySameCount = await em.count(View, { app, key: rawView.key })
 
     if (keySameCount > 0) {
       throw new LogicException(`参数key冲突，该值必须全局唯一`, LogicExceptionCode.NotUnique);
     }
 
-    const view = em.create(View, pick(rawView, ['key', 'name', 'primaryView'], { release, app: release.app, project: release.project }))
+    const view = em.create(View, pick(rawView, ['key', 'name'], { app, project: app.project }))
 
     await em.begin()
     try {
       await em.flush()
 
+      const viewVersion = em.create(ViewVersion, {
+        name: 'init',
+        view,
+        project: app.project,
+        app
+      })
+
+      await em.flush()
+
       const solutionInstance = em.create(SolutionInstance, {
         solutionVersion: solutionComponent.solutionVersion.id,
         view,
+        viewVersion,
         primary: true,
-        release,
         solution: solutionComponent.solution.id,
-        app: release.app,
-        project: release.project
+        app,
+        project: app.project
       })
 
       await em.flush()

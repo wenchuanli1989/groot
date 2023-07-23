@@ -24,11 +24,14 @@ export default class ResourceModel extends BaseModel {
     const releaseId = grootManager.state.getState('gs.release').id
 
     if (this.isLocalResource) {
-      const viewId = grootManager.state.getState('gs.view').id
-      const data = rawResource as ViewResource
-      data.releaseId = releaseId
-      data.viewId = viewId
-      getContext().request(APIPath.resource_addViewResource, data).then((res) => {
+      const viewVersionId = grootManager.state.getState('gs.view').viewVersionId
+      getContext().request(APIPath.resource_addViewResource, {
+        viewVersionId,
+        namespace: rawResource.namespace,
+        name: rawResource.name,
+        value: rawResource.value,
+        resourceConfigId: rawResource.resourceConfigId,
+      }).then((res) => {
         const localSttateList = grootManager.state.getState('gs.localResourceList');
         localSttateList.push(res.data as Resource);
         const viewId = grootManager.state.getState('gs.view').id

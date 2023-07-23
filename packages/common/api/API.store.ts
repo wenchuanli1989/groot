@@ -27,7 +27,7 @@ export type APIStore = {
     resourceList: Resource[],
     resourceConfigList: ResourceConfig[]
   }>];
-  [APIPath.view_add]: [View, API.Response<View>];
+  [APIPath.view_add]: [Pick<View, 'key' | 'name' | 'appId' | 'solutionComponentId'>, API.Response<View>];
   [APIPath.view_remove_viewId]: [{ viewId: number }]
   [APIPath.release_add]: [Release, API.Response<Release>],
   // [APIPath.componentInstance_reverseDetectId]: [Partial<ComponentInstance>, API.Response<number>],
@@ -67,13 +67,21 @@ export type APIStore = {
   [APIPath.block_remove_blockId]: [{ blockId: number }],
   [APIPath.item_remove_itemId]: [{ itemId: number }],
   [APIPath.block_listStructPrimaryItem_save]: [{ blockId: number, data: string }],
-  [APIPath.value_abstractType_add]: [PropValue, API.Response<PropValue>],
+  [APIPath.value_abstractType_add]: [
+    Pick<PropValue, 'type' | 'propItemId' | 'componentId' | 'componentVersionId' | 'solutionId'> |
+    Partial<Pick<PropValue, 'componentInstanceId' | 'viewId' | 'viewVersionId' | 'appId' | 'projectId'>>,
+    API.Response<PropValue>],
   [APIPath.value_abstractType_remove_propValueId]: [{ propValueId: number }],
-  [APIPath.value_update]: [PropValue, API.Response<PropValue>],
+  [APIPath.value_update]: [
+    Partial<Pick<PropValue, 'id' | 'value' | 'type' | 'propItemId' | 'componentId' | 'componentVersionId' | 'componentInstanceId' | 'viewId' | 'viewVersionId' | 'appId' | 'projectId' | 'solutionId' | 'abstractValueIdChain' | 'valueStruct'>>,
+    API.Response<PropValue>
+  ],
   [APIPath.componentInstance_remove_instanceId]: [{ instanceId: number }],
 
   [APIPath.resource_addAppResource]: [AppResource, API.Response<AppResource>],
-  [APIPath.resource_addViewResource]: [ViewResource, API.Response<ViewResource>],
+  [APIPath.resource_addViewResource]: [
+    Pick<ViewResource, 'viewVersionId' | 'namespace' | 'name' | 'value'> | Partial<Pick<ViewResource, 'resourceConfigId' | 'imageResourceId'>>,
+    API.Response<ViewResource>],
   [APIPath.resource_updateAppResource]: [AppResource, API.Response<AppResource>],
   [APIPath.resource_updateViewResource]: [ViewResource, API.Response<ViewResource>],
 

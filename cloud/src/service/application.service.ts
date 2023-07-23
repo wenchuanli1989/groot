@@ -3,10 +3,10 @@ import { RequestContext, wrap } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { LogicException } from 'config/Logic.exception';
 import { AppResource } from 'entities/AppResource';
+import { AppView } from 'entities/AppView';
 import { Application } from 'entities/Application';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
 import { Release } from 'entities/Release';
-import { View } from 'entities/View';
 import { parseResource } from 'util/common';
 
 
@@ -38,7 +38,11 @@ export class ApplicationService {
     })
     app.resourceConfigList = [...resourceConfigMap.values()]
 
-    app.viewList = await em.find(View, { release });
+    const appViewList = await em.find(AppView, { release }, { populate: ['view'] });
+    app.viewList = appViewList.map(item => {
+      item.view.viewVersionId = item.id
+      return item.view
+    })
 
     return app;
   }

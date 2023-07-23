@@ -1,18 +1,19 @@
 import { Entity, ManyToOne, Property } from "@mikro-orm/core";
-import { Release } from "./Release";
 import { Resource } from "./Resource";
 import { SoftDelete } from "../config/soft-delete";
 import { View } from "./View";
 import { Application } from "./Application";
 import { ProjectResource } from "./ProjectResource";
 import { Project } from "./Project";
+import { ViewVersion } from "./ViewVersion";
 
 @SoftDelete()
 @Entity()
 export class ViewResource extends Resource {
 
-  @ManyToOne({ serializer: value => value?.id, serializedName: 'releaseId' })
-  release: Release;
+
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'viewVersionId' })
+  viewVersion: ViewVersion;
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'viewId' })
   view: View;
@@ -34,7 +35,7 @@ export class ViewResource extends Resource {
   releaseId: number
 
   @Property({ persist: false })
-  viewId: number
+  viewVersionId: number
 
   @Property({ persist: false })
   imageResourceId: number

@@ -27,7 +27,7 @@ import { LargeText } from 'entities/LargeText';
 import { AppResource } from 'entities/AppResource';
 import { ViewResource } from 'entities/ViewResource';
 import { installPipelineModule, parseResource } from 'util/common';
-import { View } from 'entities/View';
+import { AppView } from 'entities/AppView';
 
 
 
@@ -76,7 +76,7 @@ export class AssetService {
     const { app, project } = release
 
     const extHandler = createExtensionHandler();
-    const viewToViewDataMap = new Map<View, ViewData>();
+    const viewToViewDataMap = new Map<AppView, ViewData>();
     const appData = {
       name: app.name,
       key: app.key,
@@ -128,10 +128,10 @@ export class AssetService {
 
 
     const appPropItemExtScriptModuleList = extHandler.getPipeline('propItem', ExtensionLevel.Application)
-    const viewList = await em.find(View, { release });
-    for (let view of viewList) {
+    const appViewList = await em.find(AppView, { release }, { populate: ['view'] });
+    for (let appView of appViewList) {
       const viewData = {
-        key: view.key,
+        key: appView.view.key,
         url: '',
         metadataList: [],
         resourceList: [],
@@ -143,19 +143,19 @@ export class AssetService {
 
       // 加载实例级别插件
       const viewExtensionInstanceList = await em.find(ExtensionInstance, {
-        relationId: view.id,
+        relationId: appView.viewVersion.id,
         relationType: ExtensionRelationType.View,
         secret: false
       }, { populate: ['extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw', 'extension'] })
       installPipelineModule({
         list: viewExtensionInstanceList,
         level: ExtensionLevel.View,
-        extHandler, viewId: view.id
+        extHandler, viewId: appView.view.id
       })
-      const viewResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.View, view.id)
-      const viewPropItemExtScriptModuleList = extHandler.getPipeline('propItem', ExtensionLevel.View, view.id)
+      const viewResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.View, appView.view.id)
+      const viewPropItemExtScriptModuleList = extHandler.getPipeline('propItem', ExtensionLevel.View, appView.view.id)
 
-      const solutionInstanceList = await em.find(SolutionInstance, { view })
+      const solutionInstanceList = await em.find(SolutionInstance, { viewVersion: appView.viewVersion })
 
       const primarySolutionInstance = solutionInstanceList.find(item => item.primary)
       const noPrimarySolutionInstanceList = solutionInstanceList.filter(item => !item.primary)
@@ -171,14 +171,14 @@ export class AssetService {
         installPipelineModule({
           list: solutionExtensionInstanceList,
           level: ExtensionLevel.Solution,
-          extHandler, viewId: view.id, solutionId
+          extHandler, viewId: appView.view.id, solutionId
         })
       }
 
-      const solutionResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.Solution, view.id)
+      const solutionResourceExtScriptModuleList = extHandler.getPipeline('resource', ExtensionLevel.Solution, appView.view.id)
 
       // 处理实例资源
-      const viewResourceList = await em.find(ViewResource, { view }, { populate: ['resourceConfig', 'imageResource.resourceConfig'] })
+      const viewResourceList = await em.find(ViewResource, { viewVersion: appView.viewVersion }, { populate: ['resourceConfig', 'imageResource.resourceConfig'] })
       const resourceConfigMap = new Map()
       viewResourceList.map(resource => {
         return parseResource(resource, resourceConfigMap)
@@ -201,34 +201,37 @@ export class AssetService {
       viewData.resourceConfigList = [...resourceConfigMap.values()]
 
 
-      const instanceList = await em.find(ComponentInstance, { view }, { populate: ['component', 'componentVersion', 'solutionInstance.solutionVersion'] });
+      const instanceList = await em.find(ComponentInstance,
+        { viewVersion: appView.viewVersion },
+        { populate: ['component', 'componentVersion', 'solutionInstance.solutionVersion'] }
+      );
 
       // 生成子实例metadata
       for (let instance of instanceList) {
         const solutionId = instance.solution.id
-        const solutionPropItemExtScriptModuleList = extHandler.getPipeline('propItem', ExtensionLevel.Solution, view.id, solutionId)
+        const solutionPropItemExtScriptModuleList = extHandler.getPipeline('propItem', ExtensionLevel.Solution, appView.view.id, solutionId)
 
         const childMetadata = await this.createMetadata(instance, em, appPropItemExtScriptModuleList, solutionPropItemExtScriptModuleList, viewPropItemExtScriptModuleList, viewData);
         viewData.metadataList.push(childMetadata);
       }
 
-      viewToViewDataMap.set(view, viewData);
+      viewToViewDataMap.set(appView, viewData);
 
       // 卸载解决方案级别插件
-      const solutionExt = extHandler.solutionExt.get(view.id)
+      const solutionExt = extHandler.solutionExt.get(appView.view.id)
       if (solutionExt) {
         for (const [solutionId, map] of solutionExt) {
           for (const { instance } of map.values()) {
-            extHandler.uninstall({ extInstanceId: instance.id, level: ExtensionLevel.Solution, solutionId, viewId: view.id })
+            extHandler.uninstall({ extInstanceId: instance.id, level: ExtensionLevel.Solution, solutionId, viewId: appView.view.id })
           }
         }
       }
 
       // 卸载实例级别插件
-      const viewExt = extHandler.viewExt.get(view.id)
+      const viewExt = extHandler.viewExt.get(appView.view.id)
       if (viewExt) {
         for (const { instance } of viewExt.values()) {
-          extHandler.uninstall({ extInstanceId: instance.id, level: ExtensionLevel.View, viewId: view.id })
+          extHandler.uninstall({ extInstanceId: instance.id, level: ExtensionLevel.View, viewId: appView.view.id })
         }
       }
 
@@ -248,19 +251,20 @@ export class AssetService {
       // 创建InstanceAsset
       const newAssetList = [];
 
-      for (const view of viewList) {
+      for (const appView of appViewList) {
 
         const content = em.create(LargeText, {
-          text: JSON.stringify(viewToViewDataMap.get(view))
+          text: JSON.stringify(viewToViewDataMap.get(appView))
         })
 
         await em.flush()
 
         const asset = em.create(BundleAsset, {
           content,
-          view,
+          view: appView.view,
+          viewVersion: appView.viewVersion,
           bundle,
-          manifestKey: view.key,
+          manifestKey: appView.view.key,
           app,
           project
         });
@@ -269,7 +273,7 @@ export class AssetService {
 
         appData.viewList.push({
           key: asset.manifestKey,
-          primaryView: view.primaryView,
+          primaryView: appView.primaryView,
           url: `http://groot-local.com:10000/asset/instance/${asset.id}`
         })
         newAssetList.push(asset);

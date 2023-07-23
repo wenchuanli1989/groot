@@ -8,7 +8,6 @@ import { PropBlock } from "./PropBlock";
 import { PropGroup } from "./PropGroup";
 import { PropItem } from "./PropItem";
 import { PropValue } from "./PropValue";
-import { Release } from "./Release";
 import { SolutionInstance } from './SolutionInstance'
 import { SoftDelete } from "../config/soft-delete";
 import { View } from "./View";
@@ -16,6 +15,7 @@ import { Application } from "./Application";
 import { Project } from "./Project";
 import { SolutionComponent } from "./SolutionComponent";
 import { Solution } from "./Solution";
+import { ViewVersion } from "./ViewVersion";
 
 @SoftDelete()
 @Entity()
@@ -27,14 +27,14 @@ export class ComponentInstance extends BaseEntity {
   @ManyToOne()
   componentVersion: ComponentVersion;
 
-  @ManyToOne({ serializer: value => value?.id, serializedName: 'releaseId' })
-  release: Release;
-
   @Property({ comment: '一般为组件实例第一次创建时的ID，多个版本迭代实例重新创建，但是trackI永远复制上一个版本的，保证多版本迭代之间还可以追溯组件实例的历史记录' })
   trackId: number;
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'viewId' })
   view: View;
+
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'viewVersionId' })
+  viewVersion: ViewVersion;
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'parentId' })
   parent?: ComponentInstance;

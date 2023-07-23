@@ -11,6 +11,7 @@ import { Project } from "./Project";
 import { Application } from "./Application";
 import { Solution } from "./Solution";
 import { View } from "./View";
+import { ViewVersion } from "./ViewVersion";
 
 @SoftDelete()
 @Entity()
@@ -45,6 +46,9 @@ export class PropValue extends BaseEntity {
    */
   @ManyToOne({ serializer: value => value?.id, serializedName: 'viewId' })
   view?: View;
+
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'viewVersionId' })
+  viewVersion?: ViewVersion;
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'instanceId' })
   componentInstance?: ComponentInstance;
@@ -87,4 +91,7 @@ export class PropValue extends BaseEntity {
 
   @Property({ persist: false })
   projectId?: number;
+
+  @Property({ persist: false })
+  viewVersionId?: number;
 }

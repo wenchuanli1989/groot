@@ -6,9 +6,9 @@ import { SolutionVersion } from "./SolutionVersion";
 import { SoftDelete } from "../config/soft-delete";
 import { Solution } from "./Solution";
 import { View } from "./View";
-import { Release } from "./Release";
 import { Project } from "./Project";
 import { Application } from "./Application";
+import { ViewVersion } from "./ViewVersion";
 
 @SoftDelete()
 @Entity()
@@ -20,6 +20,9 @@ export class SolutionInstance extends BaseEntity {
   @ManyToOne({ serializer: value => value?.id, serializedName: 'viewId' })
   view: View;
 
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'viewVersionId' })
+  viewVersion: ViewVersion;
+
   @Property()
   primary = false
   /**
@@ -28,8 +31,6 @@ export class SolutionInstance extends BaseEntity {
   @ManyToOne({ serializer: value => value?.id, serializedName: 'solutionId' })
   solution: Solution;
 
-  @ManyToOne({ serializer: value => value?.id, serializedName: 'releaseId' })
-  release: Release;
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'projectId' })
   project: Project;

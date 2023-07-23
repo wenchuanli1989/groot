@@ -7,6 +7,7 @@ import { SoftDelete } from "../config/soft-delete";
 import { View } from "./View";
 import { Application } from "./Application";
 import { Project } from "./Project";
+import { ViewVersion } from "./ViewVersion";
 
 @SoftDelete()
 @Entity()
@@ -19,7 +20,11 @@ export class BundleAsset extends BaseEntity {
   manifestKey: string;
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'viewId' })
-  view: View
+  view: View;
+
+  @ManyToOne({ serializer: value => value?.id, serializedName: 'viewVersionId' })
+  viewVersion: ViewVersion;
+
 
   @ManyToOne({ serializer: value => value?.id, serializedName: 'bundleId', comment: '最初创建asset的bundle' })
   bundle: Bundle

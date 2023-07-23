@@ -329,6 +329,7 @@ export default class PropPersistModel extends BaseModel {
       abstractValueIdChain,
       componentVersionId: getComponentVersionId(),
       componentId: component.id,
+      viewVersionId: grootManager.state.getState('gs.view').viewVersionId
     } as PropValue;
 
     if (getContext().params.mode === StudioMode.Prototype) {
@@ -406,6 +407,7 @@ export default class PropPersistModel extends BaseModel {
       paramData.componentVersionId = getComponentVersionId();
       paramData.value = valueStr;
       paramData.valueStruct = valueStruct;
+      paramData.viewVersionId = grootManager.state.getState('gs.view').viewVersionId
 
       if (isPrototypeMode) {
         paramData.type = PropValueType.Prototype;

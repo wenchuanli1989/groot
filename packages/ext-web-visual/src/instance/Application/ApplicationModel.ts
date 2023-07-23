@@ -43,8 +43,13 @@ export default class ApplicationModel extends BaseModel {
 
   public addView(view: View) {
     this.instanceAddModalStatus = ModalStatus.Submit;
-    view.releaseId = grootManager.state.getState('gs.release').id
-    return getContext().request(APIPath.view_add, view).then(({ data }) => {
+
+    return getContext().request(APIPath.view_add, {
+      key: view.key,
+      name: view.name,
+      appId: view.appId,
+      solutionComponentId: view.solutionComponentId
+    }).then(({ data }) => {
       grootManager.state.getState('gs.viewList').push(data)
 
       grootManager.command.executeCommand('gc.openView', data.id)

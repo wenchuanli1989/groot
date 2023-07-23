@@ -15,6 +15,7 @@ import { SolutionComponent } from "../entities/SolutionComponent";
 import { View } from "../entities/View";
 import { Project } from "../entities/Project";
 import { Application } from "../entities/Application";
+import { ViewVersion } from "../entities/ViewVersion";
 
 export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project, app: Application) => {
   // 创建组件
@@ -201,17 +202,24 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     key: '/layout/groot/table',
     app,
     project,
-    release
   })
   await em.persistAndFlush(tableView);
+
+  const tableViewVersion = em.create(ViewVersion, {
+    name: 'v0.0.1',
+    view: tableView,
+    project,
+    app
+  })
+  await em.persistAndFlush(tableViewVersion);
 
   // 创建入口解决方案实例
   const solutionInstance = em.create(SolutionInstance, {
     solution: solution,
     solutionVersion: solution.recentVersion,
     view: tableView,
+    viewVersion: tableViewVersion,
     primary: true,
-    release,
     app,
     project
   })
@@ -229,9 +237,9 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
 
   const tableComponentInstance = em.create(ComponentInstance, {
     view: tableView,
+    viewVersion: tableViewVersion,
     component: tableComponent,
     componentVersion: tableComponentVersion,
-    release,
     trackId: 0,
     solution,
     project,
@@ -252,7 +260,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   tableComponentInstance.solutionInstance = solutionInstance
   await em.persistAndFlush(tableComponentInstance);
 
-  await createValue(em, columnInnerItem, tableComponent, tableComponentVersion, [columnItem1, columnItem2, columnItem3], { instance: tableComponentInstance, project, app });
+  await createValue(em, columnInnerItem, tableComponent, tableComponentVersion, [columnItem1, columnItem2, columnItem3], { instance: tableComponentInstance, project, app, viewVersion: tableViewVersion });
 
   const requestValue = em.create(PropValue, {
     propItem: requestItem,
@@ -269,7 +277,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     app,
     project,
     solution,
-    view: tableView
+    view: tableView,
+    viewVersion: tableViewVersion
   });
 
   const rowKeyValue = em.create(PropValue, {
@@ -282,7 +291,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     app,
     project,
     solution,
-    view: tableView
+    view: tableView,
+    viewVersion: tableViewVersion
   });
 
   await em.persistAndFlush([requestValue, rowKeyValue]);
@@ -290,7 +300,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
 
 async function createValue(em: EntityManager, columnInnerItem: PropItem,
   tableComponent: Component, tableComponentVersion: ComponentVersion,
-  [columnItem1, columnItem2, columnItem3]: PropItem[], params: { instance?: ComponentInstance, project?: Project, app?: Application, solution?: Solution, view?: View }) {
+  [columnItem1, columnItem2, columnItem3]: PropItem[], params: { instance?: ComponentInstance, project?: Project, app?: Application, solution?: Solution, viewVersion?: ViewVersion }) {
 
   const columnValue1 = em.create(PropValue, {
     propItem: columnInnerItem,
@@ -322,28 +332,32 @@ async function createValue(em: EntityManager, columnInnerItem: PropItem,
     columnValue1.project = params.project
     columnValue1.componentInstance = params.instance
     columnValue1.solution = params.solution
-    columnValue1.view = params.view
+    columnValue1.view = params.viewVersion.view
+    columnValue1.viewVersion = params.viewVersion
 
     columnValue2.type = PropValueType.Instance;
     columnValue2.app = params.app;
     columnValue2.project = params.project
     columnValue2.componentInstance = params.instance
     columnValue2.solution = params.solution
-    columnValue2.view = params.view
+    columnValue2.view = params.viewVersion.view
+    columnValue2.viewVersion = params.viewVersion
 
     columnValue3.type = PropValueType.Instance;
     columnValue3.app = params.app;
     columnValue3.project = params.project
     columnValue3.componentInstance = params.instance
     columnValue3.solution = params.solution
-    columnValue3.view = params.view
+    columnValue3.view = params.viewVersion.view
+    columnValue3.viewVersion = params.viewVersion
 
     columnValue4.type = PropValueType.Instance;
     columnValue4.app = params.app;
     columnValue4.project = params.project
     columnValue4.componentInstance = params.instance
     columnValue4.solution = params.solution
-    columnValue4.view = params.view
+    columnValue4.view = params.viewVersion.view
+    columnValue4.viewVersion = params.viewVersion
   } else {
     columnValue1.type = PropValueType.Prototype;
     columnValue1.solution = params.solution
@@ -463,84 +477,96 @@ async function createValue(em: EntityManager, columnInnerItem: PropItem,
     columnValue1Item1.project = params.project
     columnValue1Item1.componentInstance = params.instance
     columnValue1Item1.solution = params.solution
-    columnValue1Item1.view = params.view
+    columnValue1Item1.view = params.viewVersion.view
+    columnValue1Item1.viewVersion = params.viewVersion
 
     columnValue1Item2.type = PropValueType.Instance;
     columnValue1Item2.app = params.app;
     columnValue1Item2.project = params.project
     columnValue1Item2.componentInstance = params.instance
     columnValue1Item2.solution = params.solution
-    columnValue1Item2.view = params.view
+    columnValue1Item2.view = params.viewVersion.view
+    columnValue1Item2.viewVersion = params.viewVersion
 
     columnValue1Item3.type = PropValueType.Instance;
     columnValue1Item3.app = params.app;
     columnValue1Item3.project = params.project
     columnValue1Item3.componentInstance = params.instance
     columnValue1Item3.solution = params.solution
-    columnValue1Item3.view = params.view
+    columnValue1Item3.view = params.viewVersion.view
+    columnValue1Item3.viewVersion = params.viewVersion
 
     columnValue2Item1.type = PropValueType.Instance;
     columnValue2Item1.app = params.app;
     columnValue2Item1.project = params.project
     columnValue2Item1.componentInstance = params.instance
     columnValue2Item1.solution = params.solution
-    columnValue2Item1.view = params.view
+    columnValue2Item1.view = params.viewVersion.view
+    columnValue2Item1.viewVersion = params.viewVersion
 
     columnValue2Item2.type = PropValueType.Instance;
     columnValue2Item2.app = params.app;
     columnValue2Item2.project = params.project
     columnValue2Item2.componentInstance = params.instance
     columnValue2Item2.solution = params.solution
-    columnValue2Item2.view = params.view
+    columnValue2Item2.view = params.viewVersion.view
+    columnValue2Item2.viewVersion = params.viewVersion
 
     columnValue2Item3.type = PropValueType.Instance;
     columnValue2Item3.app = params.app;
     columnValue2Item3.project = params.project
     columnValue2Item3.componentInstance = params.instance
     columnValue2Item3.solution = params.solution
-    columnValue2Item3.view = params.view
+    columnValue2Item3.view = params.viewVersion.view
+    columnValue2Item3.viewVersion = params.viewVersion
 
     columnValue3Item1.type = PropValueType.Instance;
     columnValue3Item1.app = params.app;
     columnValue3Item1.project = params.project
     columnValue3Item1.componentInstance = params.instance
     columnValue3Item1.solution = params.solution
-    columnValue3Item1.view = params.view
+    columnValue3Item1.view = params.viewVersion.view
+    columnValue3Item1.viewVersion = params.viewVersion
 
     columnValue3Item2.type = PropValueType.Instance;
     columnValue3Item2.app = params.app;
     columnValue3Item2.project = params.project
     columnValue3Item2.componentInstance = params.instance
     columnValue3Item2.solution = params.solution
-    columnValue3Item2.view = params.view
+    columnValue3Item2.view = params.viewVersion.view
+    columnValue3Item2.viewVersion = params.viewVersion
 
     columnValue3Item3.type = PropValueType.Instance;
     columnValue3Item3.app = params.app;
     columnValue3Item3.project = params.project
     columnValue3Item3.componentInstance = params.instance
     columnValue3Item3.solution = params.solution
-    columnValue3Item3.view = params.view
+    columnValue3Item3.view = params.viewVersion.view
+    columnValue3Item3.viewVersion = params.viewVersion
 
     columnValue4Item1.type = PropValueType.Instance;
     columnValue4Item1.app = params.app;
     columnValue4Item1.project = params.project
     columnValue4Item1.componentInstance = params.instance
     columnValue4Item1.solution = params.solution
-    columnValue4Item1.view = params.view
+    columnValue4Item1.view = params.viewVersion.view
+    columnValue4Item1.viewVersion = params.viewVersion
 
     columnValue4Item2.type = PropValueType.Instance;
     columnValue4Item2.app = params.app;
     columnValue4Item2.project = params.project
     columnValue4Item2.componentInstance = params.instance
     columnValue4Item2.solution = params.solution
-    columnValue4Item2.view = params.view
+    columnValue4Item2.view = params.viewVersion.view
+    columnValue4Item2.viewVersion = params.viewVersion
 
     columnValue4Item3.type = PropValueType.Instance;
     columnValue4Item3.app = params.app;
     columnValue4Item3.project = params.project
     columnValue4Item3.componentInstance = params.instance
     columnValue4Item3.solution = params.solution
-    columnValue4Item3.view = params.view
+    columnValue4Item3.view = params.viewVersion.view
+    columnValue4Item3.viewVersion = params.viewVersion
 
   } else {
 

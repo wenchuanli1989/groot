@@ -26,12 +26,14 @@ export class PropValueService {
     if (rawPropValue.type === PropValueType.Instance) {
       LogicException.assertParamEmpty(rawPropValue.componentInstanceId, 'componentInstanceId');
       LogicException.assertParamEmpty(rawPropValue.viewId, 'viewId');
+      LogicException.assertParamEmpty(rawPropValue.viewVersionId, 'viewVersionId');
       LogicException.assertParamEmpty(rawPropValue.appId, 'appId');
       LogicException.assertParamEmpty(rawPropValue.projectId, 'projectId');
       LogicException.assertParamEmpty(rawPropValue.solutionId, 'solutionId');
 
       query.componentInstance = rawPropValue.componentInstanceId;
       query.view = rawPropValue.viewId;
+      query.viewVersion = rawPropValue.viewVersionId;
       query.app = rawPropValue.appId;
       query.project = rawPropValue.projectId;
       query.solution = rawPropValue.solutionId;
@@ -91,6 +93,7 @@ export class PropValueService {
       LogicException.assertParamEmpty(rawPropValue.componentVersionId, 'componentVersionId');
       LogicException.assertParamEmpty(rawPropValue.componentInstanceId, 'componentInstanceId');
       LogicException.assertParamEmpty(rawPropValue.viewId, 'viewId');
+      LogicException.assertParamEmpty(rawPropValue.viewVersionId, 'viewVersionId');
       LogicException.assertParamEmpty(rawPropValue.appId, 'appId');
       LogicException.assertParamEmpty(rawPropValue.projectId, 'projectId');
       LogicException.assertParamEmpty(rawPropValue.solutionId, 'solutionId');
@@ -107,7 +110,8 @@ export class PropValueService {
         app: rawPropValue.appId,
         viewId: rawPropValue.viewId,
         project: rawPropValue.projectId,
-        solution: rawPropValue.solutionId
+        solution: rawPropValue.solutionId,
+        viewVersion: rawPropValue.viewVersionId
       });
       await em.flush();
       return newPropValue;

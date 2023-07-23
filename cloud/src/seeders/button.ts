@@ -17,6 +17,7 @@ import { SolutionComponent } from "../entities/SolutionComponent";
 import { View } from "../entities/View";
 import { Application } from "../entities/Application";
 import { SolutionInstance } from "../entities/SolutionInstance";
+import { ViewVersion } from "../entities/ViewVersion";
 
 export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project, app: Application) => {
   // 创建组件
@@ -108,9 +109,16 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     key: '/layout/groot/button',
     app,
     project,
-    release
   })
   await em.persistAndFlush(btnView);
+
+  const btnViewVersion = em.create(ViewVersion, {
+    name: 'v0.0.1',
+    view: btnView,
+    app,
+    project,
+  })
+  await em.persistAndFlush(btnViewVersion);
 
   const solutionComponent = em.create(SolutionComponent, {
     solution,
@@ -127,8 +135,8 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     solution: solution,
     solutionVersion: solution.recentVersion,
     view: btnView,
+    viewVersion: btnViewVersion,
     primary: true,
-    release,
     app,
     project
   })
@@ -138,9 +146,9 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   const btnComponentInstance = em.create(ComponentInstance, {
     component: btnComponent,
     componentVersion: btnComponentVersion,
-    release,
     trackId: 0,
     view: btnView,
+    viewVersion: btnViewVersion,
     app,
     project,
     solution,
@@ -175,7 +183,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
 
   const viewResource = em.create(ViewResource, {
     view: btnView,
-    release,
+    viewVersion: btnViewVersion,
     name: 'demo2',
     value: '/demo2',
     namespace: 'dataSource',

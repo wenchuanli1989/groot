@@ -4,12 +4,11 @@ import { Injectable } from '@nestjs/common';
 import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
 import { AppResource } from 'entities/AppResource';
 import { Application } from 'entities/Application';
-import { ComponentInstance } from 'entities/ComponentInstance';
 import { ViewResource } from 'entities/ViewResource';
 import { ProjectResource } from 'entities/ProjectResource';
 import { Release } from 'entities/Release';
 import { ResourceConfig } from 'entities/ResourceConfig';
-import { View } from 'entities/View';
+import { ViewVersion } from 'entities/ViewVersion';
 
 
 @Injectable()
@@ -18,22 +17,19 @@ export class ResourceService {
   async addViewResource(rawResource: ViewResource) {
     const em = RequestContext.getEntityManager();
 
-    LogicException.assertParamEmpty(rawResource.viewId, 'viewId');
-    LogicException.assertParamEmpty(rawResource.releaseId, 'releaseId');
+    LogicException.assertParamEmpty(rawResource.viewVersionId, 'viewVersionId');
     LogicException.assertParamEmpty(rawResource.namespace, 'namespace');
     LogicException.assertParamEmpty(rawResource.name, 'name');
     LogicException.assertParamEmpty(rawResource.value, 'value');
 
-    const release = await em.findOne(ComponentInstance, rawResource.releaseId);
-    LogicException.assertNotFound(release, 'Release', rawResource.releaseId);
-    const view = await em.findOne(View, { id: rawResource.viewId, release });
-    LogicException.assertNotFound(view, 'View', `id = ${rawResource.viewId} and releaseId = ${release.id}`);
+    const viewVersion = await em.findOne(ViewVersion, { id: rawResource.viewVersionId });
+    LogicException.assertNotFound(viewVersion, 'ViewVersion', rawResource.viewVersionId);
 
     const resourceUnique = await em.count(ViewResource, {
       name: rawResource.name,
       namespace: rawResource.namespace,
-      release,
-      view
+      view: viewVersion.view,
+      viewVersion
     });
 
     if (resourceUnique > 0) {
@@ -50,12 +46,12 @@ export class ResourceService {
 
     const newResource = em.create(ViewResource, {
       ...pick(rawResource, ['namespace', 'name', 'type', 'value']),
-      release,
-      view,
+      view: viewVersion.view,
+      viewVersion,
       resourceConfig,
       imageResource,
-      app: view.app,
-      project: view.project
+      app: viewVersion.app,
+      project: viewVersion.project
     });
 
     await em.flush();
@@ -135,7 +131,6 @@ export class ResourceService {
       const resourceUnique = await em.count(ViewResource, {
         name: rawResource.name,
         namespace: resource.namespace,
-        release: resource.release,
         view: resource.view
       });
 
