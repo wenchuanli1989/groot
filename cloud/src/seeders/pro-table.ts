@@ -16,6 +16,7 @@ import { View } from "../entities/View";
 import { Project } from "../entities/Project";
 import { Application } from "../entities/Application";
 import { ViewVersion } from "../entities/ViewVersion";
+import { AppView } from "../entities/AppView";
 
 export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project, app: Application) => {
   // 创建组件
@@ -212,6 +213,15 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     app
   })
   await em.persistAndFlush(tableViewVersion);
+
+  const tableAppView = em.create(AppView, {
+    release,
+    view: tableView,
+    viewVersion: tableViewVersion,
+    app,
+    project
+  })
+  await em.persistAndFlush(tableAppView);
 
   // 创建入口解决方案实例
   const solutionInstance = em.create(SolutionInstance, {

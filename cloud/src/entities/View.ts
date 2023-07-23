@@ -33,4 +33,7 @@ export class View extends BaseEntity {
 
   @Property({ persist: false })
   viewVersionId: number
+
+  @Property({ persist: false })
+  primaryView: boolean
 }
