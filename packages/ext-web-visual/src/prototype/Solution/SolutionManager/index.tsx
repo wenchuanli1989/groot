@@ -18,7 +18,6 @@ const SolutionManager = () => {
     <div >
       <Button icon={<PlusOutlined />} type="link" onClick={() => {
         solutionModel.componentAddModalStatus = ModalStatus.Init
-        solutionModel.parentIdForAddComponent = undefined
       }} />
       <Button icon={<SyncOutlined spin={solutionModel.syncVersionDoing} />} type="link" onClick={() => {
         solutionModel.syncVersion()

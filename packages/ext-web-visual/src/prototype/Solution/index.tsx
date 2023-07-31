@@ -34,7 +34,7 @@ export const Solution = () => {
         label: <div onClick={() => {
           switchSolutionComponent(item)
         }}>
-          <ComponentItem solutionComponent={item} isParent={null} />
+          <ComponentItem solutionComponent={item} isRoot />
         </div>,
         children: undefined
       }
@@ -48,7 +48,7 @@ export const Solution = () => {
             label: <div onClick={() => {
               switchSolutionComponent(childrenItem)
             }}>
-              <ComponentItem solutionComponent={childrenItem} isParent={item} />
+              <ComponentItem solutionComponent={childrenItem} isRoot={false} />
             </div>,
           })
         }

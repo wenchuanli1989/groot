@@ -6,7 +6,7 @@ import SolutionModel from "../SolutionModel"
 import styles from './index.module.less'
 import { grootManager } from "context"
 
-const ComponentItem: React.FC<{ solutionComponent: SolutionComponent, isParent: SolutionComponent }> = ({ solutionComponent, isParent }) => {
+const ComponentItem: React.FC<{ solutionComponent: SolutionComponent, isRoot: boolean }> = ({ solutionComponent, isRoot }) => {
   const solutionModel = useModel(SolutionModel)
 
   const onSwitchVersion = (versionId) => {
@@ -39,19 +39,7 @@ const ComponentItem: React.FC<{ solutionComponent: SolutionComponent, isParent: 
         cancelText="取消">
         删除版本
       </Popconfirm>
-    }]
-
-  if (isParent) {
-    dropMenus.push({
-      key: 'add',
-      label: '添加子组件',
-      onClick: () => {
-        solutionModel.componentAddModalStatus = ModalStatus.Init
-        solutionModel.parentIdForAddComponent = solutionComponent.id
-      }
-    })
-  } else {
-    dropMenus.push({
+    }, {
       key: 'remove',
       label: <Popconfirm title="确定删除吗"
         onConfirm={() => {
@@ -61,8 +49,7 @@ const ComponentItem: React.FC<{ solutionComponent: SolutionComponent, isParent: 
         cancelText="取消">
         删除
       </Popconfirm>
-    })
-  }
+    }]
 
   if (solutionComponent.currVersionId !== solutionComponent.componentVersionId) {
     dropMenus.push({
@@ -85,7 +72,7 @@ const ComponentItem: React.FC<{ solutionComponent: SolutionComponent, isParent: 
       <Space>
         <span>{solutionComponent.component.name}</span>
 
-        {solutionModel.activeSolutionComponentId === solutionComponent.id && (
+        {solutionModel.activeSolutionComponentId === solutionComponent.id && isRoot && (
           <Dropdown menu={{ items: dropMenus }} placement="bottomRight" >
             <SettingOutlined />
           </Dropdown>
