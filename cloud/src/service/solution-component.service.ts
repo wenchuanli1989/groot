@@ -103,8 +103,8 @@ export class SolutionComponentService {
 
       const solutionVersion = await em.findOne(SolutionVersion, rawSolutionComponent.solutionVersionId)
 
-      const markTag = rawSolutionComponent.markTagList.length > 0
-      const consumeTag = rawSolutionComponent.consumeTagList.length > 0
+      const markTag = rawSolutionComponent.markTagList?.length > 0
+      const consumeTag = rawSolutionComponent.consumeTagList?.length > 0
 
       const solutionComponent = em.create(SolutionComponent, {
         solutionVersion,

@@ -30,7 +30,10 @@ export default class SolutionModel extends BaseModel {
     this.componentAddModalStatus = ModalStatus.Submit;
 
     getContext().request(APIPath.solutionComponent_addComponent, {
-      component: rawComponent,
+      component: {
+        ...rawComponent,
+        solutionId: grootManager.state.getState('gs.solution').id
+      },
       solutionVersionId: grootManager.state.getState('gs.solution').solutionVersion.id
     }).then(({ data: solutionComponent }) => {
       this.componentAddModalStatus = ModalStatus.None;
