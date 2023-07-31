@@ -60,8 +60,9 @@ export class PropGroupService {
 
     let result: { newGroup: PropGroup, extra?: { newBlock?: PropBlock } } = { newGroup };
 
-    const parentCtx = parentEm ? em.getTransactionContext() : undefined;
-    await em.begin();
+    if (!parentEm) {
+      await em.begin();
+    }
     try {
       await em.flush();
 
@@ -76,14 +77,12 @@ export class PropGroupService {
         result.extra = childResult;
       }
 
-      await em.commit();
+      if (!parentEm) {
+        await em.commit();
+      }
     } catch (e) {
       await em.rollback();
       throw e;
-    } finally {
-      if (parentCtx) {
-        em.setTransactionContext(parentCtx);
-      }
     }
 
     return result;
@@ -97,8 +96,10 @@ export class PropGroupService {
     LogicException.assertNotFound(group, 'PropGroup', groupId);
 
     const blockList = await em.find(PropBlock, { group });
-    const parentCtx = parentEm ? em.getTransactionContext() : undefined;
-    await em.begin();
+
+    if (!parentEm) {
+      await em.begin();
+    }
     try {
       for (let blockIndex = 0; blockIndex < blockList.length; blockIndex++) {
         const block = blockList[blockIndex];
@@ -106,14 +107,15 @@ export class PropGroupService {
       }
 
       group.deletedAt = new Date()
-      await em.commit();
+
+      await em.flush()
+
+      if (!parentEm) {
+        await em.commit();
+      }
     } catch (e) {
       await em.rollback();
       throw e;
-    } finally {
-      if (parentCtx) {
-        em.setTransactionContext(parentCtx);
-      }
     }
   }
 

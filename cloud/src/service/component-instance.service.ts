@@ -53,8 +53,9 @@ export class ComponentInstanceService {
       project
     });
 
-    let parentCtx = parentEm ? em.getTransactionContext() : undefined;
-    await em.begin();
+    if (!parentEm) {
+      await em.begin();
+    }
     try {
       // 创建组件实例
       await em.flush();
@@ -92,16 +93,16 @@ export class ComponentInstanceService {
 
         newPropValue.abstractValueIdChain = abstractValueIdChain;
       });
+
       await em.flush();
 
-      await em.commit();
+      if (!parentEm) {
+        await em.commit();
+      }
+
     } catch (e) {
       await em.rollback();
       throw e;
-    } finally {
-      if (parentCtx) {
-        em.setTransactionContext(parentCtx);
-      }
     }
 
     return newInstance;

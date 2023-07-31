@@ -56,8 +56,9 @@ export class PropBlockService {
 
     let result: { newBlock: PropBlock, extra?: { newItem?: PropItem, propValue?: PropValue, childGroup?: PropGroup } } = { newBlock };
 
-    const parentCtx = parentEm ? em.getTransactionContext() : undefined;
-    await em.begin();
+    if (!parentEm) {
+      await em.begin();
+    }
     try {
       await em.flush();
       if (rawBlock.struct === PropBlockStructType.List) {
@@ -69,14 +70,12 @@ export class PropBlockService {
         result.extra = await this.propItemService.add(rawItem, em);
       }
 
-      await em.commit();
+      if (!parentEm) {
+        await em.commit();
+      }
     } catch (e) {
       await em.rollback();
       throw e;
-    } finally {
-      if (parentCtx) {
-        em.setTransactionContext(parentCtx);
-      }
     }
 
     return result;
@@ -111,8 +110,9 @@ export class PropBlockService {
 
     const itemList = await em.find(PropItem, { block });
 
-    let parentCtx = parentEm ? em.getTransactionContext() : undefined;
-    await em.begin();
+    if (!parentEm) {
+      await em.begin();
+    }
     try {
       for (let itemIndex = 0; itemIndex < itemList.length; itemIndex++) {
         const item = itemList[itemIndex];
@@ -120,14 +120,15 @@ export class PropBlockService {
       }
 
       block.deletedAt = new Date()
-      await em.commit();
+
+      await em.flush()
+
+      if (!parentEm) {
+        await em.commit();
+      }
     } catch (e) {
       await em.rollback();
       throw e;
-    } finally {
-      if (parentCtx) {
-        em.setTransactionContext(parentCtx);
-      }
     }
   }
 

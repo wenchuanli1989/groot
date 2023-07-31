@@ -140,9 +140,9 @@ export class SolutionComponentService {
     const solutionComponent = await em.findOne(SolutionComponent, solutionComponentId)
     LogicException.assertNotFound(solutionComponent, 'SolutionComponent', solutionComponentId)
 
-
-    const parentCtx = parentEm ? em.getTransactionContext() : undefined;
-    await em.begin()
+    if (!parentEm) {
+      await em.begin()
+    }
     try {
 
       await this.solutionComponentTagService.update(solutionComponentId, [], TagNatureType.MakingTag, em)
@@ -157,15 +157,13 @@ export class SolutionComponentService {
         await this.componentService.remove(solutionComponent.component.id, em)
       }
 
-      await em.commit()
+      if (!parentEm) {
+        await em.commit()
+      }
 
     } catch (e) {
       await em.rollback();
       throw e;
-    } finally {
-      if (parentCtx) {
-        em.setTransactionContext(parentCtx);
-      }
     }
   }
 }

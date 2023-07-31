@@ -58,8 +58,9 @@ export class PropItemService {
       solution: block.solution
     });
 
-    let parentCtx = parentEm ? em.getTransactionContext() : undefined;
-    await em.begin();
+    if (!parentEm) {
+      await em.begin();
+    }
     try {
 
       await em.flush();
@@ -101,15 +102,13 @@ export class PropItemService {
         await em.flush();
       }
 
-      await em.commit();
+      if (!parentEm) {
+        await em.commit();
+      }
 
     } catch (e) {
       await em.rollback();
       throw e;
-    } finally {
-      if (parentCtx) {
-        em.setTransactionContext(parentCtx);
-      }
     }
 
     result.newItem = newItem;
@@ -143,8 +142,9 @@ export class PropItemService {
 
     LogicException.assertNotFound(propItem, 'PropItem', itemId);
 
-    const parentCtx = parentEm ? em.getTransactionContext() : undefined;
-    await em.begin();
+    if (!parentEm) {
+      await em.begin();
+    }
     try {
       propItem.deletedAt = new Date()
 
@@ -157,14 +157,12 @@ export class PropItemService {
         type: PropValueType.Prototype
       }, { deletedAt: new Date() });
 
-      await em.commit();
+      if (!parentEm) {
+        await em.commit();
+      }
     } catch (e) {
       await em.rollback();
       throw e;
-    } finally {
-      if (parentCtx) {
-        em.setTransactionContext(parentCtx);
-      }
     }
   }
 

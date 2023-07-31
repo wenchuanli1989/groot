@@ -29,7 +29,9 @@ export class SolutionComponentTagService {
 
       await em.flush()
 
-      await em.commit()
+      if (!parentEm) {
+        await em.commit()
+      }
     } catch (e) {
       await em.rollback();
       throw e;

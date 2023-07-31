@@ -235,8 +235,9 @@ export class ComponentVersionService {
       throw new LogicException(`组件版本属于某个解决方案，不能删除`, LogicExceptionCode.UnExpect)
     }
 
-    let parentCtx = parentEm ? em.getTransactionContext() : undefined;
-    await em.begin()
+    if (!parentEm) {
+      await em.begin()
+    }
     try {
 
       const groupList = await em.find(PropGroup, { componentVersion })
@@ -250,14 +251,12 @@ export class ComponentVersionService {
 
       await em.flush()
 
-      await em.commit()
+      if (!parentEm) {
+        await em.commit()
+      }
     } catch (e) {
       await em.rollback();
       throw e;
-    } finally {
-      if (parentCtx) {
-        em.setTransactionContext(parentCtx);
-      }
     }
   }
 }
