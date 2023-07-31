@@ -129,3 +129,8 @@ export enum ExtensionStatus {
   Padding = 'padding',// 同一ExtensionInstance.ID重复加载
   Destroy = 'destroy',
 }
+
+export enum TagNatureType {
+  MakingTag = 1,
+  ConsumeTag = 2
+}

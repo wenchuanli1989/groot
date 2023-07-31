@@ -52,9 +52,30 @@ export default class SolutionModel extends BaseModel {
   public loadList() {
     getContext().request(APIPath.solutionComponent_list_solutionVersionId, {
       solutionVersionId: this.currSolutionVersionId,
-      view: 'all', allVersion: true
+      view: 'all', queryVersionList: true, queryTagList: true
     }).then(({ data }) => {
+      const tagMap = new Map<number, SolutionComponent[]>()
+      for (const solutionComponent of data) {
+        for (const tag of (solutionComponent.markTagList || [])) {
+          if (!tagMap.has(tag.id)) {
+            tagMap.set(tag.id, [solutionComponent])
+          } else {
+            tagMap.get(tag.id).push(solutionComponent)
+          }
+        }
+      }
+      for (const solutionComponent of data) {
+        if (solutionComponent.consumeTagList?.length) {
+          solutionComponent.children = []
+        }
+
+        for (const tag of (solutionComponent.consumeTagList || [])) {
+          const list = tagMap.get(tag.id) || []
+          solutionComponent.children.push(...list)
+        }
+      }
       this.solutionComponentList = data;
+
       data.forEach(item => {
         item.currVersionId = item.componentVersionId
       })
@@ -101,10 +122,9 @@ export default class SolutionModel extends BaseModel {
 
   public removeSolutionComponent(solutionComponentId: number) {
     getContext().request(APIPath.solutionComponent_remove, { solutionComponentId }).then(() => {
-      const solutionComponentList = this.solutionComponentList.filter(item => item.parentId !== solutionComponentId && item.id !== solutionComponentId)
-      this.solutionComponentList = solutionComponentList
-      if (this.activeSolutionComponentId === solutionComponentId && solutionComponentList.length > 0) {
-        this.activeSolutionComponentId = solutionComponentList[0].id
+      this.solutionComponentList = this.solutionComponentList.filter(item => item.id !== solutionComponentId)
+      if (this.activeSolutionComponentId === solutionComponentId && this.solutionComponentList.length > 0) {
+        this.activeSolutionComponentId = this.solutionComponentList[0].id
         grootManager.command.executeCommand('gc.openComponent', this.activeSolutionComponentId)
       }
     })

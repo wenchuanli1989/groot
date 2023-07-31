@@ -9,7 +9,7 @@ export const Material = () => {
   const [solutionComponentList, setSolutionComponentList] = useState<SolutionComponent[]>([]);
 
   useEffect(() => {
-    getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: 1, view: 'false' }).then(({ data }) => {
+    getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: 1, view: 'false', queryVersionList: false, queryTagList: false }).then(({ data }) => {
       setSolutionComponentList(data);
     })
   }, []);

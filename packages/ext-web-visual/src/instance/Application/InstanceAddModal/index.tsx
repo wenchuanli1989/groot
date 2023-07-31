@@ -13,7 +13,7 @@ const InstanceAddModal: React.FC = () => {
   useEffect(() => {
     if (applicationModel.instanceAddModalStatus === ModalStatus.Init) {
       form.resetFields();
-      getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: 1, view: 'true' }).then(({ data }) => {
+      getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: 1, view: 'true', queryVersionList: false, queryTagList: false }).then(({ data }) => {
         setComponentList(data.map(item => {
           item.component.componentVersionId = item.componentVersionId
           return item.component

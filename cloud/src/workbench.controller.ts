@@ -281,8 +281,17 @@ export class WorkbenchController {
 
   // todo 添加解决方案实现
   @Get('/solution-component/list/:solutionVersionId')
-  async solutionCompoentList(@Param('solutionVersionId') solutionVersionId: number, @Query('view') view: string, @Query('allVersion') allVersion: string) {
-    return await this.solutionComponentService.list(solutionVersionId, allVersion === 'true', view !== 'all' ? (view === 'true') : undefined);
+  async solutionCompoentList(
+    @Param('solutionVersionId') solutionVersionId: number,
+    @Query('view') view: string,
+    @Query('queryVersionList') queryVersionList: string,
+    @Query('queryTagList') queryTagList: string) {
+    return await this.solutionComponentService.list({
+      solutionVersionId,
+      queryTagList: queryTagList === 'true',
+      queryVersionList: queryVersionList === 'true',
+      view: view !== 'all' ? (view === 'true') : undefined
+    });
   }
 
 

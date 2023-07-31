@@ -1,4 +1,4 @@
-import { PropMetadataData, PropBlockLayout, PropBlockStructType, PropValueType, PropItemViewType, PropItemStruct, ValueStruct } from "@grootio/common";
+import { PropMetadataData, PropBlockLayout, PropBlockStructType, PropValueType, PropItemViewType, PropItemStruct, ValueStruct, TagNatureType } from "@grootio/common";
 import { EntityManager } from "@mikro-orm/core";
 
 import { PropValue } from "../entities/PropValue";
@@ -17,6 +17,8 @@ import { Project } from "../entities/Project";
 import { Application } from "../entities/Application";
 import { ViewVersion } from "../entities/ViewVersion";
 import { AppView } from "../entities/AppView";
+import { SolutionTag } from "../entities/SolutionTag";
+import { SolutionComponentTag } from "../entities/SolutionComponentTag";
 
 export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project, app: Application) => {
   // 创建组件
@@ -237,11 +239,32 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     componentVersion: avatarComponentVersion,
     component: avatarComponent,
     view: false,
-    parent: profileSolutionComponent
   })
 
   await em.persistAndFlush(avatarSolutionComponent)
 
+  const solutionTag = em.create(SolutionTag, {
+    name: 'profile',
+    solution
+  })
+
+  await em.persistAndFlush(solutionTag)
+
+  const solutionComponentTag = em.create(SolutionComponentTag, {
+    solutionTag,
+    solutionComponent: profileSolutionComponent,
+    type: TagNatureType.ConsumeTag
+  })
+
+  await em.persistAndFlush(solutionComponentTag)
+
+  const avatarSolutionComponentTag = em.create(SolutionComponentTag, {
+    solutionTag,
+    solutionComponent: avatarSolutionComponent,
+    type: TagNatureType.MakingTag
+  })
+
+  await em.persistAndFlush(avatarSolutionComponentTag)
   // 创建组件实例
   const profileComponentInstance = em.create(ComponentInstance, {
     view: profileView,

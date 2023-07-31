@@ -207,7 +207,8 @@ export type SolutionComponent = {
 
   component: Component,
   // ************************** 分割线已下是界面属性 **************************
-  currVersionId: number
+  currVersionId: number,
+  children: SolutionComponent[],
 } & Omit<import("../../cloud/src/entities/SolutionComponent").SolutionComponent, 'component'>;
 
 

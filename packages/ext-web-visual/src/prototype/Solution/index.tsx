@@ -28,34 +28,37 @@ export const Solution = () => {
 
   const genTreeData = (list: SolutionComponent[]) => {
 
-    const listMap = list.reduce((pre, item) => {
-      pre.set(item.id, {
-        item,
-        menu: {
-          key: item.id.toString(),
-          label: <div onClick={() => {
-            switchSolutionComponent(item)
-          }}>
-            <ComponentItem solutionComponent={item} />
-          </div>,
-          children: undefined
-        }
-      })
-      return pre;
-    }, new Map<number, { item: SolutionComponent, menu: SubMenuType }>())
-
-    return [...listMap.values()].filter(({ item, menu }) => {
-      if (item.parentId) {
-        let children = listMap.get(item.parentId).menu.children
-        if (!children) {
-          listMap.get(item.parentId).menu.children = [menu]
-        } else {
-          children.push(menu)
-        }
-        return false
+    const menuList = list.map((item) => {
+      const menuItem = {
+        key: item.id.toString(),
+        label: <div onClick={() => {
+          switchSolutionComponent(item)
+        }}>
+          <ComponentItem solutionComponent={item} isParent={null} />
+        </div>,
+        children: undefined
       }
-      return true
-    }).map(item => item.menu)
+
+      if (item.children) {
+        menuItem.children = []
+
+        for (const childrenItem of item.children) {
+          menuItem.children.push({
+            key: childrenItem.id.toString(),
+            label: <div onClick={() => {
+              switchSolutionComponent(childrenItem)
+            }}>
+              <ComponentItem solutionComponent={childrenItem} isParent={item} />
+            </div>,
+          })
+        }
+      }
+
+      return menuItem;
+    })
+
+
+    return menuList
   }
 
   return <div >
