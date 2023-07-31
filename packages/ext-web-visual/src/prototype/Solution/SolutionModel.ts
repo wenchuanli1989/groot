@@ -11,7 +11,6 @@ export default class SolutionModel extends BaseModel {
   solutionComponentList: SolutionComponent[] = [];
   currSolutionVersionId: number;
   activeSolutionComponentId: number;
-  parentIdForAddComponent?: number;
   syncVersionDoing = false
 
   public init() {
@@ -31,11 +30,8 @@ export default class SolutionModel extends BaseModel {
     this.componentAddModalStatus = ModalStatus.Submit;
 
     getContext().request(APIPath.solutionComponent_addComponent, {
-      component: {
-        ...rawComponent,
-        solutionVersionId: grootManager.state.getState('gs.solution').solutionVersion.id
-      },
-      parentId: this.parentIdForAddComponent
+      component: rawComponent,
+      solutionVersionId: grootManager.state.getState('gs.solution').solutionVersion.id
     }).then(({ data: solutionComponent }) => {
       this.componentAddModalStatus = ModalStatus.None;
       this.solutionComponentList.push(solutionComponent)

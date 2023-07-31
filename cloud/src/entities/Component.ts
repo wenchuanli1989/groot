@@ -69,8 +69,8 @@ export class Component extends BaseEntity {
   @Property({ persist: false })
   valueList?: PropValue[];
 
-  @Property({ persist: false })
-  solutionVersionId?: number;
+  // @Property({ persist: false })
+  // solutionVersionId?: number;
 
   //************************已下是接口入参或者查询返回需要定义的属性************************
   @Property({ persist: false })

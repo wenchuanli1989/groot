@@ -9,7 +9,7 @@ import { PropBlock } from 'entities/PropBlock';
 import { PropGroup } from 'entities/PropGroup';
 import { PropItem } from 'entities/PropItem';
 import { PropValue } from 'entities/PropValue';
-import { SolutionVersion } from 'entities/SolutionVersion';
+import { Solution } from 'entities/Solution';
 
 
 @Injectable()
@@ -45,14 +45,14 @@ export class ComponentService {
       throw new LogicException('参数packageName和componentName不能同时为空', LogicExceptionCode.ParamEmpty);
     }
 
-    LogicException.assertParamEmpty(rawComponent.solutionVersionId, 'solutionVersionId');
-    const solutionVersion = await em.findOne(SolutionVersion, rawComponent.solutionVersionId)
-    LogicException.assertNotFound(solutionVersion, 'SolutionVersion', rawComponent.solutionVersionId);
+    LogicException.assertParamEmpty(rawComponent.solutionId, 'solutionId');
+    const solution = await em.findOne(Solution, rawComponent.solutionId)
+    LogicException.assertNotFound(solution, 'Solution', rawComponent.solutionId);
 
     const sameComponentCount = await em.count(Component, {
       componentName: rawComponent.componentName,
       packageName: rawComponent.packageName,
-      solution: solutionVersion.solution
+      solution
     })
 
 
@@ -61,7 +61,7 @@ export class ComponentService {
     }
 
     const newComponent = em.create(Component, pick(rawComponent, ['name', 'componentName', 'packageName'], {
-      solution: solutionVersion.solution
+      solution
     }));
 
     const parentCtx = parentEm ? em.getTransactionContext() : undefined;
