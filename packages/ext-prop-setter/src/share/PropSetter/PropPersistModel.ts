@@ -329,7 +329,6 @@ export default class PropPersistModel extends BaseModel {
       abstractValueIdChain,
       componentVersionId: getComponentVersionId(),
       componentId: component.id,
-      viewVersionId: grootManager.state.getState('gs.view').viewVersionId
     } as PropValue;
 
     if (getContext().params.mode === StudioMode.Prototype) {
@@ -342,6 +341,7 @@ export default class PropPersistModel extends BaseModel {
       paramsData.componentInstanceId = componentInstance.id;
       paramsData.appId = grootManager.state.getState('gs.app').id
       paramsData.viewId = grootManager.state.getState('gs.view').id
+      paramsData.viewVersionId = grootManager.state.getState('gs.view').viewVersionId
       paramsData.projectId = grootManager.state.getState('gs.app').projectId
       paramsData.solutionId = componentInstance.solutionId
     }
@@ -407,7 +407,6 @@ export default class PropPersistModel extends BaseModel {
       paramData.componentVersionId = getComponentVersionId();
       paramData.value = valueStr;
       paramData.valueStruct = valueStruct;
-      paramData.viewVersionId = grootManager.state.getState('gs.view').viewVersionId
 
       if (isPrototypeMode) {
         paramData.type = PropValueType.Prototype;
@@ -420,6 +419,7 @@ export default class PropPersistModel extends BaseModel {
         paramData.componentInstanceId = componentInstance.id;
         paramData.appId = grootManager.state.getState('gs.app').id
         paramData.viewId = grootManager.state.getState('gs.view').id
+        paramData.viewVersionId = grootManager.state.getState('gs.view').viewVersionId
         paramData.projectId = grootManager.state.getState('gs.app').projectId
         paramData.solutionId = componentInstance.solutionId
 

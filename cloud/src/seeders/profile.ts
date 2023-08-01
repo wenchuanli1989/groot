@@ -228,7 +228,7 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     solutionVersion: solution.recentVersion,
     componentVersion: profileComponentVersion,
     component: profileComponent,
-    view: false,
+    view: true,
   })
 
   await em.persistAndFlush(profileSolutionComponent)
@@ -238,7 +238,6 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     solutionVersion: solution.recentVersion,
     componentVersion: avatarComponentVersion,
     component: avatarComponent,
-    view: false,
   })
 
   await em.persistAndFlush(avatarSolutionComponent)

@@ -28,28 +28,20 @@ export class ViewService {
   ) { }
 
   // todo **id为componentInstanceId**
-  async getDetailByViewIdAndReleaseId(viewId: number, releaseId: number) {
+  async getDetailByViewVersionId(viewVersionId: number) {
     const em = RequestContext.getEntityManager();
 
-    LogicException.assertParamEmpty(viewId, 'viewId');
-    LogicException.assertParamEmpty(releaseId, 'releaseId');
-
-    const release = await em.findOne(Release, releaseId)
-    LogicException.assertNotFound(release, 'Release', releaseId);
-
-    const view = await em.findOne(View, viewId)
-    LogicException.assertNotFound(view, 'View', viewId);
-
-    const appView = await em.findOne(AppView, { view, release })
-    LogicException.assertNotFound(appView, 'AppView', `viewId: ${viewId} releaseId: ${releaseId}`);
+    LogicException.assertParamEmpty(viewVersionId, 'viewVersionId');
+    const viewVersion = await em.findOne(ViewVersion, viewVersionId, { populate: ['view'] })
+    LogicException.assertNotFound(viewVersion, 'ViewVersion', viewVersionId);
 
     const viewExtensionInstanceList = await em.find(ExtensionInstance, {
-      relationId: appView.viewVersion.id,
+      relationId: viewVersionId,
       relationType: ExtensionRelationType.View,
       secret: false
     }, { populate: ['extension', 'extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw',] })
 
-    const solutionInstanceList = await em.find(SolutionInstance, { viewVersion: appView.viewVersion })
+    const solutionInstanceList = await em.find(SolutionInstance, { viewVersion: viewVersionId }, { orderBy: { primary: 'DESC' } })
 
     for (const solutionInstance of solutionInstanceList) {
       solutionInstance.extensionInstanceList = await em.find(ExtensionInstance, {
@@ -59,7 +51,7 @@ export class ViewService {
       }, { populate: ['extension', 'extensionVersion.propItemPipelineRaw', 'extensionVersion.resourcePipelineRaw',] })
     }
 
-    const instanceList = await em.find(ComponentInstance, { viewVersion: appView.viewVersion }, {
+    const instanceList = await em.find(ComponentInstance, { viewVersion: viewVersionId }, {
       populate: ['component', 'componentVersion'],
     });
 
@@ -73,7 +65,7 @@ export class ViewService {
     }
 
     let resourceList = await em.find(ViewResource,
-      { viewVersion: appView.viewVersion },
+      { viewVersion: viewVersionId },
       { populate: ['imageResource.resourceConfig', 'resourceConfig'] }
     )
 
@@ -83,7 +75,8 @@ export class ViewService {
     })
     const resourceConfigList = [...resourceConfigMap.values()]
 
-    return { ...view, instanceList, resourceList, resourceConfigList, viewExtensionInstanceList, solutionInstanceList };
+    viewVersion.view.viewVersionId = viewVersionId
+    return { ...viewVersion.view, instanceList, resourceList, resourceConfigList, viewExtensionInstanceList, solutionInstanceList };
   }
 
   async add(rawView: View) {

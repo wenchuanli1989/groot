@@ -30,7 +30,7 @@ export const Solution = () => {
 
     const menuList = list.map((item) => {
       const menuItem = {
-        key: item.id.toString(),
+        key: `${item.id.toString()}-parent`,
         label: <div onClick={() => {
           switchSolutionComponent(item)
         }}>

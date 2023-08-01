@@ -14,7 +14,7 @@ export enum APIPath {
   solutionComponent_addComponent = 'POST solution-component/add-component',
   componentVersion_add = 'POST component-version/add',
   componentVersion_publish = 'POST component-version/publish',
-  view_detailByViewIdAndReleaseId = 'view/detail-by-viewId-and-releaseId',
+  view_detailByViewVersionId = 'view/detail-by-viewVersionId',
   view_add = 'POST view/add',
   view_remove_viewId = 'view/remove/:viewId',
   // componentInstance_reverseDetectId = 'component-instance/reverse-detect-id',

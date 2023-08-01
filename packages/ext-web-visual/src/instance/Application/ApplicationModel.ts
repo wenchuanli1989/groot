@@ -47,7 +47,7 @@ export default class ApplicationModel extends BaseModel {
     return getContext().request(APIPath.view_add, {
       key: view.key,
       name: view.name,
-      appId: view.appId,
+      appId: grootManager.state.getState('gs.app').id,
       solutionComponentId: view.solutionComponentId
     }).then(({ data }) => {
       grootManager.state.getState('gs.viewList').push(data)

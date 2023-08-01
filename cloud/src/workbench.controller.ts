@@ -156,9 +156,9 @@ export class WorkbenchController {
     return this.applicationService.getDetailByReleaseId(releaseId);
   }
 
-  @Get('/view/detail-by-viewId-and-releaseId')
-  async viewDetailByViewIdAndReleaseId(@Query('viewId') viewId: number, @Query('releaseId') releaseId: number) {
-    return this.viewService.getDetailByViewIdAndReleaseId(viewId, releaseId);
+  @Get('/view/detail-by-viewVersionId')
+  async viewDetailByViewIdAndReleaseId(@Query('viewVersionId') viewVersionId: number) {
+    return this.viewService.getDetailByViewVersionId(viewVersionId);
   }
 
   @Post('/component-version/add')

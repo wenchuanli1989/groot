@@ -240,7 +240,6 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     solutionVersion: solution.recentVersion,
     componentVersion: tableComponentVersion,
     component: tableComponent,
-    view: true,
   })
 
   await em.persistAndFlush(solutionComponent)
