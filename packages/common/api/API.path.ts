@@ -55,5 +55,7 @@ export enum APIPath {
   componentVersion_remove = 'POST component-version/remove',
   solutionComponent_syncVersion = 'POST solution-component/syncVersion',
 
-  solutionComponent_remove = 'POST solution-component/remove'
+  solutionComponent_remove = 'POST solution-component/remove',
+
+  solutionComponent_listByViewVersionId = 'solution-component/list-by-viewVersionId'
 }

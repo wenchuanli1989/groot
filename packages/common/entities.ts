@@ -198,7 +198,8 @@ export type SolutionVersion = {
 
 export type SolutionInstance = {
 
-  extensionInstanceList: ExtensionRuntime[]
+  extensionInstanceList: ExtensionRuntime[],
+  solutionComponentList: SolutionComponent[]
   // ************************** 分割线已下是界面属性 **************************
 } & Omit<import("../../cloud/src/entities/SolutionInstance").SolutionInstance, ''>;
 

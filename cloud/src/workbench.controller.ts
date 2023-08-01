@@ -294,6 +294,10 @@ export class WorkbenchController {
     });
   }
 
+  @Get('/solution-component/list-by-viewVersionId')
+  async solutionCompoentListByViewVersionId(@Query('viewVersionId') viewVersionId: number) {
+    return await this.solutionComponentService.listByViewVersionId(viewVersionId);
+  }
 
   @Get('/application/release-list/:appId')
   async componentList(@Param('appId') appId: number) {

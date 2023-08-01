@@ -1,5 +1,5 @@
 import { APIPath, SolutionComponent } from "@grootio/common";
-import { getContext } from "context";
+import { getContext, grootManager } from "context";
 import { useEffect, useState } from "react";
 import { DragComponent } from "./DragComponent";
 
@@ -9,8 +9,10 @@ export const Material = () => {
   const [solutionComponentList, setSolutionComponentList] = useState<SolutionComponent[]>([]);
 
   useEffect(() => {
-    getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: 1, view: 'false', queryVersionList: false, queryTagList: false }).then(({ data }) => {
-      setSolutionComponentList(data);
+    const viewVersionId = grootManager.state.getState('gs.view').viewVersionId;
+    getContext().request(APIPath.solutionComponent_listByViewVersionId, { viewVersionId }).then(({ data }) => {
+      const { solutionComponentList } = data.find(item => item.primary)
+      setSolutionComponentList(solutionComponentList);
     })
   }, []);
 

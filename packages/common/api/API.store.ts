@@ -101,7 +101,8 @@ export type APIStore = {
   [APIPath.solutionVersion_add]: [{ imageVersionId: number, name: string }, API.Response<SolutionVersion>]
   [APIPath.componentVersion_remove]: [{ solutionVersionId: number, componentVersionId: number }],
   [APIPath.solutionComponent_syncVersion]: [{ solutionVersionId: number, newSolutionComponentList: SolutionComponent[] }],
-  [APIPath.solutionComponent_remove]: [{ solutionComponentId: number }]
+  [APIPath.solutionComponent_remove]: [{ solutionComponentId: number }],
+  [APIPath.solutionComponent_listByViewVersionId]: [{ viewVersionId: number }, API.Response<SolutionInstance[]>]
 };
 
 

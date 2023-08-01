@@ -9,6 +9,7 @@ import { View } from "./View";
 import { Project } from "./Project";
 import { Application } from "./Application";
 import { ViewVersion } from "./ViewVersion";
+import { SolutionComponent } from "./SolutionComponent";
 
 @SoftDelete()
 @Entity()
@@ -41,6 +42,9 @@ export class SolutionInstance extends BaseEntity {
 
   @Property({ persist: false })
   extensionInstanceList: ExtensionInstance[]
+
+  @Property({ persist: false })
+  solutionComponentList: SolutionComponent[]
 
   @Property({ persist: false })
   solutionVersionId: number

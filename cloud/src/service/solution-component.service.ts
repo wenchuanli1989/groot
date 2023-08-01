@@ -8,6 +8,7 @@ import { ComponentService } from './component.service';
 import { SolutionComponentTagService } from './solution-component-tag.service';
 import { TagNatureType } from '@grootio/common';
 import { SolutionComponentTag } from 'entities/SolutionComponentTag';
+import { SolutionInstance } from 'entities/SolutionInstance';
 
 @Injectable()
 export class SolutionComponentService {
@@ -52,6 +53,21 @@ export class SolutionComponentService {
     }
 
     return solutionComponentList;
+  }
+
+  async listByViewVersionId(viewVersionId: number) {
+    const em = RequestContext.getEntityManager();
+
+    LogicException.assertParamEmpty(viewVersionId, 'viewVersionId')
+
+    const solutionInstanceList = await em.find(SolutionInstance, { viewVersion: viewVersionId }, { orderBy: { primary: 'DESC' } })
+
+    for (const solutionInstance of solutionInstanceList) {
+      const solutionComponentList = await em.find(SolutionComponent, { solutionVersion: solutionInstance.solutionVersion }, { populate: ['component'] })
+      solutionInstance.solutionComponentList = solutionComponentList
+    }
+
+    return solutionInstanceList;
   }
 
   async syncVersion(solutionVersionId: number, newSolutionComponentList: SolutionComponent[]) {
