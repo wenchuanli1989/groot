@@ -132,6 +132,8 @@ export class ViewService {
       }, em);
 
       await em.commit()
+
+      view.viewVersionId = viewVersion.id;
       return view
     } catch (e) {
       await em.rollback();

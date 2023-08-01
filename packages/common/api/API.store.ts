@@ -20,7 +20,7 @@ export type APIStore = {
   [APIPath.solutionComponent_addComponent]: [Partial<SolutionComponent>, API.Response<SolutionComponent>];
   [APIPath.componentVersion_add]: [ComponentVersion, API.Response<ComponentVersion>];
   [APIPath.componentVersion_publish]: [{ componentVersionId: number }];
-  [APIPath.view_detailByViewVersionId]: [{ viewVersionId: number }, API.Response<{
+  [APIPath.view_detailByViewVersionId]: [{ viewVersionId: number }, API.Response<View & {
     instanceList: ComponentInstance[],
     viewExtensionInstanceList: ExtensionRuntime[],
     solutionInstanceList: SolutionInstance[],

@@ -22,7 +22,7 @@ export const Application = () => {
   }, [])
 
   const openView = (view: View) => {
-    grootManager.command.executeCommand('gc.openView', view.id)
+    grootManager.command.executeCommand('gc.openView', view.viewVersionId)
   }
 
 

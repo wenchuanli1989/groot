@@ -32,12 +32,12 @@ export const instanceBootstrap = () => {
     return createResource(viewId)
   })
 
-  registerCommand('gc.loadView', (_, viewId) => {
-    return loadView(viewId);
+  registerCommand('gc.loadView', (_, viewVersionId) => {
+    return loadView(viewVersionId);
   })
 
-  registerCommand('gc.openView', (_, viewId, primaryView) => {
-    return openView(viewId, primaryView)
+  registerCommand('gc.openView', (_, viewVersionId, primaryView) => {
+    return openView(viewVersionId, primaryView)
   })
 
   registerCommand('gc.unloadView', (_, viewId) => {
@@ -173,10 +173,10 @@ const createFullMetadata = (viewId: number) => {
   }
 }
 
-const loadView = (viewId: number) => {
-  const { request, groot: { loadExtension, launchExtension }, params } = getContext();
-  const releaseId = +params.releaseId
-  return request(APIPath.view_detailByViewIdAndReleaseId, { viewId, releaseId }).then(({ data }) => {
+const loadView = (viewVersionId: number) => {
+  const { request, groot: { loadExtension, launchExtension } } = getContext();
+  return request(APIPath.view_detailByViewVersionId, { viewVersionId }).then(({ data }) => {
+    const viewId = data.id;
     activeViewIdSet.add(viewId)
     const root = data.instanceList.find(item => !item.parentId)
     const children = data.instanceList.filter(item => !!item.parentId)
@@ -215,13 +215,16 @@ const loadView = (viewId: number) => {
     const metadataData = executeCommand('gc.createMetadata', viewId)
 
     return {
-      ...resourceData,
-      ...metadataData
+      viewMetadata: {
+        ...resourceData,
+        ...metadataData
+      },
+      viewData: data
     }
   });
 }
 
-const openView = (viewId: number, primaryView = true) => {
+const openView = (viewVersionId: number, primaryView = true) => {
   const { executeCommand } = grootManager.command
   const { getState } = grootManager.state
 
@@ -232,9 +235,10 @@ const openView = (viewId: number, primaryView = true) => {
   viewCache.clear()
   if (primaryView) {
     // todo 清空缓存数据
-    return executeCommand('gc.loadView', viewId).then((data) => {
+    return executeCommand('gc.loadView', viewVersionId).then(({ viewMetadata, viewData }) => {
+      const viewId = viewData.id;
       const view = getState('gs.viewList').find(item => item.id === viewId)
-      executeCommand('gc.stageRefresh', view.key, data)
+      executeCommand('gc.stageRefresh', view.key, viewMetadata)
       const { root } = viewCache.get(viewId)
       executeCommand('gc.switchIstance', root.id, viewId)
     })

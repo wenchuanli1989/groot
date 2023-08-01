@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import React from "react";
 import { APIStore } from "./api/API.store";
-import { Application, Component, ComponentInstance, ExtensionInstance, PropGroup, PropItem, Release, Resource, ResourceConfig, Solution, View } from "./entities";
+import { Application, Component, ComponentInstance, ExtensionInstance, PropGroup, PropItem, Release, Resource, ResourceConfig, Solution, SolutionInstance, View } from "./entities";
 import { GridLayout } from "./GridLayout";
 import { ApplicationData, Metadata, ViewDataCore } from "./internal";
 import { ExtensionLevel, ExtensionPipelineLevel } from "./enum";
@@ -25,7 +25,7 @@ export type GrootContextParams = {
   mode: string,
   releaseId: string,
   solutionVersionId: string,
-  viewId?: string,
+  viewVersionId?: string,
   componentVersionId?: string,
 }
 
@@ -132,7 +132,16 @@ export type GrootCommandDict = {
   'gc.ui.render.statusBar': [[], ReactElement | null],
 
   'gc.openView': [[number, boolean] | [number], Promise<void>],
-  'gc.loadView': [[number], Promise<ViewDataCore>],
+  'gc.loadView': [[number], Promise<{
+    viewMetadata: ViewDataCore,
+    viewData: View & {
+      instanceList: ComponentInstance[],
+      viewExtensionInstanceList: ExtensionRuntime[],
+      solutionInstanceList: SolutionInstance[],
+      resourceList: Resource[],
+      resourceConfigList: ResourceConfig[]
+    }
+  }>],
   'gc.switchIstance': [[number, number] | [number], void],
   'gc.createMetadata': [[number] | [], { metadataList: Metadata[], propTaskList: PropTask[] }],
   'gc.createResource': [[number] | [], { resourceList: Resource[], resourceTaskList: ResourceTask[], resourceConfigList: ResourceConfig[] }],
