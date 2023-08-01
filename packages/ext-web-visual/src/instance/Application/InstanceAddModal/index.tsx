@@ -8,15 +8,17 @@ import ApplicationModel from "../ApplicationModel";
 const InstanceAddModal: React.FC = () => {
   const applicationModel = useModel(ApplicationModel);
   const [form] = Form.useForm();
-  const [componentList, setComponentList] = useState<Component[]>([]);
+  const [componentList, setComponentList] = useState<{ name: string, value: number }[]>([]);
 
   useEffect(() => {
     if (applicationModel.instanceAddModalStatus === ModalStatus.Init) {
       form.resetFields();
-      getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: 1, view: 'true', queryVersionList: false, queryTagList: false }).then(({ data }) => {
+      getContext().request(APIPath.solutionComponent_list_solutionVersionId, { solutionVersionId: 2, view: 'true', queryVersionList: false, queryTagList: false }).then(({ data }) => {
         setComponentList(data.map(item => {
-          item.component.componentVersionId = item.componentVersionId
-          return item.component
+          return {
+            name: item.component.name,
+            value: item.id
+          }
         }));
       })
     }
@@ -50,7 +52,7 @@ const InstanceAddModal: React.FC = () => {
             <Select disabled={empty}>
               {
                 componentList.map((c) => {
-                  return <Select.Option key={c.componentVersionId} value={c.componentVersionId}>{c.name}</Select.Option>
+                  return <Select.Option key={c.value} value={c.value}>{c.name}</Select.Option>
                 })
               }
             </Select>

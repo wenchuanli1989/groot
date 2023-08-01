@@ -34,7 +34,7 @@ export class ReleaseService {
       throw new LogicException(`迭代版本名称冲突，该值必须在应用范围内唯一`, LogicExceptionCode.NotUnique);
     }
 
-    const originAppViewList = await em.find(AppView, { app: imageRelease.app })
+    const originAppViewList = await em.find(AppView, { release: imageRelease })
     const originAppExtInstanceList = await em.find(ExtensionInstance, { relationId: rawRelease.imageReleaseId, relationType: ExtensionRelationType.Application })
     const originAppResourceList = await em.find(AppResource, { release: imageRelease })
     const originCoreExtInstance = await em.findOne(ExtensionInstance, { relationId: imageRelease.id, relationType: ExtensionRelationType.Application, secret: true });

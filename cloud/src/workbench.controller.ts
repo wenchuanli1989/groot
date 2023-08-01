@@ -158,7 +158,7 @@ export class WorkbenchController {
 
   @Get('/view/detail-by-viewVersionId')
   async viewDetailByViewIdAndReleaseId(@Query('viewVersionId') viewVersionId: number) {
-    return this.viewService.getDetailByViewVersionId(viewVersionId);
+    return this.viewService.getDetailByViewVersionId(+viewVersionId);
   }
 
   @Post('/component-version/add')
@@ -296,7 +296,7 @@ export class WorkbenchController {
 
   @Get('/solution-component/list-by-viewVersionId')
   async solutionCompoentListByViewVersionId(@Query('viewVersionId') viewVersionId: number) {
-    return await this.solutionComponentService.listByViewVersionId(viewVersionId);
+    return await this.solutionComponentService.listByViewVersionId(+viewVersionId);
   }
 
   @Get('/application/release-list/:appId')
@@ -312,7 +312,7 @@ export class WorkbenchController {
 
   @Get('/componentVersion/get-by-solutionVersionId-and-componentId')
   async getBySolutionVersionIdAndComponentId(@Query('solutionVersionId') solutionVersionId: number, @Query('componentId') componentId: number) {
-    return await this.componentVersionService.getBySolutionVersionIdAndComponentId(solutionVersionId, componentId)
+    return await this.componentVersionService.getBySolutionVersionIdAndComponentId(+solutionVersionId, +componentId)
   }
 
   @Post('/solution-version/add')

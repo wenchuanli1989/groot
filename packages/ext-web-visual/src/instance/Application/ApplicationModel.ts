@@ -47,14 +47,16 @@ export default class ApplicationModel extends BaseModel {
     return getContext().request(APIPath.view_add, {
       key: view.key,
       name: view.name,
-      appId: grootManager.state.getState('gs.app').id,
+      primaryView: view.primaryView,
+      releaseId: grootManager.state.getState('gs.release').id,
       solutionComponentId: view.solutionComponentId
     }).then(({ data }) => {
       grootManager.state.getState('gs.viewList').push(data)
 
-      grootManager.command.executeCommand('gc.openView', data.id)
-    }).finally(() => {
+      grootManager.command.executeCommand('gc.openView', data.viewVersionId)
       this.instanceAddModalStatus = ModalStatus.None;
+    }).catch(() => {
+      this.instanceAddModalStatus = ModalStatus.Init;
     })
   }
 
@@ -63,9 +65,10 @@ export default class ApplicationModel extends BaseModel {
     this.releaseAddModalStatus = ModalStatus.Submit;
     return getContext().request(APIPath.release_add, rawRelease).then(({ data }) => {
       // this.releaseList.push(data);
-      return this.switchRelease(data.id);
-    }).finally(() => {
       this.releaseAddModalStatus = ModalStatus.None;
+      return this.switchRelease(data.id);
+    }).catch(() => {
+      this.releaseAddModalStatus = ModalStatus.Init;
     })
   }
 

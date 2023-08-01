@@ -84,22 +84,22 @@ export class ViewService {
 
     LogicException.assertParamEmpty(rawView.key, 'key');
     LogicException.assertParamEmpty(rawView.name, 'name');
-    LogicException.assertParamEmpty(rawView.appId, 'appId');
+    LogicException.assertParamEmpty(rawView.releaseId, 'releaseId');
     LogicException.assertParamEmpty(rawView.solutionComponentId, 'solutionComponentId');
 
-    const app = await em.findOne(Application, rawView.appId);
-    LogicException.assertNotFound(app, 'Application', rawView.appId);
+    const release = await em.findOne(Release, rawView.releaseId);
+    LogicException.assertNotFound(release, 'Release', rawView.releaseId);
 
     const solutionComponent = await em.findOne(SolutionComponent, rawView.solutionComponentId);
     LogicException.assertNotFound(solutionComponent, 'SolutionComponent', rawView.solutionComponentId);
 
-    const keySameCount = await em.count(View, { app, key: rawView.key })
+    const keySameCount = await em.count(AppView, { release, view: { key: rawView.key } })
 
     if (keySameCount > 0) {
       throw new LogicException(`参数key冲突，该值必须全局唯一`, LogicExceptionCode.NotUnique);
     }
 
-    const view = em.create(View, pick(rawView, ['key', 'name'], { app, project: app.project }))
+    const view = em.create(View, pick(rawView, ['key', 'name'], { app: release.app, project: release.project }))
 
     await em.begin()
     try {
@@ -108,8 +108,19 @@ export class ViewService {
       const viewVersion = em.create(ViewVersion, {
         name: 'init',
         view,
-        project: app.project,
-        app
+        project: release.project,
+        app: release.app
+      })
+
+      await em.flush()
+
+      em.create(AppView, {
+        viewVersion,
+        release,
+        view,
+        primaryView: rawView.primaryView,
+        app: release.app,
+        project: release.project
       })
 
       await em.flush()
@@ -120,8 +131,8 @@ export class ViewService {
         viewVersion,
         primary: true,
         solution: solutionComponent.solution.id,
-        app,
-        project: app.project
+        app: release.app,
+        project: release.project
       })
 
       await em.flush()

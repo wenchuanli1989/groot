@@ -29,7 +29,7 @@ export class View extends BaseEntity {
   solutionComponentId: number
 
   @Property({ persist: false })
-  appId: number
+  releaseId: number
 
   @Property({ persist: false })
   viewVersionId: number

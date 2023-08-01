@@ -40,7 +40,7 @@ export class ApplicationService {
 
     const appViewList = await em.find(AppView, { release }, { populate: ['view'] });
     app.viewList = appViewList.map(item => {
-      item.view.viewVersionId = item.id
+      item.view.viewVersionId = item.viewVersion.id
       return item.view
     })
 

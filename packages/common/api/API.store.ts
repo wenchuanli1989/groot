@@ -27,7 +27,7 @@ export type APIStore = {
     resourceList: Resource[],
     resourceConfigList: ResourceConfig[]
   }>];
-  [APIPath.view_add]: [Pick<View, 'key' | 'name' | 'appId' | 'solutionComponentId'>, API.Response<View>];
+  [APIPath.view_add]: [Pick<View, 'key' | 'name' | 'releaseId' | 'solutionComponentId'>, API.Response<View>];
   [APIPath.view_remove_viewId]: [{ viewId: number }]
   [APIPath.release_add]: [Release, API.Response<Release>],
   // [APIPath.componentInstance_reverseDetectId]: [Partial<ComponentInstance>, API.Response<number>],
