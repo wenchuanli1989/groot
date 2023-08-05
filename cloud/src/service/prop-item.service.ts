@@ -9,6 +9,7 @@ import { PropItem } from 'entities/PropItem';
 import { PropValue } from 'entities/PropValue';
 import { CommonService } from './common.service';
 import { PropGroupService } from './prop-group.service';
+import { LargeText } from 'entities/LargeText';
 
 @Injectable()
 export class PropItemService {
@@ -49,7 +50,7 @@ export class PropItemService {
     const firstItem = await em.findOne(PropItem, { block }, { orderBy: { order: 'DESC' } });
 
     const newItem = em.create(PropItem, {
-      ...pick(rawItem, ['label', 'propKey', 'rootPropKey', 'struct', 'viewType', 'span', 'valueOptions', 'versionTraceId']),
+      ...pick(rawItem, ['label', 'propKey', 'rootPropKey', 'struct', 'viewType', 'span', 'versionTraceId']),
       block,
       group: block.group,
       component: block.component,
@@ -64,6 +65,10 @@ export class PropItemService {
     try {
 
       await em.flush();
+
+      if (rawItem.extraDataStr) {
+        rawItem.extraData = em.create(LargeText, { text: rawItem.extraDataStr })
+      }
 
       // if (rawItem.type === PropItemType.Component) {
       //   em.create(PropValue, {
@@ -138,7 +143,7 @@ export class PropItemService {
   async remove(itemId: number, parentEm?: EntityManager) {
     let em = parentEm || RequestContext.getEntityManager();
 
-    const propItem = await em.findOne(PropItem, itemId);
+    const propItem = await em.findOne(PropItem, itemId, { populate: ['extraData'] });
 
     LogicException.assertNotFound(propItem, 'PropItem', itemId);
 
@@ -147,6 +152,12 @@ export class PropItemService {
     }
     try {
       propItem.deletedAt = new Date()
+
+      if (propItem.extraData?.text) {
+        propItem.extraData.deletedAt = new Date();
+      }
+
+      await em.flush()
 
       if (!!propItem.childGroup) {
         await this.propGroupService.remove(propItem.childGroup.id, em);
@@ -170,7 +181,7 @@ export class PropItemService {
     const em = RequestContext.getEntityManager();
 
     LogicException.assertParamEmpty(rawItem.id, 'id');
-    const propItem = await em.findOne(PropItem, rawItem.id);
+    const propItem = await em.findOne(PropItem, rawItem.id, { populate: ['extraData'] });
     LogicException.assertNotFound(propItem, 'PropItem', rawItem.id);
 
 
@@ -184,9 +195,17 @@ export class PropItemService {
           type: PropValueType.Prototype
         }, { deletedAt: new Date() });
       }
-      pick(rawItem, ['label', 'propKey', 'rootPropKey', 'viewType', 'span', 'valueOptions'], propItem);
+      pick(rawItem, ['label', 'propKey', 'rootPropKey', 'viewType', 'span'], propItem);
       if (typeChange) {
         propItem.defaultValue = '';
+      }
+
+      if (rawItem.extraDataStr) {
+        if (propItem.extraData?.text) {
+          propItem.extraData.text = rawItem.extraDataStr;
+        } else {
+          propItem.extraData = em.create(LargeText, { text: rawItem.extraDataStr })
+        }
       }
       await em.flush();
 

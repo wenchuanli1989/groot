@@ -1,6 +1,5 @@
-import { ComponentInstance, PropMetadataDataItem, PropMetadataData, DragAddComponentPong, PostMessageType, PropBlock, PropGroup, PropItem, PropValueType, ValueStruct, wrapperState, BaseModel, PropItemStruct, viewRender, FormItemRender } from "@grootio/common";
+import { ComponentInstance, PropMetadataDataItem, PropMetadataData, DragAddComponentPong, PostMessageType, PropBlock, PropGroup, PropItem, PropValueType, ValueStruct, BaseModel, PropItemStruct } from "@grootio/common";
 import { commandBridge, grootManager } from "context";
-import React from "react";
 
 import PropPersistModel from "./PropPersistModel";
 
@@ -17,9 +16,6 @@ export default class PropHandleModel extends BaseModel {
    */
   public propItemStack: PropItem[] = [];
   public propPathChainEle: HTMLElement;
-
-  public propFormItemObj = {} as Record<string, React.FC<FormItemRender>>;
-
 
   public inject(propPersist: PropPersistModel) {
     this.propPersist = propPersist;
@@ -263,12 +259,6 @@ export default class PropHandleModel extends BaseModel {
     commandBridge.removeChildInstance = this.removeChildInstance
     commandBridge.addChildInstance = this.addChildInstance
 
-
-    const formItemRenderList = grootManager.state.getState('gs.propItem.formRenderList')
-    formItemRenderList.forEach((item) => {
-      this.propFormItemObj[item.viewType] = item.render
-    })
-
   }
 
 
@@ -351,18 +341,6 @@ export default class PropHandleModel extends BaseModel {
 
       // this.forceUpdateFormKey++;
     })
-  }
-
-  public renderFormItem(propItem: PropItem, formItemProps: any, simplify: boolean) {
-    if (this.propFormItemObj[propItem.viewType]) {
-      const view = this.propFormItemObj[propItem.viewType]
-      return viewRender(view, { propItem, simplify, formItemProps })
-    } else if (this.propFormItemObj['*']) {
-      const view = this.propFormItemObj['*']
-      return viewRender(view, { propItem, simplify, formItemProps })
-    } else {
-      return React.createElement(React.Fragment, null, '未识别的类型')
-    }
   }
 
   private getItemById(propItemId: number, instanceId: number) {

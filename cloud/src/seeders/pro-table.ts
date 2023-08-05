@@ -17,6 +17,7 @@ import { Project } from "../entities/Project";
 import { Application } from "../entities/Application";
 import { ViewVersion } from "../entities/ViewVersion";
 import { AppView } from "../entities/AppView";
+import { LargeText } from "../entities/LargeText";
 
 export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project, app: Application) => {
   // 创建组件
@@ -127,11 +128,16 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   })
   await em.persistAndFlush(columnItem2);
 
+  const extraData2 = em.create(LargeText, {
+    text: '{"optionList": [{"label": "文本","value": "text"},{"label": "日期","value": "date"},{"label": "下拉框","value": "select"}]}'
+  })
+  await em.persistAndFlush(extraData2)
+
   const columnItem3 = em.create(PropItem, {
     label: '类型',
     propKey: 'valueType',
     viewType: PropItemViewType.Select,
-    valueOptions: '[{"label": "文本","value": "text"},{"label": "日期","value": "date"},{"label": "下拉框","value": "select"}]',
+    extraData: extraData2,
     block: columnInnerBlock,
     group: columnInnerGroup,
     componentVersion: tableComponentVersion,

@@ -60,7 +60,7 @@ export class ViewService {
 
       instance.groupList = await em.find(PropGroup, { component: instance.component, componentVersion: instance.componentVersion });
       instance.blockList = await em.find(PropBlock, { component: instance.component, componentVersion: instance.componentVersion });
-      instance.itemList = await em.find(PropItem, { component: instance.component, componentVersion: instance.componentVersion });
+      instance.itemList = await em.find(PropItem, { component: instance.component, componentVersion: instance.componentVersion }, { populate: ['extraData'] });
       instance.valueList = await em.find(PropValue, { componentInstance: instance });
     }
 

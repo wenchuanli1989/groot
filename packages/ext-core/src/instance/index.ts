@@ -1,7 +1,6 @@
 import { APIPath, ExtensionLevel, PropBlockStructType, PropGroup, PropItemPipelineParams, View, propAppendTask } from "@grootio/common"
 import { metadataFactory, pipelineExec, propTreeFactory } from '@grootio/core'
 import { getContext, grootManager } from "context"
-import { parseOptions } from "../util"
 import { createResourceTaskList } from "util/resource"
 
 const viewCache = new Map<number, Partial<View>>()
@@ -126,8 +125,11 @@ const createFullMetadata = (viewId: number) => {
     if (!instance.propTree) {
 
       itemList.forEach(item => {
-        parseOptions(item);
-        delete item.valueOptions
+        try {
+          item.extraData = JSON.parse(item.extraData as any as string)
+        } catch (e) {
+          item.extraData = null
+        }
       })
 
       blockList.filter(block => block.struct === PropBlockStructType.List).forEach((block) => {

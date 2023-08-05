@@ -13,6 +13,7 @@ import { PropGroupService } from './prop-group.service';
 import { PropItemService } from './prop-item.service';
 import { SolutionComponent } from 'entities/SolutionComponent';
 import { SolutionVersion } from 'entities/SolutionVersion';
+import { LargeText } from 'entities/LargeText';
 
 const tempIdData = {
   itemId: 1,
@@ -49,7 +50,7 @@ export class ComponentVersionService {
 
     const originGroupList = await em.find(PropGroup, { component: imageComponentVersion.component, componentVersion: imageComponentVersion });
     const originBlockList = await em.find(PropBlock, { component: imageComponentVersion.component, componentVersion: imageComponentVersion });
-    const originItemList = await em.find(PropItem, { component: imageComponentVersion.component, componentVersion: imageComponentVersion });
+    const originItemList = await em.find(PropItem, { component: imageComponentVersion.component, componentVersion: imageComponentVersion }, { populate: ['extraData'] });
     const originValueList = await em.find(PropValue, { component: imageComponentVersion.component, componentVersion: imageComponentVersion, type: PropValueType.Prototype });
 
     const groupMap = new Map<number, PropGroup>();
@@ -99,7 +100,7 @@ export class ComponentVersionService {
         const originItem = originItemList[itemIndex];
         const item = em.create(PropItem, {
           ...pick(originItem,
-            ['label', 'propKey', 'struct', 'valueOptions', 'viewType', 'span', 'rootPropKey', 'order', 'component', 'versionTraceId', 'defaultValue']
+            ['label', 'propKey', 'struct', 'viewType', 'span', 'rootPropKey', 'order', 'component', 'versionTraceId', 'defaultValue']
           ),
           componentVersion,
           block: tempIdData.blockId,
@@ -107,6 +108,12 @@ export class ComponentVersionService {
           solution: componentVersion.solution
         });
         itemMap.set(originItem.id, item);
+
+        if (originItem.extraData) {
+          item.extraData = em.create(LargeText, {
+            text: originItem.extraData.text
+          })
+        }
       }
 
       for (let valueIndex = 0; valueIndex < originValueList.length; valueIndex++) {

@@ -7,7 +7,7 @@ import {
 import { BaseExceptionFilter } from '@nestjs/core';
 import { Response } from 'express';
 
-import { LogicException } from './logic.exception';
+import { LogicException } from './Logic.exception';
 
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {

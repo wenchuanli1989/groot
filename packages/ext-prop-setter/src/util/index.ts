@@ -1,14 +1,6 @@
 import { PropItem, PropItemViewType } from "@grootio/common";
 
 
-
-
-export const stringifyOptions = (propItem: PropItem) => {
-  if (([PropItemViewType.Checkbox, PropItemViewType.Radio, PropItemViewType.Select, PropItemViewType.ButtonGroup] as string[]).includes(propItem.viewType)) {
-    propItem.valueOptions = JSON.stringify(propItem.optionList || []);
-  }
-}
-
 export const calcPropValueIdChain = (propItem: PropItem, defaultValueId?: number) => {
   let ctxPropItem = propItem;
   const propValueIdList = [];

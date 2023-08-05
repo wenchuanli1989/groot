@@ -19,6 +19,7 @@ import { ViewVersion } from "../entities/ViewVersion";
 import { AppView } from "../entities/AppView";
 import { SolutionTag } from "../entities/SolutionTag";
 import { SolutionComponentTag } from "../entities/SolutionComponentTag";
+import { LargeText } from "../entities/LargeText";
 
 export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project, app: Application) => {
   // 创建组件
@@ -76,12 +77,17 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     solution
   });
 
+  const extraData3 = em.create(LargeText, {
+    text: '{"optionList": [{"label": "圆形","value": "circle"},{"label": "方形","value": "square"}]}'
+  })
+  await em.persistAndFlush(extraData3)
+
   const avatarItem2 = em.create(PropItem, {
     label: '形状',
     propKey: 'shape',
     viewType: PropItemViewType.ButtonGroup,
     defaultValue: '"circle"',
-    valueOptions: '[{"label": "圆形","value": "circle"},{"label": "方形","value": "square"}]',
+    extraData: extraData3,
     block: avatarBlock,
     group: avatarGroup,
     componentVersion: avatarComponentVersion,

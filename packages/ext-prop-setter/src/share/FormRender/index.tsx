@@ -1,5 +1,5 @@
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { PropItem, PropItemStruct, PropItemViewType, useModel } from "@grootio/common";
+import { PropItemViewRenderProps, PropItemStruct, PropItemViewType, useModel } from "@grootio/common";
 import { Button, Checkbox, DatePicker, Form, Input, InputNumber, Radio, Select, Switch, SwitchProps, TimePicker, Tooltip } from "antd";
 import dayjs from "dayjs";
 import ComponentChildren from "./ComponentChildren";
@@ -7,14 +7,10 @@ import NumberSlider from "./NumberSlider";
 import TextEditor from "./TextEditor";
 import PropHandleModel from "share/PropSetter/PropHandleModel";
 
-type PropType = {
-  formItemProps: any,
-  propItem: PropItem,
-  simplify: boolean
-}
 
-const FormRender: React.FC<PropType> = ({ propItem, simplify, formItemProps, ...props }) => {
+const FormRender: React.FC<PropItemViewRenderProps> = ({ propItem, simplify, formItemProps, ...props }) => {
   const propHandleModel = useModel(PropHandleModel);
+  const extraData = propItem.extraData
 
   let field = <>未知类型</>
   let initialValue = formItemProps.initialValue ? JSON.parse(formItemProps.initialValue.replace(/\n|\r/mg, '')) : undefined;
@@ -27,7 +23,7 @@ const FormRender: React.FC<PropType> = ({ propItem, simplify, formItemProps, ...
     formItemProps.valuePropName = 'checked'
     field = <SwitchPatch {...props} />
   } else if (propItem.viewType === PropItemViewType.Select) {
-    field = <Select options={propItem.optionList} {...props} />
+    field = <Select options={extraData?.optionList} {...props} />
   } else if (propItem.viewType === PropItemViewType.DatePicker) {
     field = <DatePicker {...props} />;
     initialValue = dayjs(JSON.parse(formItemProps.initialValue));
@@ -59,16 +55,16 @@ const FormRender: React.FC<PropType> = ({ propItem, simplify, formItemProps, ...
         field = <NumberSlider min={1} max={100} {...props} />;
       } else if (propItem.viewType === PropItemViewType.ButtonGroup) {
         field = <Radio.Group {...props}>
-          {propItem.optionList.map((option) => {
+          {extraData?.optionList.map((option) => {
             return <Tooltip title={option.title} key={option.value}>
               <Radio.Button value={option.value}>{option.label}</Radio.Button>
             </Tooltip>
           })}
         </Radio.Group>;
       } else if (propItem.viewType === PropItemViewType.Radio) {
-        field = <Radio.Group options={propItem.optionList} {...props} />
+        field = <Radio.Group options={extraData?.optionList} {...props} />
       } else if (propItem.viewType === PropItemViewType.Checkbox) {
-        field = <Checkbox.Group options={propItem.optionList} {...props} />
+        field = <Checkbox.Group options={extraData?.optionList} {...props} />
       } else if (propItem.viewType === PropItemViewType.Json) {
         field = <TextEditor type="json" {...props} />
       } else if (propItem.viewType === PropItemViewType.Function) {

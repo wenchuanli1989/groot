@@ -1,7 +1,6 @@
 import { APIPath, Component, ExtensionLevel, PropBlockStructType, PropGroup, PropItemPipelineParams, propAppendTask } from "@grootio/common"
 import { metadataFactory, pipelineExec, propTreeFactory } from "@grootio/core";
 import { getContext, grootManager } from "context"
-import { parseOptions } from "../util";
 
 const componentCache = new Map<number, Component>()
 
@@ -117,7 +116,11 @@ const loadComponent = (componentVersionId: number) => {
     })
 
     itemList.forEach(item => {
-      parseOptions(item);
+      try {
+        item.extraData = JSON.parse(item.extraData as any as string)
+      } catch (e) {
+        item.extraData = null
+      }
     })
 
     componentCache.set(componentVersionId, component)

@@ -32,7 +32,7 @@ export class ComponentService {
     // component.versionList = await em.find(ComponentVersion, { component });
     component.groupList = await em.find(PropGroup, { component: componentId, componentVersion: version });
     component.blockList = await em.find(PropBlock, { component: componentId, componentVersion: version });
-    component.itemList = await em.find(PropItem, { component: componentId, componentVersion: version });
+    component.itemList = await em.find(PropItem, { component: componentId, componentVersion: version }, { populate: ['extraData'] });
     component.valueList = await em.find(PropValue, { component: componentId, componentVersion: version, type: PropValueType.Prototype });
 
     return component;

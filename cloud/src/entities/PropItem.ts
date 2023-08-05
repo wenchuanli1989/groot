@@ -1,5 +1,5 @@
 import { PropItemStruct } from "@grootio/common";
-import { Entity, ManyToOne, Property } from "@mikro-orm/core";
+import { Entity, ManyToOne, OneToOne, Property } from "@mikro-orm/core";
 
 import { BaseEntity } from "./BaseEntity";
 import { Component } from "./Component";
@@ -8,6 +8,7 @@ import { PropBlock } from "./PropBlock";
 import { PropGroup } from "./PropGroup";
 import { SoftDelete } from "../config/soft-delete";
 import { Solution } from "./Solution";
+import { LargeText } from "./LargeText";
 
 @SoftDelete()
 @Entity()
@@ -75,10 +76,10 @@ export class PropItem extends BaseEntity {
   defaultValue = '';
 
   /**
-   * 类型为多选，单选，下拉框时所对应选项列表，json化存储
+   * json化存储
    */
-  @Property({ length: 200 })
-  valueOptions = '';
+  @OneToOne({ serializer: value => value?.text, serializedName: 'extraData' })
+  extraData?: LargeText;
 
   /**
    * 必要领域归属字段
@@ -90,5 +91,7 @@ export class PropItem extends BaseEntity {
   @Property({ persist: false })
   blockId?: number;
 
+  @Property({ persist: false })
+  extraDataStr?: string;
 }
 

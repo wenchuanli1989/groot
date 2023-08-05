@@ -130,7 +130,7 @@ export class ComponentInstanceService {
 
     newInstance.groupList = await em.find(PropGroup, { component: newInstance.component, componentVersion: newInstance.componentVersion });
     newInstance.blockList = await em.find(PropBlock, { component: newInstance.component, componentVersion: newInstance.componentVersion });
-    newInstance.itemList = await em.find(PropItem, { component: newInstance.component, componentVersion: newInstance.componentVersion });
+    newInstance.itemList = await em.find(PropItem, { component: newInstance.component, componentVersion: newInstance.componentVersion }, { populate: ['extraData'] });
     newInstance.valueList = await em.find(PropValue, { componentInstance: newInstance });
 
     return newInstance;

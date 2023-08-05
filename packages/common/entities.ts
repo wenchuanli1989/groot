@@ -34,12 +34,12 @@ export type PropItem = {
   childGroup?: PropGroup,
   block: PropBlock,
   defaultValue: any,
+  extraData: Record<string, any>,
 
   groupId: number,
   childGroupId?: number,
   // ************************** 分割线已下是界面属性 **************************
   highlight?: boolean,
-  optionList: PropValueOption[],
   extraUIData?: {
     type: 'BlockListPrefs',
     data?: any
@@ -50,12 +50,6 @@ export type PropItem = {
   noSetting: boolean
 } & Omit<import("../../cloud/src/entities/PropItem").PropItem, 'childGroup' | 'block' | 'defaultValue'>;
 
-export type PropValueOption = {
-  label: string,
-  value: string,
-  title?: string,
-  icon?: string
-};
 
 export type ComponentVersion = {
 

@@ -1,8 +1,8 @@
-import { APIPath, BaseModel, ComponentInstance, PropBlock, PropGroup, PropItem, PropItemStruct, PropMetadataData, PropValue, PropValueType, StudioMode, ValueStruct } from "@grootio/common";
+import { APIPath, BaseModel, ComponentInstance, PropBlock, PropGroup, PropItem, PropItemStruct, PropMetadataData, PropValue, PropValueType, StudioMode, ValueStruct, pick } from "@grootio/common";
 import { getContext, grootManager } from "context";
 import { getComponentVersionId } from "share";
 
-import { assignBaseType, autoIncrementForName, calcPropValueIdChain, stringifyOptions } from "util/index";
+import { assignBaseType, autoIncrementForName, calcPropValueIdChain } from "util/index";
 import PropHandleModel from "./PropHandleModel";
 
 /**
@@ -205,20 +205,30 @@ export default class PropPersistModel extends BaseModel {
     }
   }
 
-  public updateOrAddPropItem(item: PropItem) {
-    const itemData = Object.assign(this.currSettingPropItem, item);
+  public updateOrAddPropItem(rawFormData: PropItem) {
+    const itemFormData = pick(rawFormData, ['label', 'propKey', 'rootPropKey'])
+    Object.keys(rawFormData).forEach(key => {
+      if (!['label', 'propKey', 'rootPropKey'].includes(key)) {
+        if (!itemFormData.extraData) {
+          itemFormData.extraData = {} as any
+        }
 
-    stringifyOptions(itemData);
+        itemFormData.extraData[key] = rawFormData[key]
+      }
+    })
 
+    if (itemFormData.extraData) {
+      itemFormData.extraDataStr = JSON.stringify(itemFormData.extraData)
+    }
     this.settingModalSubmitting = true;
-    if (itemData.id) {
-      this.request(APIPath.item_update, itemData).then(({ data }) => {
+    if (this.currSettingPropItem.id) {
+      this.request(APIPath.item_update, { ...this.currSettingPropItem, ...itemFormData }).then(({ data }) => {
         const block = this.propHandle.getPropBlock(data.blockId);
         let itemIndex = block.propItemList.findIndex(item => item.id === data.id);
         // block.propItemList.splice(itemIndex, 1, propItem);
         const originItem = block.propItemList[itemIndex];
         assignBaseType(originItem, data);
-        originItem.optionList = itemData.optionList;
+        originItem.extraData = itemFormData.extraData
 
         this.currSettingPropItem = undefined;
         const instanceId = grootManager.state.getState('gs.activeComponentInstance')?.id
@@ -227,9 +237,9 @@ export default class PropPersistModel extends BaseModel {
         this.settingModalSubmitting = false;
       })
     } else {
-      this.request(APIPath.item_add, itemData).then(({ data: { newItem, childGroup, extra } }) => {
+      this.request(APIPath.item_add, { ...this.currSettingPropItem, ...itemFormData }).then(({ data: { newItem, childGroup, extra } }) => {
         newItem.valueList = [];
-        newItem.optionList = itemData.optionList;
+        newItem.extraData = itemFormData.extraData
         const block = this.propHandle.getPropBlock(newItem.blockId);
         block.propItemList.push(newItem);
         newItem.block = block;

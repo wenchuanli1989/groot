@@ -2,6 +2,7 @@ import { commandBridge, getContext, grootManager, isPrototypeMode } from "contex
 import { PropSetter } from "./PropSetter";
 import FormRender from './FormRender'
 import { ViewsContainer } from "@grootio/common";
+import SettingRender from "./SettingRender";
 
 
 export const shareBootstrap = () => {
@@ -26,22 +27,21 @@ export const shareBootstrap = () => {
   }
   getState('gs.ui.viewMap').set(propSetterView.id, propSetterView)
 
-  registerState('gs.propItem.formRenderList', [{ viewType: '*', render: FormRender }], true)
-
-  registerState('gs.propItem.viewTypeMap', new Map([
-    ['text', { label: '文本' }],
-    ['textarea', { label: '多行文本' }],
-    ['number', { label: '数字' }],
-    ['slider', { label: '滑块' }],
-    ['buttonGroup', { label: '按钮组' }],
-    ['switch', { label: '开关' }],
-    ['select', { label: '下拉框' }],
-    ['checkbox', { label: '多选' }],
-    ['radio', { label: '单选' }],
-    ['datePicker', { label: '日期' }],
-    ['timePicker', { label: '时间' }],
-    ['json', { label: 'json' }],
-    ['function', { label: '函数' }],
+  registerState('gs.propItem.type', new Map([
+    ['text', { label: '文本', viewRender: FormRender, settingRender: null, icon: null }],
+    ['textarea', { label: '多行文本', viewRender: FormRender, settingRender: null, icon: null }],
+    ['number', { label: '数字', viewRender: FormRender, settingRender: null, icon: null }],
+    ['slider', { label: '滑块', viewRender: FormRender, settingRender: null, icon: null }],
+    ['switch', { label: '开关', viewRender: FormRender, settingRender: null, icon: null }],
+    ['buttonGroup', { label: '按钮组', viewRender: FormRender, settingRender: SettingRender, icon: null }],
+    ['select', { label: '下拉框', viewRender: FormRender, settingRender: SettingRender, icon: null }],
+    ['checkbox', { label: '多选', viewRender: FormRender, settingRender: SettingRender, icon: null }],
+    ['radio', { label: '单选', viewRender: FormRender, settingRender: SettingRender, icon: null }],
+    ['datePicker', { label: '日期', viewRender: FormRender, settingRender: null, icon: null }],
+    ['timePicker', { label: '时间', viewRender: FormRender, settingRender: null, icon: null }],
+    ['json', { label: 'json', viewRender: FormRender, settingRender: null, icon: null }],
+    ['function', { label: '函数', viewRender: FormRender, settingRender: null, icon: null }],
+    ['*', { label: '未知', viewRender: () => <>暂不支持该类型</>, settingRender: null, icon: null }]
   ]), false);
 
   registerCommand('gc.removeChildInstance', (_, instanceId: number, itemId: number, abstractValueIdChain?: string) => {

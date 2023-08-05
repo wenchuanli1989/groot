@@ -1,7 +1,6 @@
-import { Form, Input, Modal, Radio, Select, Space, Switch, Typography } from "antd";
-import React, { useEffect, useState } from "react";
-import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import { PropItem, PropItemViewType, useModel } from "@grootio/common";
+import { Form, FormInstance, Input, Modal, Radio, Switch } from "antd";
+import React, { ReactElement, useEffect, useState } from "react";
+import { PropItemSettingRenderProps, PropItem, useModel, pick, getOrigin } from "@grootio/common";
 import PropPersistModel from "../PropPersistModel";
 import { propKeyRule } from "util/index";
 import { grootManager } from "context";
@@ -10,87 +9,10 @@ import { grootManager } from "context";
 const PropItemSetting: React.FC = () => {
   const propPersistModel = useModel(PropPersistModel);
 
-  const [form] = Form.useForm<PropItem>();
-  const [propTypeOptions] = useState(() => {
-    const viewTypeMap = grootManager.state.getState('gs.propItem.viewTypeMap')
-    const result = [...viewTypeMap.keys()].map((value) => ({ label: viewTypeMap.get(value).label, value }))
-    return result
-  })
-
-  const handleOk = async () => {
-    const itemFormData = await form.validateFields();
-    propPersistModel.updateOrAddPropItem(itemFormData);
-  }
-
-  const handleCancel = () => {
-    propPersistModel.currSettingPropItem = undefined;
-  }
-
-  useEffect(() => {
-    if (propPersistModel.currSettingPropItem) {
-      form.resetFields();
-      form.setFieldsValue(propPersistModel.currSettingPropItem);
-    }
-  }, [propPersistModel.currSettingPropItem]);
-
-  const renderSelectFormItem = () => {
-    return (
-      <Form.Item label="选项" >
-        <Form.List name="optionList" initialValue={[{}]} >
-          {(fields, { add, remove }) => {
-            return <>
-              {fields.map(({ key, name, ...restField }, index) => {
-                return <Space key={key} align="baseline">
-                  <Form.Item name={[name, 'label']} {...restField} rules={[{ required: true }]}>
-                    <Input placeholder="请输入名称" />
-                  </Form.Item>
-                  <Form.Item name={[name, 'value']} {...restField} rules={[{ required: true }]}>
-                    <Input placeholder="请输入数据" />
-                  </Form.Item>
-
-                  <Form.Item noStyle dependencies={['type']}>
-                    {() => {
-                      const type = form.getFieldValue('type');
-                      return type === PropItemViewType.ButtonGroup ? <Form.Item name={[name, 'title']} {...restField} >
-                        <Input placeholder="请输入描述" />
-                      </Form.Item> : null;
-                    }}
-                  </Form.Item>
-
-                  <Form.Item noStyle dependencies={['viewType']}>
-                    {() => {
-                      const viewType = form.getFieldValue('viewType');
-                      return viewType === PropItemViewType.ButtonGroup ? <Form.Item name={[name, 'icon']} {...restField} >
-                        <Input placeholder="请输入图标" />
-                      </Form.Item> : null;
-                    }}
-                  </Form.Item>
-
-                  <Typography.Link onClick={() => add({ label: '', value: '' }, index + 1)}>
-                    <PlusOutlined />
-                  </Typography.Link>
-                  <Typography.Link disabled={fields.length === 1} onClick={() => remove(name)}>
-                    <DeleteOutlined />
-                  </Typography.Link>
-                </Space>
-              })}
-            </>
-          }}
-        </Form.List>
-      </Form.Item>
-    )
-  }
-
-  return (<Modal mask={false} destroyOnClose width={600} title={propPersistModel.currSettingPropItem?.id ? '更新配置项' : '创建配置项'}
-    confirmLoading={propPersistModel.settingModalSubmitting} open={!!propPersistModel.currSettingPropItem}
-    onOk={handleOk} onCancel={handleCancel} okText={propPersistModel.currSettingPropItem?.id ? '更新' : '创建'}>
-
-    <Form form={form} colon={false} labelAlign="right" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} >
+  const defaultSettingRender = () => {
+    return (<>
       <Form.Item name="label" label="名称" rules={[{ required: true }]}>
         <Input />
-      </Form.Item>
-      <Form.Item label="类型" name="viewType" rules={[{ required: true }]} initialValue="text">
-        <Select options={propTypeOptions} />
       </Form.Item>
 
       <Form.Item label="属性名" rules={[{ required: true }, { pattern: propKeyRule, message: '格式错误，必须是标准js标识符' }]} name="propKey">
@@ -110,16 +32,127 @@ const PropItemSetting: React.FC = () => {
           </Form.Item>)
       }
 
+    </>)
+  }
 
-      <Form.Item dependencies={['viewType']} noStyle >
-        {({ getFieldValue }) => {
-          const viewType = getFieldValue('viewType');
-          const hasOption = ([PropItemViewType.Select, PropItemViewType.Radio, PropItemViewType.Checkbox, PropItemViewType.ButtonGroup] as string[]).includes(viewType);
+  if (!propPersistModel.currSettingPropItem) return null
 
-          return hasOption ? renderSelectFormItem() : null
-        }}
-      </Form.Item>
-    </Form>
+  if (!propPersistModel.currSettingPropItem.id) {
+    return <CreatePropItemSetting defaultSettingRender={defaultSettingRender()} />
+  } else {
+    return <UpdatePropItemSetting defaultSettingRender={defaultSettingRender()} />
+  }
+}
+
+const CreatePropItemSetting: React.FC<{ defaultSettingRender: ReactElement }> = ({ defaultSettingRender }) => {
+  const [form] = Form.useForm<PropItem>();
+  const propPersistModel = useModel(PropPersistModel);
+  const [viewTypeMap] = grootManager.state.useStateByName('gs.propItem.type')
+  const [SettingRender, setSettingRender] = useState<React.FC<PropItemSettingRenderProps>>()
+  const [showSelectType, setShowSelectType] = useState(true)
+
+  const handleOk = async () => {
+    if (!showSelectType) {
+      const rawFormData = await form.validateFields();
+      propPersistModel.updateOrAddPropItem(rawFormData);
+    } else {
+      setShowSelectType(false)
+    }
+  }
+
+  const handleCancel = () => {
+    if (showSelectType) {
+      setShowSelectType(false)
+      propPersistModel.currSettingPropItem = undefined;
+    } else {
+      setShowSelectType(true)
+    }
+  }
+
+  const createProps = () => {
+    const props = {
+      title: '',
+      okText: '',
+      cancelText: '',
+      confirmLoading: propPersistModel.settingModalSubmitting,
+      children: null
+    }
+
+    if (showSelectType) {
+      props.title = '选择类型'
+      props.okText = '下一步'
+      props.cancelText = '取消'
+
+      props.children = (<div style={{ display: 'flex', gap: '10px' }}>
+        {[...viewTypeMap.keys()].filter(key => key !== '*').map(viewTypeKey => {
+          const item = viewTypeMap.get(viewTypeKey)
+
+          return <div key={viewTypeKey} onClick={() => {
+            setSettingRender(() => {
+              propPersistModel.currSettingPropItem.viewType = viewTypeKey
+              if (item.settingRender) {
+                return item.settingRender
+              } else {
+                return () => <Form form={form} colon={false} labelAlign="right" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>{defaultSettingRender}</Form>
+              }
+            })
+          }}>{item.label}</div>
+        })}
+      </div>)
+    } else {
+      props.title = '创建配置项'
+      props.okText = '创建'
+      props.cancelText = '上一步'
+      props.children = <SettingRender propItem={propPersistModel.currSettingPropItem} form={form} simplify={false} defaultRender={defaultSettingRender} type='create' />
+    }
+
+    return props;
+  }
+
+  const modalProps = createProps()
+
+  return (<Modal mask={false} destroyOnClose width={600} title={modalProps.title}
+    confirmLoading={modalProps.confirmLoading} cancelText={modalProps.cancelText} open
+    onOk={handleOk} onCancel={handleCancel} okText={modalProps.okText} >
+    {modalProps.children}
+  </Modal>)
+}
+
+const UpdatePropItemSetting: React.FC<{ defaultSettingRender: ReactElement }> = ({ defaultSettingRender }) => {
+  const [form] = Form.useForm<PropItem>();
+  const propPersistModel = useModel(PropPersistModel);
+  const [settingRender] = useState<ReactElement>(() => {
+    const viewTypeMap = grootManager.state.getState('gs.propItem.type')
+    const viewType = propPersistModel.currSettingPropItem.viewType
+    const Render = viewTypeMap.get(viewType)?.settingRender || viewTypeMap.get('*')?.settingRender
+
+    if (!Render) {
+      return <Form form={form} colon={false} labelAlign="right" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>{defaultSettingRender}</Form>
+    }
+
+    return <Render defaultRender={defaultSettingRender} type="update" form={form} propItem={propPersistModel.currSettingPropItem} simplify={false} />
+  })
+
+  useEffect(() => {
+    form.setFieldsValue(propPersistModel.currSettingPropItem)
+    if (propPersistModel.currSettingPropItem.extraData) {
+      form.setFieldsValue(propPersistModel.currSettingPropItem.extraData)
+    }
+  }, [])
+
+  const handleOk = async () => {
+    const rawFormData = await form.validateFields();
+    propPersistModel.updateOrAddPropItem(rawFormData);
+  }
+
+  const handleCancel = () => {
+    propPersistModel.currSettingPropItem = undefined;
+  }
+
+  return (<Modal mask={false} destroyOnClose width={600} title="更新配置项"
+    confirmLoading={propPersistModel.settingModalSubmitting} open
+    onOk={handleOk} onCancel={handleCancel} okText="更新" >
+    {settingRender}
   </Modal>)
 }
 

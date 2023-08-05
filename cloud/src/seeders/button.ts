@@ -19,6 +19,7 @@ import { Application } from "../entities/Application";
 import { SolutionInstance } from "../entities/SolutionInstance";
 import { ViewVersion } from "../entities/ViewVersion";
 import { AppView } from "../entities/AppView";
+import { LargeText } from "../entities/LargeText";
 
 export const create = async (em: EntityManager, solution: Solution, release: Release, project: Project, app: Application) => {
   // 创建组件
@@ -76,12 +77,17 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
     solution
   });
 
+  const extraData1 = em.create(LargeText, {
+    text: '{"optionList": [{"label": "主要","value": "primary"},{"label": "默认","value": "default"},{"label": "幽灵","value": "dashed"},{"label": "链接","value": "link"}]}'
+  })
+  await em.persistAndFlush(extraData1)
+
   const btnItem2 = em.create(PropItem, {
     label: '按钮类型',
     propKey: 'type',
     viewType: PropItemViewType.ButtonGroup,
     defaultValue: '"primary"',
-    valueOptions: '[{"label": "主要","value": "primary"},{"label": "默认","value": "default"},{"label": "幽灵","value": "dashed"},{"label": "链接","value": "link"}]',
+    extraData: extraData1,
     block: btnBlock,
     group: btnGroup,
     componentVersion: btnComponentVersion,

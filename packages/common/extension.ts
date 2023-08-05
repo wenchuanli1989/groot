@@ -203,9 +203,7 @@ export type GrootStateDict = {
   'gs.stage.playgroundPath': [string, false],
   'gs.stage.debugBaseUrl': [string, false],
 
-  'gs.propItem.viewTypeMap': [Map<string, { label: string }>, false],
-  'gs.propItem.formRenderList': [{ viewType: string, render: React.FC<FormItemRender> }, true],
-  'gs.propItem.settingRenderList': [{ viewType: string, render: React.FC<FormItemRender> }, true],
+  'gs.propItem.type': [Map<string, { label: string, viewRender: React.FC<PropItemViewRenderProps>, settingRender: React.FC<PropItemSettingRenderProps>, icon: ReactElement }>, false],
   'gs.propSetting.breadcrumbList': [{ id: number, name: string }, true],
 }
 
@@ -410,10 +408,18 @@ interface GetPipeline {
   (type: 'propItem' | 'resource', level: ExtensionLevel.Solution, viewId: number, solutionId?: number): ExtScriptModule[];
 }
 
-export type FormItemRender = {
+export type PropItemViewRenderProps = {
   propItem: PropItem,
   simplify: boolean,
   formItemProps: any
+}
+
+export type PropItemSettingRenderProps = {
+  type: 'create' | 'update',
+  propItem: PropItem,
+  simplify: boolean,
+  defaultRender: ReactElement,
+  form: any;
 }
 
 export type PropItemPipelineParams = {
