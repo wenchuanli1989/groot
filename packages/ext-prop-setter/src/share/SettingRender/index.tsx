@@ -4,7 +4,6 @@ import { Form, Input, Space, Typography } from "antd";
 
 const SettingRender: React.FC<PropItemSettingRenderProps> = ({ propItem, defaultRender, form }) => {
 
-  debugger
   if (![PropItemViewType.Select, PropItemViewType.ButtonGroup, PropItemViewType.Checkbox, PropItemViewType.Radio].includes(propItem.viewType as PropItemViewType)) {
     return (<>类型异常</>)
   }

@@ -78,7 +78,7 @@ export class PropItem extends BaseEntity {
   /**
    * json化存储
    */
-  @OneToOne({ serializer: value => value?.text, serializedName: 'extraData' })
+  @OneToOne({ serializer: value => value?.text, serializedName: 'extraDataStr' })
   extraData?: LargeText;
 
   /**

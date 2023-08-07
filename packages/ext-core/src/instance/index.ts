@@ -126,7 +126,7 @@ const createFullMetadata = (viewId: number) => {
 
       itemList.forEach(item => {
         try {
-          item.extraData = JSON.parse(item.extraData as any as string)
+          item.extraData = JSON.parse(item.extraDataStr)
         } catch (e) {
           item.extraData = null
         }

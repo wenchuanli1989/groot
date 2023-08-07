@@ -1,9 +1,11 @@
-import { Form, FormInstance, Input, Modal, Radio, Switch } from "antd";
-import React, { ReactElement, useEffect, useState } from "react";
-import { PropItemSettingRenderProps, PropItem, useModel, pick, getOrigin } from "@grootio/common";
+import { Form, Input, Modal, Radio, Switch } from "antd";
+import React, { ReactElement, useEffect, useMemo, useState } from "react";
+import { PropItemSettingRenderProps, PropItem, useModel } from "@grootio/common";
 import PropPersistModel from "../PropPersistModel";
 import { propKeyRule } from "util/index";
 import { grootManager } from "context";
+
+import styles from './index.module.less'
 
 
 const PropItemSetting: React.FC = () => {
@@ -48,6 +50,7 @@ const CreatePropItemSetting: React.FC<{ defaultSettingRender: ReactElement }> = 
   const [form] = Form.useForm<PropItem>();
   const propPersistModel = useModel(PropPersistModel);
   const [viewTypeMap] = grootManager.state.useStateByName('gs.propItem.type')
+  const [selectType, setSelectType] = useState<string>()
   const [SettingRender, setSettingRender] = useState<React.FC<PropItemSettingRenderProps>>()
   const [showSelectType, setShowSelectType] = useState(true)
 
@@ -56,13 +59,21 @@ const CreatePropItemSetting: React.FC<{ defaultSettingRender: ReactElement }> = 
       const rawFormData = await form.validateFields();
       propPersistModel.updateOrAddPropItem(rawFormData);
     } else {
+      propPersistModel.currSettingPropItem.viewType = selectType
       setShowSelectType(false)
+      form.setFieldsValue(propPersistModel.currSettingPropItem)
+      if (propPersistModel.currSettingPropItem.extraData) {
+        form.setFieldsValue(propPersistModel.currSettingPropItem.extraData)
+      }
     }
   }
 
   const handleCancel = () => {
+    propPersistModel.currSettingPropItem = undefined;
+  }
+
+  const cancelBtnClick = () => {
     if (showSelectType) {
-      setShowSelectType(false)
       propPersistModel.currSettingPropItem = undefined;
     } else {
       setShowSelectType(true)
@@ -83,13 +94,13 @@ const CreatePropItemSetting: React.FC<{ defaultSettingRender: ReactElement }> = 
       props.okText = '下一步'
       props.cancelText = '取消'
 
-      props.children = (<div style={{ display: 'flex', gap: '10px' }}>
+      props.children = (<div className={styles.viewTypeContainer}>
         {[...viewTypeMap.keys()].filter(key => key !== '*').map(viewTypeKey => {
           const item = viewTypeMap.get(viewTypeKey)
 
-          return <div key={viewTypeKey} onClick={() => {
+          return <div className={`${styles.viewType} ${selectType === viewTypeKey ? styles.viewTypeActive : ''}`} key={viewTypeKey} onClick={() => {
+            setSelectType(viewTypeKey)
             setSettingRender(() => {
-              propPersistModel.currSettingPropItem.viewType = viewTypeKey
               if (item.settingRender) {
                 return item.settingRender
               } else {
@@ -113,7 +124,7 @@ const CreatePropItemSetting: React.FC<{ defaultSettingRender: ReactElement }> = 
 
   return (<Modal mask={false} destroyOnClose width={600} title={modalProps.title}
     confirmLoading={modalProps.confirmLoading} cancelText={modalProps.cancelText} open
-    onOk={handleOk} onCancel={handleCancel} okText={modalProps.okText} >
+    onOk={handleOk} onCancel={handleCancel} okText={modalProps.okText} cancelButtonProps={{ onClick: cancelBtnClick }} >
     {modalProps.children}
   </Modal>)
 }
@@ -121,17 +132,17 @@ const CreatePropItemSetting: React.FC<{ defaultSettingRender: ReactElement }> = 
 const UpdatePropItemSetting: React.FC<{ defaultSettingRender: ReactElement }> = ({ defaultSettingRender }) => {
   const [form] = Form.useForm<PropItem>();
   const propPersistModel = useModel(PropPersistModel);
-  const [settingRender] = useState<ReactElement>(() => {
+  const settingRender = useMemo<ReactElement>(() => {
     const viewTypeMap = grootManager.state.getState('gs.propItem.type')
     const viewType = propPersistModel.currSettingPropItem.viewType
-    const Render = viewTypeMap.get(viewType)?.settingRender || viewTypeMap.get('*')?.settingRender
+    const SettingRender = viewTypeMap.get(viewType)?.settingRender || viewTypeMap.get('*')?.settingRender
 
-    if (!Render) {
+    if (!SettingRender) {
       return <Form form={form} colon={false} labelAlign="right" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>{defaultSettingRender}</Form>
     }
 
-    return <Render defaultRender={defaultSettingRender} type="update" form={form} propItem={propPersistModel.currSettingPropItem} simplify={false} />
-  })
+    return <SettingRender defaultRender={defaultSettingRender} type="update" form={form} propItem={propPersistModel.currSettingPropItem} simplify={false} />
+  }, [])
 
   useEffect(() => {
     form.setFieldsValue(propPersistModel.currSettingPropItem)

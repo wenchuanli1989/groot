@@ -61,6 +61,15 @@ const createFullMetadata = (component: Component) => {
         group.expandBlockIdList = group.propBlockList.map(block => block.id);
       }
     })
+
+    itemList.forEach(item => {
+      try {
+        item.extraData = JSON.parse(item.extraDataStr)
+      } catch (e) {
+        item.extraData = null
+      }
+    })
+
     component.propTree = propTree;
   }
 
