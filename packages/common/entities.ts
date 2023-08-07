@@ -115,6 +115,7 @@ export type Resource = {
 
 
 export type ResourceConfig = {
+  value: Record<string, any>,
 
   // ************************** 分割线已下是界面属性 **************************
 } & Omit<import("../../cloud/src/entities/ResourceConfig").ResourceConfig, ''>;

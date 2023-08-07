@@ -256,9 +256,15 @@ export class DatabaseSeeder extends Seeder {
     });
     await em.persistAndFlush(extCoreReleaseInstance);
 
+    const resourceConfigValue = em.create(LargeText, {
+      text: 'http://groot-local.com:10000/workbench/resource-demo'
+    })
+
+    await em.persistAndFlush(resourceConfigValue)
+
     const resourceConfig = em.create(ResourceConfig, {
       name: '数据库连接',
-      value: 'http://groot-local.com:10000/workbench/resource-demo',
+      value: resourceConfigValue,
       type: 'mysql',
       project
     })

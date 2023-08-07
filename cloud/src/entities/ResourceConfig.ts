@@ -1,7 +1,8 @@
-import { Entity, ManyToOne, Property } from "@mikro-orm/core";
+import { Entity, ManyToOne, OneToOne, Property } from "@mikro-orm/core";
 import { BaseEntity } from "./BaseEntity";
 import { SoftDelete } from "../config/soft-delete";
 import { Project } from "./Project";
+import { LargeText } from "./LargeText";
 
 @SoftDelete()
 @Entity()
@@ -9,8 +10,8 @@ export class ResourceConfig extends BaseEntity {
   @Property({ length: 20 })
   name: string;
 
-  @Property({ length: 1000 })
-  value: string;
+  @OneToOne({ serializer: value => value?.text, serializedName: 'valueStr' })
+  value?: LargeText;
 
   @Property({ length: 20 })
   type: string;

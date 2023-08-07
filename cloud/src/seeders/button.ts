@@ -176,11 +176,15 @@ export const create = async (em: EntityManager, solution: Solution, release: Rel
   btnComponentInstance.trackId = btnComponentInstance.id;
   await em.persistAndFlush(btnComponentInstance);
 
+  const resourceConfigValue = em.create(LargeText, {
+    text: 'http://groot-local.com:10000/workbench/resource-demo'
+  })
 
+  await em.persistAndFlush(resourceConfigValue)
 
   const resourceConfig = em.create(ResourceConfig, {
     name: 'aaa',
-    value: 'http://groot-local.com:10000/workbench/resource-demo',
+    value: resourceConfigValue,
     type: 'www',
     project
   })
