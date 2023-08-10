@@ -204,7 +204,7 @@ export type GrootStateDict = {
   'gs.stage.debugBaseUrl': [string, false],
 
   'gs.propItem.type': [Map<string, { label: string, viewRender: React.FC<PropItemViewRenderProps>, settingRender: React.FC<PropItemSettingRenderProps>, icon: ReactElement }>, false],
-  'gs.propSetting.breadcrumbList': [{ id: number, name: string }, true],
+  'gs.propSetter.breadcrumbList': [{ id: number, name: string }, true],
 }
 
 export type GrootHookDict = {

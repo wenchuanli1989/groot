@@ -8,7 +8,7 @@ export const instanceBootstrap = () => {
   const { registerCommand, executeCommand } = grootManager.command;
   const { callHook } = grootManager.hook;
 
-  registerState('gs.propSetting.breadcrumbList', [], true)
+  registerState('gs.propSetter.breadcrumbList', [], true)
 
   registerCommand('gc.pushMetadata', (_, instanceId) => {
     const viewId = grootManager.state.getState('gs.view').id
@@ -44,7 +44,7 @@ const updateBreadcrumbList = (newInstance: ComponentInstance) => {
   const { getState } = grootManager.state
   const { root, children } = getState('gs.view')
   const list = [root, ...children]
-  const breadcrumbList = grootManager.state.getState('gs.propSetting.breadcrumbList')
+  const breadcrumbList = grootManager.state.getState('gs.propSetter.breadcrumbList')
   breadcrumbList.length = 0;
 
   let ctxInstance = newInstance;

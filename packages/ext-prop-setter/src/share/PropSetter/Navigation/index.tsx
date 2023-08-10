@@ -10,7 +10,7 @@ export const Navigation = () => {
   const { callHook } = grootManager.hook
   const { executeCommand } = grootManager.command
 
-  const [breadcrumbList] = useStateByName('gs.propSetting.breadcrumbList', []);
+  const [breadcrumbList] = useStateByName('gs.propSetter.breadcrumbList', []);
 
   return <div className={styles.container}>
     <Breadcrumb separator=">" items={
