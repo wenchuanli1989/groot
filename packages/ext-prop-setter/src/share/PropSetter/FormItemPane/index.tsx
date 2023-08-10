@@ -9,7 +9,7 @@ type PropsType = {
   simplify: boolean,
   formItemProps: FormItemProps
 }
-const FormItemView: React.FC<PropsType> = ({ propItem, simplify, formItemProps }) => {
+const FormItemPane: React.FC<PropsType> = ({ propItem, simplify, formItemProps }) => {
 
   // 缓存组件避免重新渲染导致组件销毁重建
   const View = useMemo(() => {
@@ -23,4 +23,4 @@ const FormItemView: React.FC<PropsType> = ({ propItem, simplify, formItemProps }
   return <View propItem={propItem} simplify={simplify} formItemProps={formItemProps} />
 }
 
-export default FormItemView;
+export default FormItemPane;

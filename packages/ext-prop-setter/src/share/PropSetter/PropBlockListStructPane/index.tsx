@@ -8,7 +8,7 @@ import styles from './index.module.less';
 import PropHandleModel from "../PropHandleModel";
 import PropPersistModel from "../PropPersistModel";
 import { grootManager, isPrototypeMode } from "context";
-import FormItemView from "../FormItemView";
+import FormItemPane from "../FormItemPane";
 
 type PropsType = {
   block: PropBlock
@@ -69,7 +69,7 @@ const PropBlockListStructPane: React.FC<PropsType> = ({ block: propBlock }) => {
       width: '',
       render: (_, record) => {
 
-        return <FormItemView propItem={propItem} simplify formItemProps={{
+        return <FormItemPane propItem={propItem} simplify formItemProps={{
           name: `propItemId_${propItem.id}_abstractValueId_${record.abstractValueId}`,
           preserve: false,
           initialValue: getInitValue(propItem, record.abstractValueId)

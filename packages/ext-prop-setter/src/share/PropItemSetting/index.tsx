@@ -2,7 +2,7 @@ import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { PropItemSettingRenderProps, PropItemViewType } from "@grootio/common";
 import { Form, Input, Space, Typography } from "antd";
 
-const SettingRender: React.FC<PropItemSettingRenderProps> = ({ propItem, defaultRender, form }) => {
+const PropItemSetting: React.FC<PropItemSettingRenderProps> = ({ propItem, defaultRender, form }) => {
 
   if (![PropItemViewType.Select, PropItemViewType.ButtonGroup, PropItemViewType.Checkbox, PropItemViewType.Radio].includes(propItem.viewType as PropItemViewType)) {
     return (<>类型异常</>)
@@ -57,4 +57,4 @@ const SettingRender: React.FC<PropItemSettingRenderProps> = ({ propItem, default
   )
 }
 
-export default SettingRender;
+export default PropItemSetting;

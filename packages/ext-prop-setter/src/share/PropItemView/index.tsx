@@ -8,7 +8,7 @@ import TextEditor from "./TextEditor";
 import PropHandleModel from "share/PropSetter/PropHandleModel";
 
 
-const FormRender: React.FC<PropItemViewRenderProps> = ({ propItem, simplify, formItemProps, ...props }) => {
+const PropItemView: React.FC<PropItemViewRenderProps> = ({ propItem, simplify, formItemProps, ...props }) => {
   const propHandleModel = useModel(PropHandleModel);
   const extraData = propItem.extraData
 
@@ -83,4 +83,4 @@ const SwitchPatch: React.FC<SwitchProps & React.RefAttributes<HTMLElement> | { o
   }} {...params} />
 }
 
-export default FormRender
+export default PropItemView
