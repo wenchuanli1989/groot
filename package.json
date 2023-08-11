@@ -10,6 +10,14 @@
     "packages/react"
   ],
   "scripts": {
+    "groot:examples": "cd ./examples/webpack-demo && npm start",
+    "groot:pangu": "cd ./pangu && npm start",
+    "groot:studio": "cd ./packages/studio && npm start",
+    "groot:core": "cd ./packages/ext-core && npm start",
+    "groot:web-visual": "cd ./packages/ext-web-visual && npm start",
+    "groot:prop-setter": "cd ./packages/ext-prop-setter && npm start",
+    "groot:work-area": "cd ./packages/ext-work-area && npm start",
+    "groot": "npm-run-all --parallel groot:**",
     "code-stat": "cloc --exclude-dir='node_modules,examples' --include-ext='ts,tsx' ."
   },
   "lint-staged": {
@@ -30,6 +38,7 @@
     "eslint": "8.36.0",
     "eslint-config-prettier": "8.7.0",
     "lint-staged": "13.2.0",
+    "npm-run-all": "4.1.5",
     "prettier": "2.8.4",
     "typescript": "5.0.2"
   }
