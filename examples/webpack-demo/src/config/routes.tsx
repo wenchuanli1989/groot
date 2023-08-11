@@ -1,10 +1,12 @@
-import Demo from "pages/Demo";
-import Home from "pages/Home";
 import Layout from "./Layout";
+import { lazy } from 'react';
+
+const Home = lazy(() => import('../pages/Home').then(pkg => ({ default: pkg.default })))
+const Demo = lazy(() => import('../pages/Demo').then(pkg => ({ default: pkg.default })))
 
 const routes = [
   {
-    path: '/',
+    path: '/home',
     element: <Home />,
   },
   {

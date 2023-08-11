@@ -1,11 +1,8 @@
 import { useRoutes } from 'react-router-dom';
 import routes from './config/routes';
-import { Avatar, Button, Input, Select } from 'antd';
-import { ProTable } from '@ant-design/pro-table';
 import react from 'react';
-import Profile from 'components/Profile';
-import { DateFormItem, EmailFormItem, FormContainer, InputFormItem, MultiDetailFormItem, PhoneFormItem, SelectFormItem } from 'components/FormComponent';
 import { UIManager } from '@grootio/react';
+import { lazy } from 'react';
 
 
 function App() {
@@ -13,6 +10,7 @@ function App() {
 
   return element;
 }
+
 
 // todo ... 解决modules强引用导致初始包过大问题
 UIManager.init({
@@ -24,23 +22,23 @@ UIManager.init({
   modules: {
     react,
     antd: {
-      Button,
-      Input,
-      Select,
-      Avatar
+      Button: lazy(() => import('antd').then(pkg => ({ default: pkg.Button }))),
+      Input: lazy(() => import('antd').then(pkg => ({ default: pkg.Input }))),
+      Select: lazy(() => import('antd').then(pkg => ({ default: pkg.Select }))),
+      Avatar: lazy(() => import('antd').then(pkg => ({ default: pkg.Avatar }))),
     },
     '@ant-design/pro-table': {
-      ProTable
+      ProTable: lazy(() => import('@ant-design/pro-table').then(pkg => ({ default: pkg.ProTable })))
     },
     app: {
-      Profile,
-      FormContainer,
-      InputFormItem,
-      SelectFormItem,
-      DateFormItem,
-      PhoneFormItem,
-      EmailFormItem,
-      MultiDetailFormItem
+      Profile: lazy(() => import('./components/Profile').then(pkg => ({ default: pkg.default }))),
+      FormContainer: lazy(() => import('./components/FormComponent').then(pkg => ({ default: pkg.FormContainer }))),
+      InputFormItem: lazy(() => import('./components/FormComponent').then(pkg => ({ default: pkg.InputFormItem }))),
+      SelectFormItem: lazy(() => import('./components/FormComponent').then(pkg => ({ default: pkg.SelectFormItem }))),
+      DateFormItem: lazy(() => import('./components/FormComponent').then(pkg => ({ default: pkg.DateFormItem }))),
+      PhoneFormItem: lazy(() => import('./components/FormComponent').then(pkg => ({ default: pkg.PhoneFormItem }))),
+      EmailFormItem: lazy(() => import('./components/FormComponent').then(pkg => ({ default: pkg.EmailFormItem }))),
+      MultiDetailFormItem: lazy(() => import('./components/FormComponent').then(pkg => ({ default: pkg.MultiDetailFormItem }))),
     },
   }
 });
