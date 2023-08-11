@@ -1,7 +1,7 @@
 import { pick } from '@grootio/common';
 import { RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/logic.exception';
 import { AppResource } from 'entities/AppResource';
 import { Application } from 'entities/Application';
 import { ViewResource } from 'entities/ViewResource';

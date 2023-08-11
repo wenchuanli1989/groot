@@ -2,7 +2,7 @@ import { RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { pick, ExtensionRelationType } from '@grootio/common';
 
-import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/logic.exception';
 import { Release } from 'entities/Release';
 import { ComponentInstanceService } from './component-instance.service';
 import { PropValueService } from './prop-value.service';

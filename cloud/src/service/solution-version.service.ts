@@ -1,7 +1,7 @@
 import { ExtensionRelationType, pick } from '@grootio/common';
 import { RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/logic.exception';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
 import { SolutionComponent } from 'entities/SolutionComponent';
 import { SolutionVersion } from 'entities/SolutionVersion';

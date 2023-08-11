@@ -2,7 +2,7 @@ import { pick, PropValueType } from '@grootio/common';
 import { EntityManager, RequestContext, wrap } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 
-import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/logic.exception';
 import { Component } from 'entities/Component';
 import { ComponentVersion } from 'entities/ComponentVersion';
 import { PropBlock } from 'entities/PropBlock';

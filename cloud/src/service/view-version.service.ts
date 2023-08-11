@@ -1,7 +1,7 @@
 import { ExtensionRelationType, PropMetadataData, PropValueType, ValueStruct, pick } from '@grootio/common';
 import { RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/logic.exception';
 import { ComponentInstance } from 'entities/ComponentInstance';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
 import { PropValue } from 'entities/PropValue';

@@ -1,7 +1,7 @@
 import { ExtensionRelationType, pick } from '@grootio/common';
 import { RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/logic.exception';
 import { ComponentInstance } from 'entities/ComponentInstance';
 import { ExtensionInstance } from 'entities/ExtensionInstance';
 import { PropBlock } from 'entities/PropBlock';
@@ -16,7 +16,6 @@ import { View } from 'entities/View';
 import { parseResource } from '../util/common';
 import { SolutionComponent } from 'entities/SolutionComponent';
 import { ViewVersion } from 'entities/ViewVersion';
-import { Application } from 'entities/Application';
 import { AppView } from 'entities/AppView';
 
 

@@ -1,6 +1,6 @@
 import { EntityManager, RequestContext } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/logic.exception';
 import { ComponentVersion } from 'entities/ComponentVersion';
 import { SolutionComponent } from 'entities/SolutionComponent';
 import { SolutionVersion } from 'entities/SolutionVersion';

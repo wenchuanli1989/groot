@@ -9,7 +9,7 @@ import { Injectable } from '@nestjs/common';
 import { propTreeFactory, metadataFactory, pipelineExec } from '@grootio/core';
 
 
-import { LogicException, LogicExceptionCode } from 'config/Logic.exception';
+import { LogicException, LogicExceptionCode } from 'config/logic.exception';
 import { Application } from 'entities/Application';
 import { ComponentInstance } from 'entities/ComponentInstance';
 import { Release } from 'entities/Release';
